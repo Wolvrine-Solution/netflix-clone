@@ -11,7 +11,13 @@ const PORT = process.env['PORT'] ?? 4000
 app.use(helmet())
 app.use(
   cors({
-    origin: [process.env['NEXTAUTH_URL'] ?? 'http://localhost:3000', 'http://localhost:3001'],
+    origin: [
+      process.env['NEXTAUTH_URL'] ?? 'http://localhost:3000',
+      'http://localhost:3001',
+      // Allow React Native metro bundler origins
+      'http://localhost:8081',
+      'http://localhost:19006',
+    ],
     credentials: true,
   })
 )
