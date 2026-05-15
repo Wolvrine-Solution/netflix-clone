@@ -1,0 +1,184 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String        @id @default(cuid())
+  email          String        @unique
+  emailVerified  DateTime?
+  name           String?
+  image          String?
+  hashedPassword String?
+  role           Role          @default(USER)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  accounts       Account[]
+  sessions       Session[]
+  profiles       Profile[]
+  subscription   Subscription?
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Profile {
+  id           String         @id @default(cuid())
+  name         String
+  avatarUrl    String
+  isKid        Boolean        @default(false)
+  userId       String
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  myList       MyListItem[]
+  watchHistory WatchHistory[]
+
+  @@unique([userId, name])
+}
+
+model Subscription {
+  id               String          @id @default(cuid())
+  userId           String          @unique
+  plan             Plan            @default(STANDARD)
+  status           SubStatus       @default(ACTIVE)
+  stripeCustomerId String?         @unique
+  stripePriceId    String?
+  currentPeriodEnd DateTime?
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Plan {
+  BASIC
+  STANDARD
+  PREMIUM
+}
+
+enum SubStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+}
+
+model Content {
+  id             String         @id @default(cuid())
+  tmdbId         Int            @unique
+  mediaType      MediaType
+  title          String
+  description    String         @db.Text
+  posterPath     String
+  backdropPath   String
+  trailerKey     String?
+  releaseDate    String
+  rating         Float
+  runtime        Int?
+  seasons        Int?
+  episodes       Int?
+  maturityRating String         @default("TV-MA")
+  isFeatured     Boolean        @default(false)
+  genres         ContentGenre[]
+  myListItems    MyListItem[]
+  watchHistory   WatchHistory[]
+  rowItems       ContentRow[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+enum MediaType {
+  movie
+  tv
+}
+
+model Genre {
+  id       Int            @id
+  name     String         @unique
+  contents ContentGenre[]
+}
+
+model ContentGenre {
+  contentId String
+  genreId   Int
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  genre     Genre   @relation(fields: [genreId], references: [id])
+
+  @@id([contentId, genreId])
+}
+
+model Row {
+  id       String       @id @default(cuid())
+  title    String
+  query    String
+  order    Int
+  contents ContentRow[]
+}
+
+model ContentRow {
+  contentId String
+  rowId     String
+  order     Int
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  row       Row     @relation(fields: [rowId], references: [id], onDelete: Cascade)
+
+  @@id([contentId, rowId])
+}
+
+model MyListItem {
+  id        String   @id @default(cuid())
+  profileId String
+  contentId String
+  addedAt   DateTime @default(now())
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  content   Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, contentId])
+}
+
+model WatchHistory {
+  id        String   @id @default(cuid())
+  profileId String
+  contentId String
+  progress  Float    @default(0)
+  updatedAt DateTime @updatedAt
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  content   Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, contentId])
+}

@@ -1,0 +1,9 @@
+{
+  "extends": "../config/typescript/base.json",
+  "include": ["src"],
+  "compilerOptions": {
+    "outDir": "dist",
+    "lib": ["ES2022"],
+    "types": ["node"]
+  }
+}

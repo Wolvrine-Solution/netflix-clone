@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-netflix-black text-white font-netflix;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-netflix-black;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-netflix-medium-gray rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-netflix-light-gray;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .netflix-gradient-bottom {
+    background: linear-gradient(to top, #141414 0%, transparent 100%);
+  }
+
+  .netflix-gradient-right {
+    background: linear-gradient(to left, #141414 0%, transparent 100%);
+  }
+}
+
+/* video.js overrides */
+.vjs-netflix-skin {
+  @apply w-full h-full;
+}
+
+.vjs-netflix-skin .vjs-control-bar {
+  display: none !important;
+}
