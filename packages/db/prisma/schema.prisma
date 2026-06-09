@@ -347,6 +347,8 @@ enum NotificationType {
   SUBSCRIPTION
   SYSTEM
   GENERAL
+  PROMO
+  ACCOUNT
 }
 
 // ─────────────────────────────── ADMIN AUDIT LOG ─────────────────────────────

@@ -41,13 +41,16 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
     backdropPath: content.backdropPath,
     releaseDate: content.releaseDate,
     rating: content.rating,
-    mediaType: content.mediaType,
+    mediaType: content.mediaType as 'movie' | 'tv',
     maturityRating: content.maturityRating,
     trailerKey: content.trailerKey ?? undefined,
     isFeatured: content.isFeatured,
     genres: content.genres.map((cg) => ({ id: cg.genre.id, name: cg.genre.name })),
     runtime: content.runtime ?? undefined,
     seasons: content.contentSeasons.length > 0 ? content.contentSeasons.length : (content.seasons ?? undefined),
+    status: content.status as import('@netflix/types').ContentStatus,
+    language: content.language,
+    cast: content.cast,
   }
 
   let videoUrl: string | null = content.videoUrl ?? null

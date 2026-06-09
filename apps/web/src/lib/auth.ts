@@ -1,4 +1,5 @@
 import NextAuth from 'next-auth'
+import { encode } from 'next-auth/jwt'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
@@ -45,6 +46,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async session({ session, token }) {
       if (token['userId']) session.user.id = token['userId'] as string
+      ;(session as { accessToken?: string }).accessToken = await encode({
+        token,
+        secret: process.env['NEXTAUTH_SECRET'] ?? '',
+      })
       return session
     },
   },

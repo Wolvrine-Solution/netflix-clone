@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { FiPlus, FiEdit2, FiTrash2, FiCheck, FiX } from 'react-icons/fi'
 
-interface Genre { id: number; name: string; _count?: { genres: number } }
+interface Genre { id: number; name: string; _count?: { contents: number } }
 
 export default function GenresPage() {
   const { data: session } = useSession()
@@ -119,7 +119,7 @@ export default function GenresPage() {
                   <>
                     <span className="flex-1 font-medium">{g.name}</span>
                     {g._count !== undefined && (
-                      <span className="text-xs text-gray-500">{g._count.genres} items</span>
+                      <span className="text-xs text-gray-500">{g._count.contents} items</span>
                     )}
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
                       <button

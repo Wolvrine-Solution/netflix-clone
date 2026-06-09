@@ -9,12 +9,15 @@ async function getMovies() {
     orderBy: { rating: 'desc' },
   })
   return contents.map((c): ContentItem => ({
-    id: c.id, tmdbId: c.tmdbId, title: c.title, description: c.description,
+    id: c.id, tmdbId: c.tmdbId ?? undefined, title: c.title, description: c.description,
     posterPath: c.posterPath, backdropPath: c.backdropPath, releaseDate: c.releaseDate,
-    rating: c.rating, mediaType: c.mediaType, maturityRating: c.maturityRating,
+    rating: c.rating, mediaType: c.mediaType as 'movie' | 'tv', maturityRating: c.maturityRating,
     trailerKey: c.trailerKey ?? undefined, isFeatured: c.isFeatured,
     genres: c.genres.map((cg) => ({ id: cg.genre.id, name: cg.genre.name })),
     runtime: c.runtime ?? undefined,
+    status: c.status as import('@netflix/types').ContentStatus,
+    language: c.language,
+    cast: c.cast,
   }))
 }
 

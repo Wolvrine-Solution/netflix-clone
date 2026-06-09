@@ -12,7 +12,7 @@ adminRowsRouter.use(authenticate, adminOnly)
 const rowSchema = z.object({
   title: z.string().min(1),
   query: z.string().min(1),
-  order: z.number().int().min(0),
+  order: z.number().int().min(0).optional(),
   mediaType: z.string().optional(),
   isActive: z.boolean().default(true),
 })
@@ -29,8 +29,22 @@ adminRowsRouter.get('/', async (_req, res, next) => {
 
 adminRowsRouter.post('/', validate(rowSchema), async (req, res, next) => {
   try {
-    const row = await prisma.row.create({ data: req.body as z.infer<typeof rowSchema> })
+    const body = req.body as z.infer<typeof rowSchema>
+    const maxOrder = await prisma.row.aggregate({ _max: { order: true } })
+    const row = await prisma.row.create({
+      data: { ...body, order: body.order ?? (maxOrder._max.order ?? -1) + 1 },
+    })
     res.status(201).json({ data: row })
+  } catch (err) { next(err) }
+})
+
+// Reorder rows in bulk — must be before /:id to avoid Express matching "reorder" as an id
+// body: { rows: [{id: string, order: number}] }
+adminRowsRouter.put('/reorder', async (req, res, next) => {
+  try {
+    const { rows } = req.body as { rows: Array<{ id: string; order: number }> }
+    await Promise.all(rows.map(({ id, order }) => prisma.row.update({ where: { id }, data: { order } })))
+    res.json({ message: 'Rows reordered' })
   } catch (err) { next(err) }
 })
 
@@ -45,15 +59,6 @@ adminRowsRouter.delete('/:id', async (req, res, next) => {
   try {
     await prisma.row.delete({ where: { id: req.params['id'] } })
     res.json({ message: 'Row deleted' })
-  } catch (err) { next(err) }
-})
-
-// Reorder rows in bulk
-adminRowsRouter.put('/reorder', async (req, res, next) => {
-  try {
-    const { ids } = req.body as { ids: string[] }
-    await Promise.all(ids.map((id, index) => prisma.row.update({ where: { id }, data: { order: index } })))
-    res.json({ message: 'Rows reordered' })
   } catch (err) { next(err) }
 })
 
