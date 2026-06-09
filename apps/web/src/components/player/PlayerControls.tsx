@@ -13,6 +13,8 @@ interface PlayerControlsProps {
   videoRef: RefObject<HTMLVideoElement>
   content: ContentItem
   onBack: () => void
+  onNext?: () => void
+  onPrev?: () => void
 }
 
 function formatTime(secs: number): string {
@@ -21,7 +23,7 @@ function formatTime(secs: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
-export function PlayerControls({ videoRef, content, onBack }: PlayerControlsProps) {
+export function PlayerControls({ videoRef, content, onBack, onNext, onPrev }: PlayerControlsProps) {
   const {
     isPlaying, isMuted, volume, currentTime, duration,
     isFullscreen, showControls,
@@ -97,6 +99,11 @@ export function PlayerControls({ videoRef, content, onBack }: PlayerControlsProp
                 <button onClick={() => { if (videoRef.current) videoRef.current.currentTime += 10 }}>
                   <FiSkipForward className="text-xl hover:text-netflix-light-gray transition" />
                 </button>
+                {onNext && (
+                  <button onClick={onNext} title="Next Episode" className="text-sm text-white/70 hover:text-white transition px-2 py-1 rounded border border-white/20 hover:border-white/50">
+                    Next
+                  </button>
+                )}
 
                 {/* Volume */}
                 <div className="flex items-center gap-2">

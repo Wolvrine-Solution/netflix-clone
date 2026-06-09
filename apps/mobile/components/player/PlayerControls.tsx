@@ -10,6 +10,8 @@ interface PlayerControlsProps {
   title: string
   onBack: () => void
   onSeek: (time: number) => void
+  onNext?: () => void
+  onPrev?: () => void
 }
 
 function formatTime(secs: number): string {
@@ -18,7 +20,7 @@ function formatTime(secs: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
-export function PlayerControls({ title, onBack, onSeek }: PlayerControlsProps) {
+export function PlayerControls({ title, onBack, onSeek, onNext, onPrev }: PlayerControlsProps) {
   const { isPlaying, currentTime, duration, isMuted, setPlaying, setMuted } = usePlayerStore()
 
   const progress = duration > 0 ? currentTime / duration : 0
@@ -101,6 +103,13 @@ export function PlayerControls({ title, onBack, onSeek }: PlayerControlsProps) {
             <TouchableOpacity onPress={() => onSeek(Math.min(duration, currentTime + 10))}>
               <Text style={{ color: Colors.white, fontSize: 20 }}>⏭</Text>
             </TouchableOpacity>
+
+            {/* Next episode */}
+            {onNext && (
+              <TouchableOpacity onPress={onNext} style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' }}>
+                <Text style={{ color: Colors.white, fontSize: 12, fontWeight: '600' }}>Next ›</Text>
+              </TouchableOpacity>
+            )}
 
             {/* Mute */}
             <TouchableOpacity onPress={() => setMuted(!isMuted)}>

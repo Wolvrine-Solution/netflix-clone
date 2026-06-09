@@ -5,10 +5,14 @@ import { api } from '../../../lib/api'
 import { HeroBanner } from '../../../components/home/HeroBanner'
 import { ContentRow } from '../../../components/home/ContentRow'
 import { ContentModal } from '../../../components/home/ContentModal'
+import { ContinueWatchingRow } from '../../../components/home/ContinueWatchingRow'
 import { Navbar } from '../../../components/layout/Navbar'
 import { Colors } from '../../../constants/colors'
+import { useProfileStore } from '../../../store/useProfileStore'
 
 export default function BrowseScreen() {
+  const { activeProfile } = useProfileStore()
+
   const { data: featured, isLoading: featuredLoading } = useQuery({
     queryKey: ['featured'],
     queryFn: () => api.featured().then((r) => r.data.data),
@@ -33,6 +37,7 @@ export default function BrowseScreen() {
       ) : (
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
           <HeroBanner content={featured ?? null} />
+          {activeProfile && <ContinueWatchingRow profileId={activeProfile.id} />}
           {rows?.map((row) => (
             <ContentRow key={row.id} title={row.title} items={row.items} />
           ))}

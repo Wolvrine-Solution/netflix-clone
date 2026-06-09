@@ -56,6 +56,13 @@ export default function MainLayout() {
         }}
       />
       <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="More" />,
+        }}
+      />
+      <Tabs.Screen
         name="watch"
         options={{
           href: null, // hide from tab bar

@@ -1,6 +1,7 @@
 import { prisma } from '@netflix/db'
 import { HeroBanner } from '@/components/home/HeroBanner'
 import { MovieRow } from '@/components/home/MovieRow'
+import { ContinueWatchingRow } from '@/components/home/ContinueWatchingRow'
 import type { ContentItem, BrowseRow } from '@netflix/types'
 
 async function getBrowseData(): Promise<{ featured: ContentItem | null; rows: BrowseRow[] }> {
@@ -50,6 +51,7 @@ export default async function BrowsePage() {
     <>
       <HeroBanner content={featured} />
       <div className="relative z-10 -mt-32 pb-20 space-y-8">
+        <ContinueWatchingRow />
         {rows.map((row) => (
           <MovieRow key={row.id} title={row.title} items={row.items} />
         ))}

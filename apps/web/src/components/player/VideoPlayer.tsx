@@ -8,15 +8,19 @@ import type { ContentItem } from '@netflix/types'
 
 interface VideoPlayerProps {
   content: ContentItem
+  videoUrl?: string | null
+  onNext?: () => void
+  onPrev?: () => void
+  episodeInfo?: { season: number; episode: number; title: string } | null
 }
 
-// Public domain demo stream
 const DEMO_SRC = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
 
-export function VideoPlayer({ content }: VideoPlayerProps) {
+export function VideoPlayer({ content, videoUrl, onNext, onPrev, episodeInfo }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const hlsRef = useRef<unknown>(null)
   const router = useRouter()
   const { saveProgress } = useWatchProgress(content.id)
   const {
@@ -26,6 +30,42 @@ export function VideoPlayer({ content }: VideoPlayerProps) {
   } = usePlayerStore()
 
   const [showSkipIntro, setShowSkipIntro] = useState(false)
+  const src = videoUrl ?? DEMO_SRC
+
+  // HLS setup
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    const isHLS = src.includes('.m3u8')
+
+    if (isHLS) {
+      // Dynamically import hls.js
+      import('hls.js').then(({ default: Hls }) => {
+        if (Hls.isSupported()) {
+          const hls = new Hls({ startLevel: -1, autoStartLoad: true })
+          hls.loadSource(src)
+          hls.attachMedia(video)
+          hlsRef.current = hls
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          // Native HLS (Safari)
+          video.src = src
+        }
+      }).catch(() => {
+        video.src = src
+      })
+    } else {
+      video.src = src
+    }
+
+    return () => {
+      if (hlsRef.current) {
+        const hls = hlsRef.current as { destroy: () => void }
+        hls.destroy()
+        hlsRef.current = null
+      }
+    }
+  }, [src])
 
   useEffect(() => {
     reset()
@@ -42,12 +82,14 @@ export function VideoPlayer({ content }: VideoPlayerProps) {
       setShowSkipIntro(video.currentTime >= 15 && video.currentTime <= 90)
     }
     const onDurationChange = () => setDuration(video.duration)
+    const onEnded = () => { if (onNext) onNext() }
 
     video.addEventListener('loadeddata', onLoadedData)
     video.addEventListener('play', onPlay)
     video.addEventListener('pause', onPause)
     video.addEventListener('timeupdate', onTimeUpdate)
     video.addEventListener('durationchange', onDurationChange)
+    video.addEventListener('ended', onEnded)
 
     return () => {
       video.removeEventListener('loadeddata', onLoadedData)
@@ -55,8 +97,9 @@ export function VideoPlayer({ content }: VideoPlayerProps) {
       video.removeEventListener('pause', onPause)
       video.removeEventListener('timeupdate', onTimeUpdate)
       video.removeEventListener('durationchange', onDurationChange)
+      video.removeEventListener('ended', onEnded)
     }
-  }, [setPlaying, setCurrentTime, setDuration, setLoading, saveProgress, reset])
+  }, [setPlaying, setCurrentTime, setDuration, setLoading, saveProgress, reset, onNext])
 
   useEffect(() => {
     const video = videoRef.current
@@ -94,27 +137,35 @@ export function VideoPlayer({ content }: VideoPlayerProps) {
         case 'ArrowRight': video.currentTime += 10; break
         case 'ArrowLeft': video.currentTime -= 10; break
         case 'Escape': router.back(); break
+        case 'n': case 'N': if (onNext) onNext(); break
+        case 'p': case 'P': if (onPrev) onPrev(); break
       }
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [isPlaying, isMuted, setPlaying, setMuted, setFullscreen, router])
+  }, [isPlaying, isMuted, setPlaying, setMuted, setFullscreen, router, onNext, onPrev])
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full bg-black cursor-none"
+      className="relative w-full h-full bg-black"
       onMouseMove={resetHideTimer}
       onClick={() => setPlaying(!isPlaying)}
       style={{ cursor: showControls ? 'default' : 'none' }}
     >
       <video
         ref={videoRef}
-        src={DEMO_SRC}
         className="w-full h-full object-contain"
         autoPlay
         playsInline
       />
+
+      {/* Episode badge */}
+      {episodeInfo && (
+        <div className="absolute top-16 left-8 text-white/70 text-sm select-none pointer-events-none">
+          S{episodeInfo.season} E{episodeInfo.episode} · {episodeInfo.title}
+        </div>
+      )}
 
       {/* Skip Intro */}
       {showSkipIntro && (
@@ -134,6 +185,8 @@ export function VideoPlayer({ content }: VideoPlayerProps) {
         videoRef={videoRef}
         content={content}
         onBack={() => router.back()}
+        onNext={onNext}
+        onPrev={onPrev}
       />
     </div>
   )

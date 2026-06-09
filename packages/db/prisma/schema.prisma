@@ -7,20 +7,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ─────────────────────────────── AUTH ────────────────────────────────────────
+
 model User {
-  id             String        @id @default(cuid())
-  email          String        @unique
+  id             String         @id @default(cuid())
+  email          String         @unique
   emailVerified  DateTime?
   name           String?
   image          String?
   hashedPassword String?
-  role           Role          @default(USER)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  role           Role           @default(USER)
+  isSuspended    Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
   accounts       Account[]
   sessions       Session[]
   profiles       Profile[]
   subscription   Subscription?
+  notifications  Notification[]
+  reviews        Review[]
+  adminLogs      AdminLog[]     @relation("AdminWhoActed")
 }
 
 enum Role {
@@ -62,28 +68,36 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+// ─────────────────────────────── PROFILES ────────────────────────────────────
+
 model Profile {
   id           String         @id @default(cuid())
   name         String
   avatarUrl    String
   isKid        Boolean        @default(false)
+  language     String         @default("en")
   userId       String
   user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   myList       MyListItem[]
   watchHistory WatchHistory[]
+  reviews      Review[]
 
   @@unique([userId, name])
 }
 
+// ─────────────────────────────── SUBSCRIPTIONS ───────────────────────────────
+
 model Subscription {
-  id               String          @id @default(cuid())
-  userId           String          @unique
-  plan             Plan            @default(STANDARD)
-  status           SubStatus       @default(ACTIVE)
-  stripeCustomerId String?         @unique
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  plan             Plan      @default(STANDARD)
+  status           SubStatus @default(ACTIVE)
+  stripeCustomerId String?   @unique
   stripePriceId    String?
+  stripeSubId      String?   @unique
   currentPeriodEnd DateTime?
-  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cancelAtPeriodEnd Boolean  @default(false)
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum Plan {
@@ -96,36 +110,118 @@ enum SubStatus {
   ACTIVE
   CANCELED
   PAST_DUE
+  TRIALING
 }
 
+// ─────────────────────────────── CONTENT ─────────────────────────────────────
+
 model Content {
-  id             String         @id @default(cuid())
-  tmdbId         Int            @unique
+  id             String          @id @default(cuid())
+  tmdbId         Int?            @unique
   mediaType      MediaType
   title          String
-  description    String         @db.Text
+  description    String          @db.Text
   posterPath     String
   backdropPath   String
   trailerKey     String?
+  videoUrl       String?
   releaseDate    String
   rating         Float
   runtime        Int?
   seasons        Int?
   episodes       Int?
-  maturityRating String         @default("TV-MA")
-  isFeatured     Boolean        @default(false)
+  maturityRating String          @default("TV-MA")
+  isFeatured     Boolean         @default(false)
+  status         ContentStatus   @default(PUBLISHED)
+  language       String          @default("en")
+  country        String?
+  studio         String?
+  director       String?
+  tagline        String?
+  cast           String[]        @default([])
   genres         ContentGenre[]
+  contentSeasons Season[]
+  videoFiles     VideoFile[]
   myListItems    MyListItem[]
   watchHistory   WatchHistory[]
   rowItems       ContentRow[]
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  reviews        Review[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 enum MediaType {
   movie
   tv
 }
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// ─────────────────────────────── VIDEO FILES ─────────────────────────────────
+
+model VideoFile {
+  id        String        @id @default(cuid())
+  contentId String?
+  episodeId String?
+  quality   VideoQuality  @default(AUTO)
+  url       String
+  size      BigInt?
+  duration  Int?
+  format    String?
+  isDefault Boolean       @default(false)
+  content   Content?      @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  episode   Episode?      @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+}
+
+enum VideoQuality {
+  AUTO
+  Q_4K
+  Q_1080P
+  Q_720P
+  Q_480P
+  Q_360P
+}
+
+// ─────────────────────────────── TV SEASONS & EPISODES ───────────────────────
+
+model Season {
+  id           String    @id @default(cuid())
+  contentId    String
+  seasonNumber Int
+  title        String?
+  description  String?   @db.Text
+  posterPath   String?
+  airDate      String?
+  content      Content   @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  episodes     Episode[]
+  createdAt    DateTime  @default(now())
+
+  @@unique([contentId, seasonNumber])
+}
+
+model Episode {
+  id            String      @id @default(cuid())
+  seasonId      String
+  episodeNumber Int
+  title         String
+  description   String?     @db.Text
+  stillPath     String?
+  runtime       Int?
+  airDate       String?
+  videoUrl      String?
+  videoFiles    VideoFile[]
+  season        Season      @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+
+  @@unique([seasonId, episodeNumber])
+}
+
+// ─────────────────────────────── GENRES & CATEGORIES ─────────────────────────
 
 model Genre {
   id       Int            @id
@@ -142,12 +238,40 @@ model ContentGenre {
   @@id([contentId, genreId])
 }
 
+model Category {
+  id          String            @id @default(cuid())
+  name        String            @unique
+  slug        String            @unique
+  description String?
+  color       String?
+  icon        String?
+  isActive    Boolean           @default(true)
+  order       Int               @default(0)
+  contents    ContentCategory[]
+  createdAt   DateTime          @default(now())
+}
+
+model ContentCategory {
+  contentId  String
+  categoryId String
+  content    Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([contentId, categoryId])
+}
+
+// ─────────────────────────────── BROWSE ROWS ─────────────────────────────────
+
 model Row {
-  id       String       @id @default(cuid())
-  title    String
-  query    String
-  order    Int
-  contents ContentRow[]
+  id         String       @id @default(cuid())
+  title      String
+  query      String
+  order      Int
+  mediaType  String?
+  isActive   Boolean      @default(true)
+  contents   ContentRow[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
 }
 
 model ContentRow {
@@ -159,6 +283,8 @@ model ContentRow {
 
   @@id([contentId, rowId])
 }
+
+// ─────────────────────────────── USER CONTENT DATA ───────────────────────────
 
 model MyListItem {
   id        String   @id @default(cuid())
@@ -172,13 +298,67 @@ model MyListItem {
 }
 
 model WatchHistory {
+  id          String   @id @default(cuid())
+  profileId   String
+  contentId   String
+  episodeId   String?
+  progress    Float    @default(0)
+  watchedAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  content     Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, contentId])
+}
+
+model Review {
   id        String   @id @default(cuid())
   profileId String
   contentId String
-  progress  Float    @default(0)
+  userId    String
+  rating    Int
+  comment   String?  @db.Text
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
   content   Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([profileId, contentId])
+}
+
+// ─────────────────────────────── NOTIFICATIONS ───────────────────────────────
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType @default(GENERAL)
+  title     String
+  message   String           @db.Text
+  read      Boolean          @default(false)
+  link      String?
+  imageUrl  String?
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime         @default(now())
+}
+
+enum NotificationType {
+  NEW_CONTENT
+  SUBSCRIPTION
+  SYSTEM
+  GENERAL
+}
+
+// ─────────────────────────────── ADMIN AUDIT LOG ─────────────────────────────
+
+model AdminLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  action     String
+  resource   String
+  resourceId String?
+  details    Json?
+  ipAddress  String?
+  admin      User     @relation("AdminWhoActed", fields: [adminId], references: [id])
+  createdAt  DateTime @default(now())
 }

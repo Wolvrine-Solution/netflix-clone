@@ -48,7 +48,19 @@ export async function searchTMDB(query: string): Promise<ContentItem[]> {
 export async function getContentFromDB(id: string): Promise<ContentItem | null> {
   const content = await prisma.content.findUnique({
     where: { id },
-    include: { genres: { include: { genre: true } } },
+    include: {
+      genres: { include: { genre: true } },
+      videoFiles: { orderBy: { isDefault: 'desc' } },
+      contentSeasons: {
+        orderBy: { seasonNumber: 'asc' },
+        include: {
+          episodes: {
+            orderBy: { episodeNumber: 'asc' },
+            include: { videoFiles: { orderBy: { isDefault: 'desc' } } },
+          },
+        },
+      },
+    },
   })
   if (!content) return null
   return {
@@ -63,10 +75,40 @@ export async function getContentFromDB(id: string): Promise<ContentItem | null> 
     mediaType: content.mediaType,
     genres: content.genres.map((cg) => ({ id: cg.genre.id, name: cg.genre.name })),
     runtime: content.runtime ?? undefined,
-    seasons: content.seasons ?? undefined,
+    seasons: content.contentSeasons.length > 0 ? content.contentSeasons.length : (content.seasons ?? undefined),
     episodes: content.episodes ?? undefined,
     maturityRating: content.maturityRating,
     trailerKey: content.trailerKey ?? undefined,
     isFeatured: content.isFeatured,
+    status: content.status as import('@netflix/types').ContentStatus,
+    language: content.language,
+    country: content.country ?? undefined,
+    studio: content.studio ?? undefined,
+    director: content.director ?? undefined,
+    tagline: content.tagline ?? undefined,
+    cast: content.cast,
+    videoUrl: content.videoUrl ?? undefined,
+    videoFiles: content.videoFiles,
+    contentSeasons: content.contentSeasons.map((s) => ({
+      id: s.id,
+      contentId: content.id,
+      seasonNumber: s.seasonNumber,
+      title: s.title ?? undefined,
+      description: s.description ?? undefined,
+      posterPath: s.posterPath ?? undefined,
+      airDate: s.airDate ?? undefined,
+      episodes: s.episodes.map((e) => ({
+        id: e.id,
+        seasonId: s.id,
+        episodeNumber: e.episodeNumber,
+        title: e.title,
+        description: e.description ?? undefined,
+        stillPath: e.stillPath ?? undefined,
+        runtime: e.runtime ?? undefined,
+        airDate: e.airDate ?? undefined,
+        videoUrl: e.videoUrl ?? undefined,
+        videoFiles: e.videoFiles,
+      })),
+    })),
   }
 }

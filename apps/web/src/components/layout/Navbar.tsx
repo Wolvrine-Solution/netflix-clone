@@ -75,6 +75,18 @@ export function Navbar() {
                 Manage Profiles
               </button>
               <button
+                onClick={() => { setShowMenu(false); router.push('/settings') }}
+                className="w-full text-left px-4 py-2 hover:bg-netflix-medium-gray transition"
+              >
+                Account Settings
+              </button>
+              <button
+                onClick={() => { setShowMenu(false); router.push('/subscription') }}
+                className="w-full text-left px-4 py-2 hover:bg-netflix-medium-gray transition"
+              >
+                Subscription
+              </button>
+              <button
                 onClick={() => { setActiveProfile(null); signOut({ callbackUrl: '/' }) }}
                 className="w-full text-left px-4 py-2 hover:bg-netflix-medium-gray transition text-netflix-light-gray border-t border-netflix-medium-gray mt-2"
               >
