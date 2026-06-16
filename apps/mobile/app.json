@@ -1,46 +1,34 @@
 {
   "expo": {
-    "name": "Netflix",
-    "slug": "netflix-clone",
+    "name": "Netflix Clone",
+    "slug": "netflix-clone-mobile",
     "version": "1.0.0",
+    "scheme": "netflixclone",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "netflix",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
+    "backgroundColor": "#0A0A0B",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A0B"
+    },
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.netflix.clone"
+      "bundleIdentifier": "com.netflixclone.mobile"
     },
     "android": {
+      "package": "com.netflixclone.mobile",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#141414"
-      },
-      "package": "com.netflix.clone"
+        "backgroundColor": "#0A0A0B"
+      }
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "output": "single"
     },
-    "plugins": [
-      "expo-router",
-      "expo-video",
-      "expo-secure-store",
-      "expo-linear-gradient",
-      [
-        "expo-screen-orientation",
-        {
-          "initialOrientation": "PORTRAIT"
-        }
-      ]
-    ],
+    "plugins": ["expo-router"],
     "experiments": {
       "typedRoutes": true
-    },
-    "splash": {
-      "backgroundColor": "#141414"
     }
   }
 }

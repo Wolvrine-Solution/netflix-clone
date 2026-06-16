@@ -40,43 +40,48 @@ export function MovieRowItem({ content }: MovieRowItemProps) {
     >
       {/* Poster */}
       <motion.div
-        animate={isHovered ? { scale: 1.3, y: -20 } : { scale: 1, y: 0 }}
-        transition={{ duration: 0.2 }}
-        className="origin-bottom"
+        animate={isHovered ? { scale: 1.28, y: -24 } : { scale: 1, y: 0 }}
+        transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+        className={`origin-bottom rounded-lg ${isHovered ? 'shadow-card-hover' : 'shadow-card'}`}
       >
-        <img
-          src={content.posterPath || content.backdropPath}
-          alt={content.title}
-          className="w-full aspect-video object-cover rounded"
-          loading="lazy"
-        />
+        <div className="relative overflow-hidden rounded-lg ring-1 ring-white/5">
+          <img
+            src={content.posterPath || content.backdropPath}
+            alt={content.title}
+            className="w-full aspect-video object-cover"
+            loading="lazy"
+          />
+          {!isHovered && (
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 hover:opacity-100 transition" />
+          )}
+        </div>
 
         {/* Hover Overlay */}
         {isHovered && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="absolute bottom-0 left-0 right-0 bg-netflix-dark-gray rounded-b shadow-2xl p-3 space-y-2"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="absolute top-[calc(100%-6px)] left-0 right-0 glass-strong rounded-b-lg shadow-card-hover p-3 space-y-2"
           >
             <div className="flex items-center gap-2">
               <button
                 onClick={() => router.push(`/watch/${content.id}`)}
-                className="bg-white text-black rounded-full p-1.5 hover:bg-white/80 transition"
+                className="bg-white text-black rounded-full p-2 hover:bg-white/80 hover:scale-110 active:scale-95 transition"
               >
                 <FiPlay className="text-sm" />
               </button>
               <button
                 onClick={() => toggle(content.id)}
-                className="border-2 border-netflix-light-gray text-white rounded-full p-1.5 hover:border-white transition"
+                className="border-2 border-white/40 text-white rounded-full p-2 hover:border-white hover:scale-110 active:scale-95 transition"
               >
                 {inList ? <FiCheck className="text-sm" /> : <FiPlus className="text-sm" />}
               </button>
-              <button className="border-2 border-netflix-light-gray text-white rounded-full p-1.5 hover:border-white transition">
+              <button className="border-2 border-white/40 text-white rounded-full p-2 hover:border-white hover:scale-110 active:scale-95 transition">
                 <FiThumbsUp className="text-sm" />
               </button>
               <button
                 onClick={() => openModal(content)}
-                className="ml-auto border-2 border-netflix-light-gray text-white rounded-full p-1.5 hover:border-white transition"
+                className="ml-auto border-2 border-white/40 text-white rounded-full p-2 hover:border-white hover:scale-110 active:scale-95 transition"
               >
                 <FiChevronDown className="text-sm" />
               </button>
