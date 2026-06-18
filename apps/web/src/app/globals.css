@@ -1,8 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
   * {
     box-sizing: border-box;
   }
@@ -13,8 +19,14 @@
 
   body {
     @apply bg-netflix-black text-white font-netflix;
+    font-family: 'Inter', 'Netflix Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    @apply bg-netflix-red text-white;
   }
 
   ::-webkit-scrollbar {
@@ -45,11 +57,72 @@
   }
 
   .netflix-gradient-bottom {
-    background: linear-gradient(to top, #141414 0%, transparent 100%);
+    background: linear-gradient(to top, #0A0A0B 0%, transparent 100%);
   }
 
   .netflix-gradient-right {
-    background: linear-gradient(to left, #141414 0%, transparent 100%);
+    background: linear-gradient(to left, #0A0A0B 0%, transparent 100%);
+  }
+
+  /* Frosted-glass surface used by navbar, dropdowns, modals, mobile nav */
+  .glass {
+    background: rgba(18, 18, 20, 0.6);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-strong {
+    background: rgba(12, 12, 14, 0.82);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  /* Subtle gradient text for hero brand accents */
+  .text-gradient {
+    background: linear-gradient(135deg, #ffffff 0%, #b3b3b3 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Skeleton shimmer for loading states */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.04) 25%,
+      rgba(255, 255, 255, 0.09) 37%,
+      rgba(255, 255, 255, 0.04) 63%
+    );
+    background-size: 400% 100%;
+    @apply animate-shimmer rounded-lg;
+  }
+
+  /* Edge fade for horizontal rows */
+  .row-fade-x {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black 32px,
+      black calc(100% - 32px),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black 32px,
+      black calc(100% - 32px),
+      transparent 100%
+    );
+  }
+
+  .safe-bottom {
+    padding-bottom: calc(var(--safe-bottom) + 0.5rem);
+  }
+
+  .tap-highlight-none {
+    -webkit-tap-highlight-color: transparent;
   }
 }
 

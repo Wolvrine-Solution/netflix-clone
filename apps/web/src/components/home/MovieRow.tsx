@@ -27,17 +27,20 @@ export function MovieRow({ title, items }: MovieRowProps) {
   }
 
   return (
-    <div className="group/row px-4 md:px-16 space-y-2">
-      <h2 className="text-sm md:text-base font-semibold tracking-wide">{title}</h2>
+    <div className="group/row space-y-2.5">
+      <h2 className="px-4 md:px-16 text-base md:text-xl font-bold tracking-tight flex items-center gap-2">
+        {title}
+        <FiChevronRight className="text-sm text-netflix-red opacity-0 -translate-x-2 group-hover/row:opacity-100 group-hover/row:translate-x-0 transition-all duration-300" />
+      </h2>
       <div className="relative">
         {/* Left chevron */}
         {showLeft && (
           <button
             onClick={() => scroll('left')}
-            className="absolute left-0 top-0 bottom-0 z-20 flex items-center justify-center w-10 bg-netflix-black/50 opacity-0 group-hover/row:opacity-100 transition hover:bg-netflix-black/80"
+            className="hidden md:flex absolute left-0 top-0 bottom-0 z-20 items-center justify-center w-12 bg-gradient-to-r from-netflix-black via-netflix-black/70 to-transparent opacity-0 group-hover/row:opacity-100 transition hover:from-black"
             aria-label="Scroll left"
           >
-            <FiChevronLeft className="text-3xl" />
+            <FiChevronLeft className="text-3xl drop-shadow-lg transition-transform hover:scale-125" />
           </button>
         )}
 
@@ -45,7 +48,7 @@ export function MovieRow({ title, items }: MovieRowProps) {
         <div
           ref={rowRef}
           onScroll={onScroll}
-          className="flex gap-2 overflow-x-auto scrollbar-hide scroll-smooth"
+          className="flex gap-2 md:gap-3 overflow-x-auto scrollbar-hide scroll-smooth px-4 md:px-16 py-2"
         >
           {items.map((item) => (
             <MovieRowItem key={item.id} content={item} />
@@ -55,10 +58,10 @@ export function MovieRow({ title, items }: MovieRowProps) {
         {/* Right chevron */}
         <button
           onClick={() => scroll('right')}
-          className="absolute right-0 top-0 bottom-0 z-20 flex items-center justify-center w-10 bg-netflix-black/50 opacity-0 group-hover/row:opacity-100 transition hover:bg-netflix-black/80"
+          className="hidden md:flex absolute right-0 top-0 bottom-0 z-20 items-center justify-center w-12 bg-gradient-to-l from-netflix-black via-netflix-black/70 to-transparent opacity-0 group-hover/row:opacity-100 transition hover:from-black"
           aria-label="Scroll right"
         >
-          <FiChevronRight className="text-3xl" />
+          <FiChevronRight className="text-3xl drop-shadow-lg transition-transform hover:scale-125" />
         </button>
       </div>
     </div>
