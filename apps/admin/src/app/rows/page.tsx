@@ -71,7 +71,9 @@ export default function RowsPage() {
     if (direction === 'down' && idx === rows.length - 1) return
     const swapIdx = direction === 'up' ? idx - 1 : idx + 1
     const reordered = [...rows]
-    ;[reordered[idx], reordered[swapIdx]] = [reordered[swapIdx], reordered[idx]]
+    const temp = reordered[idx]!
+    reordered[idx] = reordered[swapIdx]!
+    reordered[swapIdx] = temp
     const orderPayload = reordered.map((r, i) => ({ id: r.id, order: i + 1 }))
     setRows(reordered.map((r, i) => ({ ...r, order: i + 1 })))
     await fetch(`${API}/api/admin/rows/reorder`, {

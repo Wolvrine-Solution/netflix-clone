@@ -49,6 +49,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       ;(session as { accessToken?: string }).accessToken = await encode({
         token,
         secret: process.env['NEXTAUTH_SECRET'] ?? '',
+        salt: 'authjs.session-token',
       })
       return session
     },

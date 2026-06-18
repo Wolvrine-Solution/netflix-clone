@@ -162,7 +162,7 @@ export function AnalyticsCharts({ data }: Props) {
                 <img src={user.image} alt="" className="w-8 h-8 rounded-full flex-shrink-0" />
               ) : (
                 <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs text-gray-400">{(user.name ?? user.email ?? '?')[0].toUpperCase()}</span>
+                  <span className="text-xs text-gray-400">{(user.name ?? user.email ?? '?').charAt(0).toUpperCase()}</span>
                 </div>
               )}
               <div className="flex-1 min-w-0">

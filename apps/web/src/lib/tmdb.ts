@@ -53,5 +53,8 @@ export function mapMovieToContentItem(movie: TMDBMovieDetails): ContentItem {
     maturityRating: 'R',
     trailerKey: movie.videos ? getTrailerKey(movie.videos.results) ?? undefined : undefined,
     isFeatured: false,
+    status: 'PUBLISHED',
+    language: 'en',
+    cast: movie.credits?.cast?.slice(0, 10).map((c) => c.name) ?? [],
   }
 }

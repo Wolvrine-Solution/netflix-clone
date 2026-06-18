@@ -96,7 +96,7 @@ export default function SettingsPage() {
                     <img src={user.image} alt="" className="w-16 h-16 rounded-full" />
                   ) : (
                     <div className="w-16 h-16 rounded-full bg-netflix-medium-gray flex items-center justify-center text-2xl font-bold">
-                      {(user?.name ?? user?.email ?? '?')[0].toUpperCase()}
+                      {(user?.name ?? user?.email ?? '?').charAt(0).toUpperCase()}
                     </div>
                   )}
                   <div>
