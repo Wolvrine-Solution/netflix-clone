@@ -1,9 +1,9 @@
-import { View, Text, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, Switch, Alert, Linking } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
-import { useState } from 'react'
 import { clearToken } from '../../../lib/auth'
 import { useProfileStore } from '../../../store/useProfileStore'
+import { useSettingsStore } from '../../../store/useSettingsStore'
 import { Colors } from '../../../constants/colors'
 
 interface SettingRow {
@@ -14,10 +14,14 @@ interface SettingRow {
 
 export default function SettingsScreen() {
   const { activeProfile, setActiveProfile } = useProfileStore()
-  const [autoPlay, setAutoPlay] = useState(true)
-  const [autoPlayPreviews, setAutoPlayPreviews] = useState(true)
-  const [wifiOnly, setWifiOnly] = useState(false)
-  const [notifs, setNotifs] = useState(true)
+  const {
+    autoPlay, setAutoPlay,
+    autoPlayPreviews, setAutoPlayPreviews,
+    wifiOnly, setWifiOnly,
+    notifications, setNotifications,
+    playbackQuality, setPlaybackQuality,
+    downloadQuality, setDownloadQuality,
+  } = useSettingsStore()
 
   async function handleSignOut() {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
@@ -33,12 +37,41 @@ export default function SettingsScreen() {
     ])
   }
 
+  function showPlaybackQualityPicker() {
+    const options: Array<typeof playbackQuality> = ['auto', '1080p', '720p', '480p', '360p']
+    Alert.alert(
+      'Playback Quality',
+      'Higher quality uses more data.',
+      [
+        ...options.map((q) => ({
+          text: q === playbackQuality ? `${q} ✓` : q,
+          onPress: () => setPlaybackQuality(q),
+        })),
+        { text: 'Cancel', style: 'cancel' as const },
+      ],
+    )
+  }
+
+  function showDownloadQualityPicker() {
+    Alert.alert(
+      'Download Quality',
+      'Higher quality uses more storage.',
+      [
+        { text: downloadQuality === 'standard' ? 'Standard ✓' : 'Standard', onPress: () => setDownloadQuality('standard') },
+        { text: downloadQuality === 'high' ? 'High ✓' : 'High', onPress: () => setDownloadQuality('high') },
+        { text: 'Cancel', style: 'cancel' as const },
+      ],
+    )
+  }
+
   function Section({ title, rows }: { title: string; rows: SettingRow[] }) {
     return (
       <View style={{ marginBottom: 24 }}>
-        <Text style={{ color: Colors.lightGray, fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1, paddingHorizontal: 16, marginBottom: 8 }}>
-          {title}
-        </Text>
+        {title ? (
+          <Text style={{ color: Colors.lightGray, fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1, paddingHorizontal: 16, marginBottom: 8 }}>
+            {title}
+          </Text>
+        ) : null}
         <View style={{ backgroundColor: Colors.darkGray, borderRadius: 12, overflow: 'hidden' }}>
           {rows.map((row, i) => (
             <TouchableOpacity
@@ -62,15 +95,22 @@ export default function SettingsScreen() {
                   thumbColor={Colors.white}
                 />
               ) : row.value ? (
-                <Text style={{ color: Colors.lightGray, fontSize: 14 }}>{row.value}</Text>
-              ) : (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Text style={{ color: Colors.lightGray, fontSize: 14 }}>{row.value}</Text>
+                  <Text style={{ color: Colors.lightGray, fontSize: 16 }}>›</Text>
+                </View>
+              ) : row.onPress ? (
                 <Text style={{ color: Colors.lightGray, fontSize: 16 }}>›</Text>
-              )}
+              ) : null}
             </TouchableOpacity>
           ))}
         </View>
       </View>
     )
+  }
+
+  const qualityLabel: Record<typeof playbackQuality, string> = {
+    auto: 'Auto', '1080p': '1080p', '720p': '720p', '480p': '480p', '360p': '360p',
   }
 
   return (
@@ -103,24 +143,49 @@ export default function SettingsScreen() {
         <Section title="Playback" rows={[
           { label: 'Auto-Play Next Episode', toggle: true, on: autoPlay, onToggle: setAutoPlay },
           { label: 'Auto-Play Previews', toggle: true, on: autoPlayPreviews, onToggle: setAutoPlayPreviews },
-          { label: 'Playback Quality', value: 'Auto', onPress: () => {} },
+          { label: 'Playback Quality', value: qualityLabel[playbackQuality], onPress: showPlaybackQualityPicker },
         ]} />
 
         <Section title="Downloads" rows={[
           { label: 'Wi-Fi Only', toggle: true, on: wifiOnly, onToggle: setWifiOnly },
-          { label: 'Download Quality', value: 'Standard', onPress: () => {} },
-          { label: 'Delete All Downloads', onPress: () => Alert.alert('Delete Downloads', 'Remove all downloaded content?', [{ text: 'Cancel', style: 'cancel' }, { text: 'Delete', style: 'destructive' }]), color: Colors.lightGray },
+          { label: 'Download Quality', value: downloadQuality === 'high' ? 'High' : 'Standard', onPress: showDownloadQualityPicker },
+          {
+            label: 'Delete All Downloads',
+            onPress: () => Alert.alert('Delete Downloads', 'Remove all downloaded content?', [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Delete', style: 'destructive' },
+            ]),
+            color: Colors.lightGray,
+          },
         ]} />
 
         <Section title="Notifications" rows={[
-          { label: 'Push Notifications', toggle: true, on: notifs, onToggle: setNotifs },
+          { label: 'Push Notifications', toggle: true, on: notifications, onToggle: setNotifications },
         ]} />
 
         <Section title="Account" rows={[
-          { label: 'Account Settings', onPress: () => {} },
-          { label: 'Subscription', onPress: () => {} },
-          { label: 'Privacy Policy', onPress: () => {} },
-          { label: 'Help Center', onPress: () => {} },
+          {
+            label: 'Account Settings',
+            onPress: () => Alert.alert('Account Settings', 'Manage your account on the Netflix website.', [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Open Website', onPress: () => Linking.openURL('https://www.netflix.com/YourAccount') },
+            ]),
+          },
+          {
+            label: 'Subscription',
+            onPress: () => Alert.alert('Subscription', 'Manage your subscription on the Netflix website.', [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Open Website', onPress: () => Linking.openURL('https://www.netflix.com/YourAccount') },
+            ]),
+          },
+          {
+            label: 'Privacy Policy',
+            onPress: () => Linking.openURL('https://help.netflix.com/legal/privacy'),
+          },
+          {
+            label: 'Help Center',
+            onPress: () => Linking.openURL('https://help.netflix.com'),
+          },
         ]} />
 
         <Section title="" rows={[

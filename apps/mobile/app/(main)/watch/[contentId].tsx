@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import * as ScreenOrientation from 'expo-screen-orientation'
 import { api } from '../../../lib/api'
 import { VideoPlayer } from '../../../components/player/VideoPlayer'
+import { useSettingsStore } from '../../../store/useSettingsStore'
 import { Colors } from '../../../constants/colors'
 
 interface Episode {
@@ -22,6 +23,7 @@ interface ContentData {
 
 export default function WatchScreen() {
   const { contentId } = useLocalSearchParams<{ contentId: string }>()
+  const { autoPlay } = useSettingsStore()
   const [currentSeason, setCurrentSeason] = useState(1)
   const [currentEpisode, setCurrentEpisode] = useState(1)
   const [showEpisodes, setShowEpisodes] = useState(false)
@@ -99,7 +101,7 @@ export default function WatchScreen() {
         videoUrl={videoUrl ?? undefined}
         episodeInfo={episodeInfo}
         onBack={() => router.back()}
-        onNext={next ? () => { setCurrentSeason(next.season); setCurrentEpisode(next.episode) } : undefined}
+        onNext={next && autoPlay ? () => { setCurrentSeason(next.season); setCurrentEpisode(next.episode) } : undefined}
         onPrev={prev ? () => { setCurrentSeason(prev.season); setCurrentEpisode(prev.episode) } : undefined}
         onShowEpisodes={isTVWithSeasons ? () => setShowEpisodes(true) : undefined}
       />
