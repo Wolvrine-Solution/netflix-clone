@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { FiGlobe, FiShield, FiMail, FiVideo, FiSave, FiCheckCircle } from 'react-icons/fi'
 
 interface SettingsSection {

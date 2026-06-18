@@ -42,6 +42,9 @@ export async function searchTMDB(query: string): Promise<ContentItem[]> {
       genres: [],
       maturityRating: 'TV-MA',
       isFeatured: false,
+      status: 'PUBLISHED' as import('@netflix/types').ContentStatus,
+      language: 'en',
+      cast: [],
     }))
 }
 

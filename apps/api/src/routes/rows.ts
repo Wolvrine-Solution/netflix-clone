@@ -24,7 +24,7 @@ rowsRouter.get('/', async (_req, res, next) => {
       title: row.title,
       items: row.contents.map((cr) => ({
         id: cr.content.id,
-        tmdbId: cr.content.tmdbId,
+        tmdbId: cr.content.tmdbId ?? undefined,
         title: cr.content.title,
         description: cr.content.description,
         posterPath: cr.content.posterPath,
@@ -38,6 +38,9 @@ rowsRouter.get('/', async (_req, res, next) => {
         maturityRating: cr.content.maturityRating,
         trailerKey: cr.content.trailerKey ?? undefined,
         isFeatured: cr.content.isFeatured,
+        status: cr.content.status,
+        language: cr.content.language,
+        cast: cr.content.cast,
       })),
     }))
     res.json({ data })

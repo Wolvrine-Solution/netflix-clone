@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useEffect } from 'react'
 import { View, TouchableWithoutFeedback, Text, TouchableOpacity } from 'react-native'
 import { VideoView, useVideoPlayer } from 'expo-video'
 import { usePlayerStore } from '../../store/usePlayerStore'
@@ -23,6 +23,8 @@ export function VideoPlayer({ content, videoUrl, episodeInfo, onBack, onNext, on
   const [showControls, setShowControls] = useState(true)
   const [showSkipIntro, setShowSkipIntro] = useState(false)
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const onNextRef = useRef(onNext)
+  onNextRef.current = onNext
 
   const { setPlaying, setCurrentTime, setDuration, setLoading, isMuted, isPlaying } = usePlayerStore()
   const { saveProgress, flushProgress } = useWatchProgress(content.id)
@@ -35,19 +37,24 @@ export function VideoPlayer({ content, videoUrl, episodeInfo, onBack, onNext, on
     p.play()
   })
 
-  player.addListener('timeUpdate', (event) => {
-    const time = event.currentTime
-    setCurrentTime(time)
-    saveProgress(time / (player.duration || 1))
-    setShowSkipIntro(time >= 15 && time <= 90)
-  })
-
-  player.addListener('statusChange', (event) => {
-    setLoading(event.status === 'loading')
-    setPlaying(event.status === 'readyToPlay' && !player.paused)
-    if (event.status === 'readyToPlay') setDuration(player.duration ?? 0)
-    if (event.status === 'idle' && onNext) onNext()
-  })
+  useEffect(() => {
+    const timeSub = player.addListener('timeUpdate', (event) => {
+      const time = event.currentTime
+      setCurrentTime(time)
+      saveProgress(time / (player.duration || 1))
+      setShowSkipIntro(time >= 15 && time <= 90)
+    })
+    const statusSub = player.addListener('statusChange', (event) => {
+      setLoading(event.status === 'loading')
+      setPlaying(event.status === 'readyToPlay' && !player.paused)
+      if (event.status === 'readyToPlay') setDuration(player.duration ?? 0)
+      if (event.status === 'idle' && onNextRef.current) onNextRef.current()
+    })
+    return () => {
+      timeSub.remove()
+      statusSub.remove()
+    }
+  }, [player])
 
   const handleTap = useCallback(() => {
     setShowControls(true)

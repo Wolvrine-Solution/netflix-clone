@@ -23,7 +23,7 @@ searchRouter.get('/', searchLimiter, async (req, res, next) => {
     const merged = [
       ...dbResults.map((c) => ({
         id: c.id,
-        tmdbId: c.tmdbId,
+        tmdbId: c.tmdbId ?? undefined,
         title: c.title,
         description: c.description,
         posterPath: c.posterPath,
@@ -35,6 +35,9 @@ searchRouter.get('/', searchLimiter, async (req, res, next) => {
         maturityRating: c.maturityRating,
         trailerKey: c.trailerKey ?? undefined,
         isFeatured: c.isFeatured,
+        status: c.status,
+        language: c.language,
+        cast: c.cast,
       })),
       ...tmdbResults.filter((r) => !dbIds.has(r.tmdbId)),
     ]

@@ -1,4 +1,5 @@
 import NextAuth from 'next-auth'
+import { encode } from 'next-auth/jwt'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import Credentials from 'next-auth/providers/credentials'
 import { compare } from 'bcryptjs'
@@ -31,11 +32,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return token
     },
-    session({ session, token }) {
+    async session({ session, token }) {
       if (session.user) {
         session.user.id = token['userId'] as string
         ;(session.user as { role?: string }).role = token['role'] as string
       }
+      ;(session as { accessToken?: string }).accessToken = await encode({
+        token,
+        secret: process.env['NEXTAUTH_SECRET'] ?? '',
+      })
       return session
     },
   },

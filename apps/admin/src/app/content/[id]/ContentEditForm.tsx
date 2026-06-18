@@ -1,8 +1,8 @@
 'use client'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { FiPlus, FiTrash2, FiCheck, FiX } from 'react-icons/fi'
+import { FiTrash2, FiCheck, FiX } from 'react-icons/fi'
 
 interface VideoFile { id: string; quality: string; url: string; isDefault: boolean; format?: string }
 interface Episode { id: string; episodeNumber: number; title: string; description?: string; runtime?: number; videoUrl?: string; airDate?: string }
