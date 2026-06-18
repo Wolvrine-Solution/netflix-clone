@@ -1,7 +1,9 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
-import { View, TouchableWithoutFeedback, Text, TouchableOpacity } from 'react-native'
+import { View, TouchableWithoutFeedback, Text, TouchableOpacity, Alert } from 'react-native'
 import { VideoView, useVideoPlayer } from 'expo-video'
+import * as ScreenOrientation from 'expo-screen-orientation'
 import { usePlayerStore } from '../../store/usePlayerStore'
+import { useSettingsStore } from '../../store/useSettingsStore'
 import { useWatchProgress } from '../../hooks/useWatchProgress'
 import { PlayerControls } from './PlayerControls'
 import { Colors } from '../../constants/colors'
@@ -26,7 +28,8 @@ export function VideoPlayer({ content, videoUrl, episodeInfo, onBack, onNext, on
   const onNextRef = useRef(onNext)
   onNextRef.current = onNext
 
-  const { setPlaying, setCurrentTime, setDuration, setLoading, isMuted, isPlaying } = usePlayerStore()
+  const { setPlaying, setCurrentTime, setDuration, setLoading, setFullscreen, isMuted, isFullscreen } = usePlayerStore()
+  const { playbackQuality, setPlaybackQuality } = useSettingsStore()
   const { saveProgress, flushProgress } = useWatchProgress(content.id)
 
   const src = videoUrl ?? DEMO_SRC
@@ -73,6 +76,31 @@ export function VideoPlayer({ content, videoUrl, episodeInfo, onBack, onNext, on
     onBack()
   }
 
+  async function handleFullscreen() {
+    if (isFullscreen) {
+      await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE)
+      setFullscreen(false)
+    } else {
+      await ScreenOrientation.unlockAsync()
+      setFullscreen(true)
+    }
+  }
+
+  function handleQuality() {
+    const options: Array<typeof playbackQuality> = ['auto', '1080p', '720p', '480p', '360p']
+    Alert.alert(
+      'Playback Quality',
+      'Higher quality uses more data.',
+      [
+        ...options.map((q) => ({
+          text: q === playbackQuality ? `${q} ✓` : q,
+          onPress: () => setPlaybackQuality(q),
+        })),
+        { text: 'Cancel', style: 'cancel' as const },
+      ],
+    )
+  }
+
   const subtitleText = episodeInfo
     ? `S${episodeInfo.season}:E${episodeInfo.episode} — ${episodeInfo.title}`
     : null
@@ -102,13 +130,15 @@ export function VideoPlayer({ content, videoUrl, episodeInfo, onBack, onNext, on
               onSeek={handleSeek}
               onNext={onNext}
               onPrev={onPrev}
+              onQuality={handleQuality}
+              onFullscreen={handleFullscreen}
             />
             {/* Episodes button */}
             {onShowEpisodes && (
               <TouchableOpacity
                 onPress={onShowEpisodes}
                 style={{
-                  position: 'absolute', top: 16, right: 16,
+                  position: 'absolute', top: 16, right: 80,
                   backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8,
                   flexDirection: 'row', alignItems: 'center', gap: 4,
                 }}
