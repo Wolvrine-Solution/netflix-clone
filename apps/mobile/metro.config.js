@@ -1,5 +1,5 @@
-// Metro config with pnpm monorepo support.
 const { getDefaultConfig } = require('expo/metro-config')
+const { withNativeWind } = require('nativewind/metro')
 const path = require('path')
 
 const projectRoot = __dirname
@@ -7,14 +7,11 @@ const workspaceRoot = path.resolve(projectRoot, '../..')
 
 const config = getDefaultConfig(projectRoot)
 
-// Watch the whole monorepo so changes in workspace packages are picked up.
+// Monorepo support: watch packages/ from root
 config.watchFolders = [workspaceRoot]
-
-// Resolve modules from both the app and the workspace root (pnpm hoists here).
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),
   path.resolve(workspaceRoot, 'node_modules'),
 ]
-config.resolver.disableHierarchicalLookup = true
 
-module.exports = config
+module.exports = withNativeWind(config, { input: './global.css' })
