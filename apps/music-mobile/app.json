@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "ChordGen",
+    "slug": "chordgen",
+    "version": "1.0.0",
+    "scheme": "chordgen",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTabletMode": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Used for recording audio",
+        "NSMicrophoneUsageDescription": "Used for recording songs"
+      }
+    },
+    "android": {
+      "permissions": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "RECORD_AUDIO"]
+    },
+    "plugins": [
+      ["expo-file-system"],
+      ["expo-document-picker"],
+      ["expo-sharing"],
+      ["expo-av"],
+      ["@react-native-async-storage/async-storage"]
+    ],
+    "experiments": {
+      "tsconfigPaths": true
+    }
+  }
+}
