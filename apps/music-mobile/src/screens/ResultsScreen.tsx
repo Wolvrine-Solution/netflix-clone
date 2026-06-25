@@ -17,10 +17,12 @@ import type { RootStackParamList, SongResult } from "@/types";
 import { getStatus, getResults, downloadFile } from "@/lib/api";
 import { useAppStore } from "@/lib/store";
 import { colors, spacing, radius, fonts } from "@/lib/theme";
+import { LinearGradient } from "expo-linear-gradient";
 import { ChordChart } from "@/components/ChordChart";
 import { ProcessingProgress } from "@/components/ProcessingProgress";
 import { DownloadSheet } from "@/components/DownloadSheet";
 import { CapoTransposeBar } from "@/components/CapoTransposeBar";
+import { gradients, shadow } from "@/lib/theme";
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Results">;
@@ -150,11 +152,19 @@ export function ResultsScreen({ navigation, route }: Props) {
         </View>
 
         <TouchableOpacity
-          style={styles.downloadBtn}
           onPress={() => setShowDownload(true)}
           disabled={downloading}
+          activeOpacity={0.85}
+          style={[shadow.subtle, downloading && styles.downloadBtnDisabled]}
         >
-          <Text style={styles.downloadBtnTxt}>{downloading ? "…" : "⬇"}</Text>
+          <LinearGradient
+            colors={gradients.brand}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.downloadBtn}
+          >
+            <Text style={styles.downloadBtnTxt}>{downloading ? "…" : "⬇"}</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
 
@@ -193,9 +203,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: "rgba(139,92,246,0.1)",
+    backgroundColor: "rgba(17,17,25,0.6)",
   },
   navBack: { position: "absolute", top: spacing.md, right: spacing.md, zIndex: 10, padding: spacing.sm },
   navBackTxt: { color: colors.muted, fontSize: 18 },
@@ -205,14 +216,14 @@ const styles = StyleSheet.create({
   songTitle: { color: colors.white, fontFamily: fonts.bold, fontSize: 15 },
   songArtist: { color: colors.muted, fontSize: 12, marginTop: 2 },
   downloadBtn: {
-    backgroundColor: colors.brand,
     borderRadius: radius.md,
-    width: 36,
-    height: 36,
+    width: 40,
+    height: 40,
     alignItems: "center",
     justifyContent: "center",
   },
-  downloadBtnTxt: { color: colors.white, fontSize: 18 },
+  downloadBtnDisabled: { opacity: 0.6 },
+  downloadBtnTxt: { color: colors.white, fontSize: 18, fontFamily: fonts.bold },
   scroll: { flex: 1 },
   scrollContent: { padding: spacing.md, paddingBottom: spacing.xxl },
   errorText: { color: colors.red, fontSize: 15, textAlign: "center", marginBottom: spacing.lg },

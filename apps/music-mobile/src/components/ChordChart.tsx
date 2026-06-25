@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import type { ChordLine } from "@/types";
 import { transposeChord } from "@/lib/chords";
-import { colors, spacing, radius, fonts } from "@/lib/theme";
+import { colors, spacing, radius, fonts, gradients, shadow } from "@/lib/theme";
 import { ChordDiagram } from "./ChordDiagram";
 
 interface Props {
@@ -28,11 +29,18 @@ export function ChordChart({ lines, transpose }: Props) {
                 return (
                   <TouchableOpacity
                     key={j}
-                    style={styles.chordTag}
                     onPress={() => setSelectedChord(chord)}
-                    activeOpacity={0.7}
+                    activeOpacity={0.8}
+                    style={shadow.subtle}
                   >
-                    <Text style={styles.chordTagTxt}>{chord}</Text>
+                    <LinearGradient
+                      colors={["rgba(139,92,246,0.3)", "rgba(168,123,250,0.15)"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.chordTag}
+                    >
+                      <Text style={styles.chordTagTxt}>{chord}</Text>
+                    </LinearGradient>
                   </TouchableOpacity>
                 );
               })}
@@ -75,12 +83,18 @@ const styles = StyleSheet.create({
   lineBlock: { marginBottom: spacing.sm },
   section: {
     color: colors.brandLight,
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: fonts.bold,
-    letterSpacing: 1,
+    letterSpacing: 1.2,
     textTransform: "uppercase",
     marginTop: spacing.lg,
-    marginBottom: 4,
+    marginBottom: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+    backgroundColor: "rgba(139,92,246,0.1)",
+    borderLeftWidth: 2,
+    borderLeftColor: colors.brand,
+    borderRadius: 4,
   },
   chordRow: {
     flexDirection: "row",
@@ -89,17 +103,17 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   chordTag: {
-    backgroundColor: "rgba(124,58,237,0.2)",
-    borderWidth: 1,
-    borderColor: "rgba(124,58,237,0.4)",
+    borderWidth: 1.5,
+    borderColor: "rgba(139,92,246,0.4)",
     borderRadius: radius.sm,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
   },
   chordTagTxt: {
-    color: colors.brandLight,
+    color: colors.white,
     fontFamily: fonts.bold,
-    fontSize: 12,
+    fontSize: 13,
+    letterSpacing: -0.3,
   },
   lyric: {
     color: "#D4D4D8",
@@ -108,7 +122,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.7)",
+    backgroundColor: "rgba(0,0,0,0.8)",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -116,17 +130,27 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: radius.xl,
     padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    width: 220,
+    borderWidth: 1.5,
+    borderColor: "rgba(139,92,246,0.3)",
+    width: 240,
     alignItems: "center",
+    shadowColor: colors.brandGlow,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 20,
+    elevation: 10,
   },
   modalClose: {
-    marginTop: spacing.md,
-    paddingVertical: 8,
+    marginTop: spacing.lg,
+    paddingVertical: 10,
     paddingHorizontal: spacing.lg,
-    backgroundColor: colors.elevated,
-    borderRadius: radius.full,
+    backgroundColor: colors.brand,
+    borderRadius: radius.lg,
+    shadowColor: colors.brandGlow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 3,
   },
-  modalCloseTxt: { color: colors.muted, fontSize: 13 },
+  modalCloseTxt: { color: colors.white, fontSize: 13, fontFamily: fonts.bold },
 });

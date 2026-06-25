@@ -63,14 +63,14 @@ export function WaveformPlayer({ audioUrl, onTimeUpdate }: Props) {
   if (!audioUrl) return null;
 
   return (
-    <div className="glass rounded-xl p-4 space-y-3">
+    <div className="glass rounded-xl p-4 space-y-4 border border-brand/20 shadow-lg shadow-brand/20">
       <div ref={containerRef} className="w-full" />
 
       <div className="flex items-center gap-3">
         <button
           onClick={togglePlay}
           disabled={!loaded}
-          className="w-9 h-9 rounded-full bg-brand hover:bg-brand-dark disabled:opacity-40 flex items-center justify-center transition-colors flex-shrink-0"
+          className="w-10 h-10 rounded-full bg-gradient-to-br from-brand to-brand-dark hover:shadow-md hover:shadow-brand/40 disabled:opacity-40 flex items-center justify-center transition-all duration-200 flex-shrink-0 hover:-translate-y-0.5"
         >
           {playing ? (
             <svg width="12" height="14" viewBox="0 0 12 14" fill="white">
@@ -84,7 +84,7 @@ export function WaveformPlayer({ audioUrl, onTimeUpdate }: Props) {
           )}
         </button>
 
-        <span className="text-xs font-mono text-muted-foreground">
+        <span className="text-xs font-mono text-muted-foreground font-medium">
           {fmt(currentTime)} / {fmt(duration)}
         </span>
       </div>

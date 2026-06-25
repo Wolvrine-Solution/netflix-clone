@@ -79,17 +79,17 @@ export function ChordDiagram({ chord }: Props) {
           const x = LEFT + (STRINGS - 1 - stringIdx) * STRING_GAP;
           if (fret === -1) {
             return (
-              <SvgText key={stringIdx} x={x} y={TOP - 6} fontSize={12} fill={colors.muted} textAnchor="middle">×</SvgText>
+              <SvgText key={stringIdx} x={x} y={TOP - 6} fontSize={13} fill={colors.accentPink} fontWeight="bold" textAnchor="middle">×</SvgText>
             );
           }
           if (fret === 0) {
             return (
-              <Circle key={stringIdx} cx={x} cy={TOP - 8} r={5} fill="none" stroke={colors.muted} strokeWidth={1.5} />
+              <Circle key={stringIdx} cx={x} cy={TOP - 8} r={5.5} fill="none" stroke={colors.accent} strokeWidth={2} />
             );
           }
           const y = TOP + (fret - displayMin + 0.5) * FRET_GAP;
           return (
-            <Circle key={stringIdx} cx={x} cy={y} r={9} fill={colors.brand} />
+            <Circle key={stringIdx} cx={x} cy={y} r={10} fill={colors.brand} />
           );
         })}
 
@@ -112,8 +112,21 @@ export function ChordDiagram({ chord }: Props) {
 }
 
 const styles = StyleSheet.create({
-  root: { alignItems: "center" },
-  chordName: { color: colors.white, fontFamily: fonts.bold, fontSize: 18, marginBottom: spacing.sm },
+  root: {
+    alignItems: "center",
+    backgroundColor: "rgba(139,92,246,0.05)",
+    borderRadius: 16,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: "rgba(139,92,246,0.15)",
+  },
+  chordName: {
+    color: colors.white,
+    fontFamily: fonts.bold,
+    fontSize: 20,
+    marginBottom: spacing.md,
+    letterSpacing: -0.5,
+  },
   noData: { alignItems: "center", padding: spacing.lg },
   noDataTxt: { color: colors.muted, fontSize: 13, marginTop: spacing.sm },
 });

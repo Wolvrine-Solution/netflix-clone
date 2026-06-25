@@ -19,18 +19,18 @@ export function ChordDiagramTooltip({ chord, onClose }: Props) {
 
   return (
     <div
-      className="fixed bottom-6 right-6 glass rounded-2xl p-4 shadow-2xl z-50 min-w-[140px]"
+      className="fixed bottom-6 right-6 glass rounded-2xl p-5 shadow-2xl shadow-brand/40 z-50 min-w-[150px] border border-brand/30 backdrop-blur-xl"
       onMouseLeave={onClose}
     >
-      <p className="text-center font-semibold text-sm mb-3">{name ?? chord}</p>
+      <p className="text-center font-bold text-base mb-4 bg-gradient-to-r from-brand-light to-accent bg-clip-text text-transparent">{name ?? chord}</p>
 
       {/* Fretboard grid */}
       <svg width="110" height="120" viewBox="0 0 110 120" className="mx-auto block">
         {/* Nut or fret position label */}
         {displayMin <= 1 ? (
-          <rect x="15" y="10" width="80" height="4" fill="white" rx="1" />
+          <rect x="15" y="10" width="80" height="4" fill="#A78BFA" rx="1" />
         ) : (
-          <text x="8" y="28" fontSize="9" fill="#888" textAnchor="middle">
+          <text x="8" y="28" fontSize="10" fill="#A78BFA" fontWeight="bold" textAnchor="middle">
             {displayMin}fr
           </text>
         )}
@@ -43,8 +43,8 @@ export function ChordDiagramTooltip({ chord, onClose }: Props) {
             y1={14}
             x2={15 + i * 16}
             y2={110}
-            stroke="#444"
-            strokeWidth="1"
+            stroke="#2E2E3D"
+            strokeWidth="1.5"
           />
         ))}
 
@@ -56,8 +56,8 @@ export function ChordDiagramTooltip({ chord, onClose }: Props) {
             y1={14 + i * 20}
             x2={95}
             y2={14 + i * 20}
-            stroke="#444"
-            strokeWidth="1"
+            stroke="#2E2E3D"
+            strokeWidth="1.5"
           />
         ))}
 
@@ -66,28 +66,28 @@ export function ChordDiagramTooltip({ chord, onClose }: Props) {
           const x = 15 + (5 - string) * 16;
           if (fret === -1) {
             return (
-              <text key={string} x={x} y={8} fontSize="10" fill="#666" textAnchor="middle">
+              <text key={string} x={x} y={8} fontSize="11" fill="#F472B6" fontWeight="bold" textAnchor="middle">
                 ×
               </text>
             );
           }
           if (fret === 0) {
             return (
-              <circle key={string} cx={x} cy={6} r={4} fill="none" stroke="#888" strokeWidth="1.5" />
+              <circle key={string} cx={x} cy={6} r={4.5} fill="none" stroke="#22D3EE" strokeWidth="2" />
             );
           }
           const y = 14 + (fret - displayMin + 0.5) * 20;
           return (
-            <circle key={string} cx={x} cy={y} r={7} fill="#7C3AED" />
+            <circle key={string} cx={x} cy={y} r={7.5} fill="#8B5CF6" />
           );
         })}
       </svg>
 
       {/* Finger numbers */}
-      <div className="flex justify-between px-4 mt-1">
+      <div className="flex justify-between px-2 mt-3 pt-2 border-t border-brand/20">
         {[...fingers].reverse().map((f, i) => (
-          <span key={i} className="text-[10px] text-muted-foreground w-4 text-center">
-            {f > 0 ? f : ""}
+          <span key={i} className="text-[11px] font-bold text-brand-light w-4 text-center">
+            {f > 0 ? f : "·"}
           </span>
         ))}
       </div>

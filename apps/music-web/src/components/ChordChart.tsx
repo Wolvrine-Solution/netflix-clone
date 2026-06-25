@@ -22,15 +22,15 @@ export function ChordChart({ lines, transpose }: Props) {
           <div key={i} className="group">
             {/* Section header (verse, chorus, etc.) */}
             {line.section && (
-              <div className="text-xs font-semibold text-brand-light uppercase tracking-widest mt-8 mb-1">
-                [{line.section}]
+              <div className="text-xs font-semibold text-brand-light uppercase tracking-widest mt-8 mb-2 px-3 py-1 rounded-lg bg-surface-elevated/40 inline-block border border-brand/20">
+                ♪ {line.section}
               </div>
             )}
 
             {hasChords ? (
-              <div className="relative leading-relaxed">
+              <div className="relative leading-relaxed p-3 rounded-lg bg-gradient-to-r from-surface-card/30 to-transparent hover:from-surface-elevated/20 transition-colors duration-300 my-1">
                 {/* Chord row */}
-                <div className="flex flex-wrap gap-x-0 font-mono text-sm mb-0.5 min-h-[1.4em]">
+                <div className="flex flex-wrap gap-x-0 font-mono text-sm mb-1 min-h-[1.4em]">
                   {renderChordRow(line, transpose, (chord) => setHoveredChord(chord))}
                 </div>
                 {/* Lyric row */}
@@ -39,7 +39,7 @@ export function ChordChart({ lines, transpose }: Props) {
                 </div>
               </div>
             ) : (
-              <div className="text-base text-zinc-200 tracking-wide py-0.5">
+              <div className="text-base text-zinc-200 tracking-wide py-1 px-3">
                 {line.lyrics || <span className="text-muted-foreground text-xs">&nbsp;</span>}
               </div>
             )}
@@ -78,7 +78,7 @@ function renderChordRow(
     result.push(
       <span
         key={`ch-${position}`}
-        className="chord-tag cursor-pointer hover:bg-brand/40 transition-colors"
+        className="chord-tag cursor-pointer transition-all duration-200 hover:shadow-md hover:shadow-brand/50 hover:bg-gradient-to-r from-brand/50 to-brand-light/30 hover:-translate-y-0.5"
         onMouseEnter={() => onHover(transposed)}
         onMouseLeave={() => onHover("")}
       >

@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Pressable } from "react-native";
-import { colors, spacing, radius, fonts } from "@/lib/theme";
+import { LinearGradient } from "expo-linear-gradient";
+import { colors, spacing, radius, fonts, gradients, shadow } from "@/lib/theme";
 
 interface Props {
   onSelect: (format: "gp5" | "pdf" | "txt") => void;
@@ -14,6 +15,8 @@ const FORMATS = [
     ext: ".gp5",
     icon: "🎸",
     desc: "Opens in Guitar Pro app",
+    accent: "#10B981",
+    accentBg: "rgba(16,185,129,0.15)",
   },
   {
     id: "pdf" as const,
@@ -21,6 +24,8 @@ const FORMATS = [
     ext: ".pdf",
     icon: "📄",
     desc: "Print-ready chord chart",
+    accent: "#EF4444",
+    accentBg: "rgba(239,68,68,0.15)",
   },
   {
     id: "txt" as const,
@@ -28,6 +33,8 @@ const FORMATS = [
     ext: ".txt",
     icon: "📝",
     desc: "Simple text format",
+    accent: "#0EA5E9",
+    accentBg: "rgba(14,165,233,0.15)",
   },
 ];
 
@@ -41,21 +48,37 @@ export function DownloadSheet({ onSelect, onClose }: Props) {
         {FORMATS.map((fmt) => (
           <TouchableOpacity
             key={fmt.id}
-            style={styles.row}
             onPress={() => onSelect(fmt.id)}
-            activeOpacity={0.7}
+            activeOpacity={0.8}
+            style={shadow.subtle}
           >
-            <Text style={styles.icon}>{fmt.icon}</Text>
-            <View style={styles.rowMeta}>
-              <Text style={styles.rowLabel}>{fmt.label}</Text>
-              <Text style={styles.rowDesc}>{fmt.desc}</Text>
-            </View>
-            <Text style={styles.ext}>{fmt.ext}</Text>
+            <LinearGradient
+              colors={[fmt.accentBg, "rgba(139,92,246,0.08)"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.row, { borderColor: fmt.accent + "40" }]}
+            >
+              <Text style={styles.icon}>{fmt.icon}</Text>
+              <View style={styles.rowMeta}>
+                <Text style={styles.rowLabel}>{fmt.label}</Text>
+                <Text style={styles.rowDesc}>{fmt.desc}</Text>
+              </View>
+              <Text style={[styles.ext, { color: fmt.accent }]}>{fmt.ext}</Text>
+            </LinearGradient>
           </TouchableOpacity>
         ))}
 
-        <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
-          <Text style={styles.cancelTxt}>Cancel</Text>
+        <TouchableOpacity
+          style={[styles.cancelBtn, shadow.subtle]}
+          onPress={onClose}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={["rgba(139,92,246,0.2)", "rgba(168,123,250,0.08)"]}
+            style={styles.cancelBtnInner}
+          >
+            <Text style={styles.cancelTxt}>Cancel</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </Pressable>
     </Pressable>
@@ -93,33 +116,36 @@ const styles = StyleSheet.create({
   title: {
     color: colors.white,
     fontFamily: fonts.bold,
-    fontSize: 16,
+    fontSize: 18,
     textAlign: "center",
     marginBottom: spacing.lg,
+    letterSpacing: -0.5,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.elevated,
     borderRadius: radius.md,
     padding: spacing.md,
     marginBottom: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: 1.5,
     gap: spacing.md,
   },
-  icon: { fontSize: 24 },
+  icon: { fontSize: 26 },
   rowMeta: { flex: 1 },
-  rowLabel: { color: colors.white, fontFamily: fonts.bold, fontSize: 14 },
-  rowDesc: { color: colors.muted, fontSize: 12, marginTop: 2 },
-  ext: { color: colors.brandLight, fontSize: 12, fontFamily: fonts.bold },
+  rowLabel: { color: colors.white, fontFamily: fonts.bold, fontSize: 15 },
+  rowDesc: { color: colors.muted, fontSize: 12, marginTop: 3 },
+  ext: { fontSize: 13, fontFamily: fonts.bold },
   cancelBtn: {
-    marginTop: spacing.sm,
-    paddingVertical: spacing.md,
-    alignItems: "center",
+    marginTop: spacing.md,
     borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
+    overflow: "hidden",
   },
-  cancelTxt: { color: colors.muted, fontSize: 14 },
+  cancelBtnInner: {
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(139,92,246,0.3)",
+  },
+  cancelTxt: { color: colors.brandLight, fontSize: 14, fontFamily: fonts.bold },
 });

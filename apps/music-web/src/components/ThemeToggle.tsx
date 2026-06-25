@@ -14,13 +14,13 @@ export function ThemeToggle() {
   return (
     <button
       onClick={() => setDark((d) => !d)}
-      className="glass w-9 h-9 rounded-lg flex items-center justify-center hover:bg-surface-elevated transition-colors"
+      className="glass w-10 h-10 rounded-lg flex items-center justify-center hover:bg-brand/10 hover:border-brand/30 transition-all duration-200 border border-brand/10 shadow-md shadow-brand/5"
       title={dark ? "Switch to light mode" : "Switch to dark mode"}
     >
       {dark ? (
-        <Sun className="w-4 h-4 text-muted-foreground" />
+        <Sun className="w-4 h-4 text-brand-light transition-transform duration-300 hover:rotate-45" />
       ) : (
-        <Moon className="w-4 h-4 text-muted-foreground" />
+        <Moon className="w-4 h-4 text-brand-light transition-transform duration-300 hover:rotate-45" />
       )}
     </button>
   );
