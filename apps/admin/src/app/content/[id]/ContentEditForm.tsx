@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { FiTrash2, FiCheck, FiX } from 'react-icons/fi'
+import { buildContentUpdateBody, toggleGenreId } from '@/lib/contentForm'
 
 interface VideoFile { id: string; quality: string; url: string; isDefault: boolean; format?: string }
 interface Episode { id: string; episodeNumber: number; title: string; description?: string; runtime?: number; videoUrl?: string; airDate?: string }
@@ -70,13 +71,7 @@ export function ContentEditForm({ content, allGenres }: Props) {
   async function save() {
     setSaving(true)
     try {
-      const body = {
-        ...form,
-        rating: parseFloat(String(form.rating)),
-        runtime: form.runtime ? parseInt(String(form.runtime)) : undefined,
-        cast: form.cast.split(',').map((c) => c.trim()).filter(Boolean),
-        genreIds: selectedGenreIds,
-      }
+      const body = buildContentUpdateBody(form, selectedGenreIds)
       const res = await fetch(`${API}/api/admin/content/${content.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -216,7 +211,7 @@ export function ContentEditForm({ content, allGenres }: Props) {
                     <button
                       key={g.id}
                       type="button"
-                      onClick={() => setSelectedGenreIds((ids) => active ? ids.filter((i) => i !== g.id) : [...ids, g.id])}
+                      onClick={() => setSelectedGenreIds((ids) => toggleGenreId(ids, g.id))}
                       className={`px-3 py-1 rounded-full text-xs font-medium transition ${active ? 'bg-netflix-red text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
                     >
                       {g.name}

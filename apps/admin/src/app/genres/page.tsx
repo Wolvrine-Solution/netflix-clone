@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { FiPlus, FiEdit2, FiTrash2, FiCheck, FiX } from 'react-icons/fi'
+import { isGenreNameValid, normalizeGenreName } from '@/lib/genreValidation'
 
 interface Genre { id: number; name: string; _count?: { contents: number } }
 
@@ -28,12 +29,13 @@ export default function GenresPage() {
   useEffect(() => { if (token) load() }, [token])
 
   async function addGenre() {
-    if (!newName.trim()) return
+    const name = normalizeGenreName(newName)
+    if (!name) return
     setAdding(true)
     await fetch(`${API}/api/admin/genres`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ name: newName.trim() }),
+      body: JSON.stringify({ name }),
     })
     setNewName('')
     setAdding(false)
@@ -41,11 +43,12 @@ export default function GenresPage() {
   }
 
   async function saveEdit(id: number) {
-    if (!editName.trim()) return
+    const name = normalizeGenreName(editName)
+    if (!name) return
     await fetch(`${API}/api/admin/genres/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ name: editName.trim() }),
+      body: JSON.stringify({ name }),
     })
     setEditId(null)
     await load()
@@ -80,7 +83,7 @@ export default function GenresPage() {
           />
           <button
             onClick={addGenre}
-            disabled={adding || !newName.trim()}
+            disabled={adding || !isGenreNameValid(newName)}
             className="bg-netflix-red hover:bg-netflix-red-hover text-white px-4 py-2 rounded-lg text-sm font-medium transition disabled:opacity-50 flex items-center gap-1.5"
           >
             <FiPlus /> {adding ? 'Adding…' : 'Add'}

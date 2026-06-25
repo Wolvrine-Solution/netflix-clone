@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { FiPlus, FiTrash2, FiEdit2, FiCheck, FiX, FiChevronUp, FiChevronDown, FiFilm } from 'react-icons/fi'
+import { computeReorder } from '@/lib/rowReorder'
 
 interface ContentItem { id: string; title: string; posterPath: string; mediaType: string }
 interface Row {
@@ -66,20 +67,13 @@ export default function RowsPage() {
   }
 
   async function moveRow(id: string, direction: 'up' | 'down') {
-    const idx = rows.findIndex((r) => r.id === id)
-    if (direction === 'up' && idx === 0) return
-    if (direction === 'down' && idx === rows.length - 1) return
-    const swapIdx = direction === 'up' ? idx - 1 : idx + 1
-    const reordered = [...rows]
-    const temp = reordered[idx]!
-    reordered[idx] = reordered[swapIdx]!
-    reordered[swapIdx] = temp
-    const orderPayload = reordered.map((r, i) => ({ id: r.id, order: i + 1 }))
-    setRows(reordered.map((r, i) => ({ ...r, order: i + 1 })))
+    const { rows: reordered, payload } = computeReorder(rows, id, direction)
+    if (!reordered || !payload) return
+    setRows(reordered)
     await fetch(`${API}/api/admin/rows/reorder`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ rows: orderPayload }),
+      body: JSON.stringify({ rows: payload }),
     })
   }
 

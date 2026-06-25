@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { FiSearch, FiDownload, FiEdit3 } from 'react-icons/fi'
+import { buildManualCreateBody, isManualContentValid } from '@/lib/contentForm'
 
 interface TMDBResult {
   id: number
@@ -68,7 +69,7 @@ export default function NewContentPage() {
     const res = await fetch(`${API}/api/admin/content`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ ...manual, rating: parseFloat(manual.rating) }),
+      body: JSON.stringify(buildManualCreateBody(manual)),
     })
     const data = await res.json() as { data?: { id?: string } }
     if (data.data?.id) router.push(`/content/${data.data.id}`)
@@ -216,7 +217,7 @@ export default function NewContentPage() {
           </div>
           <button
             onClick={createManual}
-            disabled={!manual.title || !manual.description}
+            disabled={!isManualContentValid(manual)}
             className="bg-netflix-red hover:bg-netflix-red-hover text-white px-6 py-2.5 rounded-lg font-medium transition disabled:opacity-50"
           >
             Create Content
