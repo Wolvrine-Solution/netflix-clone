@@ -18,7 +18,7 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/types";
 import { submitUrl, submitFile } from "@/lib/api";
 import { useAppStore } from "@/lib/store";
-import { colors, spacing, radius, fonts } from "@/lib/theme";
+import { colors, spacing, radius, fonts, gradients, shadow } from "@/lib/theme";
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Home">;
@@ -69,25 +69,42 @@ export function HomeScreen({ navigation }: Props) {
       style={styles.root}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
+      {/* Aurora background */}
       <LinearGradient
-        colors={["rgba(124,58,237,0.18)", "#0F0F13"]}
+        colors={gradients.aurora}
         style={StyleSheet.absoluteFill}
-        start={{ x: 0.2, y: 0 }}
-        end={{ x: 0.8, y: 0.5 }}
+        start={{ x: 0.1, y: 0 }}
+        end={{ x: 0.9, y: 0.6 }}
       />
 
       <ScrollView
-        contentContainerStyle={[styles.scroll, { paddingTop: insets.top + spacing.lg }]}
+        contentContainerStyle={[
+          styles.scroll,
+          { paddingTop: insets.top + spacing.lg },
+        ]}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.logo}>🎸 ChordGen</Text>
-          <Text style={styles.subtitle}>AI Chord Chart & Guitar Pro Generator</Text>
+          <View style={styles.logoRow}>
+            <LinearGradient
+              colors={gradients.brand}
+              style={styles.logoBadge}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <Text style={styles.logoBadgeTxt}>🎸</Text>
+            </LinearGradient>
+            <Text style={styles.logo}>ChordGen</Text>
+          </View>
         </View>
 
         {/* Hero */}
         <View style={styles.hero}>
+          <View style={styles.badge}>
+            <Text style={styles.badgeTxt}>✦  AI chord detection</Text>
+          </View>
           <Text style={styles.heroTitle}>
             Paste a song link.{"\n"}
             <Text style={styles.heroAccent}>Get chords instantly.</Text>
@@ -100,36 +117,59 @@ export function HomeScreen({ navigation }: Props) {
 
         {/* Record Audio Card */}
         <TouchableOpacity
-          style={styles.recordCard}
           onPress={() => navigation.navigate("Recording")}
-          activeOpacity={0.7}
+          activeOpacity={0.85}
+          style={shadow.subtle}
         >
-          <Text style={styles.recordIcon}>🎤</Text>
-          <View style={styles.recordMeta}>
-            <Text style={styles.recordTitle}>Record Audio</Text>
-            <Text style={styles.recordDesc}>Record and analyze in real-time</Text>
-          </View>
-          <Text style={styles.recordArrow}>›</Text>
+          <LinearGradient
+            colors={gradients.brandSoft}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.recordCard}
+          >
+            <View style={styles.recordIconWrap}>
+              <Text style={styles.recordIcon}>🎤</Text>
+            </View>
+            <View style={styles.recordMeta}>
+              <Text style={styles.recordTitle}>Record Audio</Text>
+              <Text style={styles.recordDesc}>Capture & analyze in real-time</Text>
+            </View>
+            <Text style={styles.recordArrow}>›</Text>
+          </LinearGradient>
         </TouchableOpacity>
 
         {/* Mode toggle */}
         <View style={styles.modeRow}>
-          <TouchableOpacity
-            style={[styles.modeBtn, mode === "url" && styles.modeBtnActive]}
-            onPress={() => setMode("url")}
-          >
-            <Text style={[styles.modeTxt, mode === "url" && styles.modeTxtActive]}>
-              🔗 Song URL
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.modeBtn, mode === "file" && styles.modeBtnActive]}
-            onPress={() => setMode("file")}
-          >
-            <Text style={[styles.modeTxt, mode === "file" && styles.modeTxtActive]}>
-              📁 Upload File
-            </Text>
-          </TouchableOpacity>
+          {(["url", "file"] as const).map((m) => {
+            const active = mode === m;
+            const label = m === "url" ? "🔗  Song URL" : "📁  Upload File";
+            return active ? (
+              <LinearGradient
+                key={m}
+                colors={gradients.brand}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.modeBtnActive}
+              >
+                <TouchableOpacity
+                  style={styles.modeBtnInner}
+                  onPress={() => setMode(m)}
+                  activeOpacity={0.9}
+                >
+                  <Text style={styles.modeTxtActive}>{label}</Text>
+                </TouchableOpacity>
+              </LinearGradient>
+            ) : (
+              <TouchableOpacity
+                key={m}
+                style={styles.modeBtn}
+                onPress={() => setMode(m)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.modeTxt}>{label}</Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         {/* Input */}
@@ -138,7 +178,7 @@ export function HomeScreen({ navigation }: Props) {
             <TextInput
               style={styles.input}
               placeholder="https://youtube.com/watch?v=..."
-              placeholderTextColor={colors.muted}
+              placeholderTextColor={colors.mutedDark}
               value={url}
               onChangeText={setUrl}
               autoCapitalize="none"
@@ -154,7 +194,12 @@ export function HomeScreen({ navigation }: Props) {
             )}
           </View>
         ) : (
-          <TouchableOpacity style={styles.uploadBox} onPress={handleFilePick} disabled={loading}>
+          <TouchableOpacity
+            style={styles.uploadBox}
+            onPress={handleFilePick}
+            disabled={loading}
+            activeOpacity={0.7}
+          >
             <Text style={styles.uploadIcon}>📂</Text>
             <Text style={styles.uploadLabel}>Tap to pick a file</Text>
             <Text style={styles.uploadSub}>MP3, WAV, FLAC, M4A — max 50MB</Text>
@@ -164,15 +209,26 @@ export function HomeScreen({ navigation }: Props) {
         {/* Submit */}
         {mode === "url" && (
           <TouchableOpacity
-            style={[styles.cta, (!url.trim() || loading) && styles.ctaDisabled]}
             onPress={handleUrl}
             disabled={!url.trim() || loading}
+            activeOpacity={0.9}
+            style={[
+              shadow.glow,
+              (!url.trim() || loading) && styles.ctaDisabled,
+            ]}
           >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.ctaTxt}>Generate Chord Chart</Text>
-            )}
+            <LinearGradient
+              colors={gradients.brand}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.cta}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.ctaTxt}>Generate Chord Chart  →</Text>
+              )}
+            </LinearGradient>
           </TouchableOpacity>
         )}
 
@@ -200,14 +256,22 @@ export function HomeScreen({ navigation }: Props) {
               <TouchableOpacity
                 key={job.jobId}
                 style={styles.recentItem}
-                onPress={() => navigation.navigate("Results", { jobId: job.jobId })}
+                onPress={() =>
+                  navigation.navigate("Results", { jobId: job.jobId })
+                }
+                activeOpacity={0.7}
               >
-                <Text style={styles.recentTitle} numberOfLines={1}>
-                  {job.title ?? "Unknown Song"}
-                </Text>
-                <Text style={styles.recentArtist} numberOfLines={1}>
-                  {job.artist ?? "Unknown Artist"}
-                </Text>
+                <View style={styles.recentThumb}>
+                  <Text style={styles.recentThumbTxt}>♪</Text>
+                </View>
+                <View style={styles.recentMeta}>
+                  <Text style={styles.recentTitle} numberOfLines={1}>
+                    {job.title ?? "Unknown Song"}
+                  </Text>
+                  <Text style={styles.recentArtist} numberOfLines={1}>
+                    {job.artist ?? "Unknown Artist"}
+                  </Text>
+                </View>
                 <Text style={styles.recentArrow}>›</Text>
               </TouchableOpacity>
             ))}
@@ -221,50 +285,105 @@ export function HomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
   scroll: { padding: spacing.md, paddingBottom: spacing.xxl },
-  header: { alignItems: "center", marginBottom: spacing.xl },
-  logo: { fontSize: 24, color: colors.white, fontFamily: fonts.bold, letterSpacing: -0.5 },
-  subtitle: { fontSize: 12, color: colors.muted, marginTop: 4 },
+  header: { marginBottom: spacing.xl },
+  logoRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
+  logoBadge: {
+    width: 38,
+    height: 38,
+    borderRadius: radius.md,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  logoBadgeTxt: { fontSize: 18 },
+  logo: {
+    fontSize: 20,
+    color: colors.white,
+    fontFamily: fonts.bold,
+    letterSpacing: -0.5,
+  },
   hero: { marginBottom: spacing.xl },
-  heroTitle: { fontSize: 30, color: colors.white, fontFamily: fonts.bold, lineHeight: 38 },
+  badge: {
+    alignSelf: "flex-start",
+    backgroundColor: "rgba(255,255,255,0.05)",
+    borderWidth: 1,
+    borderColor: colors.hairline,
+    borderRadius: radius.full,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginBottom: spacing.md,
+  },
+  badgeTxt: { color: colors.accent, fontSize: 11, fontFamily: fonts.bold },
+  heroTitle: {
+    fontSize: 34,
+    color: colors.white,
+    fontFamily: fonts.bold,
+    lineHeight: 40,
+    letterSpacing: -0.5,
+  },
   heroAccent: { color: colors.brandLight },
-  heroDesc: { fontSize: 15, color: colors.muted, marginTop: spacing.sm, lineHeight: 22 },
+  heroDesc: {
+    fontSize: 15,
+    color: colors.muted,
+    marginTop: spacing.sm,
+    lineHeight: 22,
+  },
   heroHighlight: { color: colors.white },
   recordCard: {
-    backgroundColor: colors.card,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: "rgba(139,92,246,0.25)",
     padding: spacing.md,
     marginBottom: spacing.lg,
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
   },
-  recordIcon: { fontSize: 32 },
+  recordIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: radius.md,
+    backgroundColor: "rgba(139,92,246,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  recordIcon: { fontSize: 26 },
   recordMeta: { flex: 1 },
-  recordTitle: { color: colors.white, fontFamily: fonts.bold, fontSize: 14 },
+  recordTitle: { color: colors.white, fontFamily: fonts.bold, fontSize: 15 },
   recordDesc: { color: colors.muted, fontSize: 12, marginTop: 2 },
-  recordArrow: { color: colors.muted, fontSize: 18 },
+  recordArrow: { color: colors.brandLight, fontSize: 22 },
   modeRow: {
     flexDirection: "row",
     backgroundColor: colors.card,
     borderRadius: radius.lg,
-    padding: 4,
+    padding: 5,
     marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.hairline,
+    gap: 5,
   },
-  modeBtn: { flex: 1, paddingVertical: 10, borderRadius: radius.md, alignItems: "center" },
-  modeBtnActive: { backgroundColor: colors.brand },
+  modeBtn: {
+    flex: 1,
+    paddingVertical: 11,
+    borderRadius: radius.md,
+    alignItems: "center",
+  },
+  modeBtnActive: {
+    flex: 1,
+    borderRadius: radius.md,
+  },
+  modeBtnInner: {
+    paddingVertical: 11,
+    alignItems: "center",
+  },
   modeTxt: { color: colors.muted, fontSize: 14 },
-  modeTxtActive: { color: colors.white, fontFamily: fonts.bold },
+  modeTxtActive: { color: colors.white, fontFamily: fonts.bold, fontSize: 14 },
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: colors.card,
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.hairline,
     paddingHorizontal: spacing.md,
     marginBottom: spacing.md,
   },
@@ -282,46 +401,69 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   uploadIcon: { fontSize: 32, marginBottom: spacing.sm },
-  uploadLabel: { color: colors.white, fontSize: 15 },
+  uploadLabel: { color: colors.white, fontSize: 15, fontFamily: fonts.bold },
   uploadSub: { color: colors.muted, fontSize: 12, marginTop: 4 },
   cta: {
-    backgroundColor: colors.brand,
     borderRadius: radius.md,
-    paddingVertical: 16,
+    paddingVertical: 17,
     alignItems: "center",
-    shadowColor: colors.brand,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 6,
   },
-  ctaDisabled: { opacity: 0.5 },
+  ctaDisabled: { opacity: 0.45 },
   ctaTxt: { color: colors.white, fontFamily: fonts.bold, fontSize: 16 },
-  uploadingRow: { flexDirection: "row", alignItems: "center", gap: 8, justifyContent: "center", marginVertical: spacing.sm },
+  uploadingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    justifyContent: "center",
+    marginVertical: spacing.sm,
+  },
   uploadingTxt: { color: colors.brandLight, fontSize: 14 },
-  sourcesRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: spacing.lg },
+  sourcesRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: spacing.lg,
+  },
   sourceChip: {
-    backgroundColor: colors.card,
+    backgroundColor: "rgba(255,255,255,0.04)",
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.hairline,
     borderRadius: radius.full,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 13,
+    paddingVertical: 7,
   },
   sourceChipTxt: { color: colors.muted, fontSize: 12 },
   section: { marginTop: spacing.xl },
-  sectionTitle: { color: colors.muted, fontSize: 11, fontFamily: fonts.bold, letterSpacing: 1, textTransform: "uppercase", marginBottom: spacing.sm },
+  sectionTitle: {
+    color: colors.muted,
+    fontSize: 11,
+    fontFamily: fonts.bold,
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+    marginBottom: spacing.sm,
+  },
   recentItem: {
     backgroundColor: colors.card,
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
+    borderColor: colors.hairline,
+    padding: spacing.sm,
     marginBottom: spacing.sm,
     flexDirection: "row",
     alignItems: "center",
+    gap: spacing.sm,
   },
-  recentTitle: { flex: 1, color: colors.white, fontSize: 14 },
-  recentArtist: { color: colors.muted, fontSize: 12, marginRight: spacing.sm },
-  recentArrow: { color: colors.muted, fontSize: 18 },
+  recentThumb: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.sm,
+    backgroundColor: "rgba(139,92,246,0.15)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  recentThumbTxt: { color: colors.brandLight, fontSize: 18 },
+  recentMeta: { flex: 1, minWidth: 0 },
+  recentTitle: { color: colors.white, fontSize: 14, fontFamily: fonts.bold },
+  recentArtist: { color: colors.muted, fontSize: 12, marginTop: 2 },
+  recentArrow: { color: colors.muted, fontSize: 20 },
 });

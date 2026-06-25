@@ -1,7 +1,9 @@
 "use client";
 
-import { FileDown, FileText, Music } from "lucide-react";
+import { useState } from "react";
+import { FileDown, FileText, Music, Check, Link as LinkIcon } from "lucide-react";
 import type { SongMeta } from "@/types";
+import clsx from "clsx";
 
 interface Props {
   jobId: string;
@@ -12,65 +14,91 @@ const FORMATS = [
   {
     key: "gp5",
     label: "Guitar Pro",
-    desc: "Open in Guitar Pro 7/8",
+    desc: "Opens in Guitar Pro 7/8",
     icon: Music,
     ext: ".gp5",
-    accent: "text-green-400",
+    tile: "bg-emerald-500/15 text-emerald-400 ring-emerald-500/20",
   },
   {
     key: "pdf",
-    label: "PDF",
+    label: "PDF Sheet",
     desc: "Print or share",
     icon: FileDown,
     ext: ".pdf",
-    accent: "text-red-400",
+    tile: "bg-rose-500/15 text-rose-400 ring-rose-500/20",
   },
   {
     key: "txt",
     label: "Plain Text",
-    desc: "Chord sheet, no formatting",
+    desc: "Chord sheet, raw",
     icon: FileText,
     ext: ".txt",
-    accent: "text-blue-400",
+    tile: "bg-sky-500/15 text-sky-400 ring-sky-500/20",
   },
 ] as const;
 
 export function DownloadPanel({ jobId, meta }: Props) {
-  return (
-    <div className="space-y-4">
-      <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">
-        Download
-      </h3>
+  const [copied, setCopied] = useState(false);
 
-      <div className="space-y-2">
-        {FORMATS.map(({ key, label, desc, icon: Icon, ext, accent }) => (
+  const handleCopy = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2.5">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          Download
+        </h3>
+
+        {FORMATS.map(({ key, label, desc, icon: Icon, ext, tile }) => (
           <a
             key={key}
             href={`/api/download/${jobId}?format=${key}`}
             download={`${meta.title ?? "chords"}${ext}`}
-            className="flex items-center gap-3 glass rounded-xl px-4 py-3 hover:bg-surface-elevated
-                       transition-all group cursor-pointer no-underline"
+            className="group flex items-center gap-3 rounded-xl border border-white/[0.06] bg-surface-card/50 px-3.5 py-3 no-underline backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/30 hover:bg-surface-elevated"
           >
-            <Icon className={`w-5 h-5 flex-shrink-0 ${accent}`} />
-            <div className="flex-1 min-w-0">
+            <span
+              className={clsx(
+                "grid h-10 w-10 shrink-0 place-items-center rounded-xl ring-1",
+                tile
+              )}
+            >
+              <Icon className="h-5 w-5" />
+            </span>
+            <div className="min-w-0 flex-1">
               <div className="text-sm font-medium">{label}</div>
               <div className="text-xs text-muted-foreground">{desc}</div>
             </div>
-            <FileDown className="w-4 h-4 text-muted-foreground group-hover:text-white transition-colors" />
+            <FileDown className="h-4 w-4 text-muted-foreground transition-all duration-300 group-hover:translate-y-0.5 group-hover:text-brand-light" />
           </a>
         ))}
       </div>
 
-      <div className="border-t border-surface-border pt-4 space-y-2">
-        <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">
+      <div className="space-y-2.5 border-t border-white/[0.06] pt-5">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
           Share
         </h3>
         <button
-          onClick={() => navigator.clipboard.writeText(window.location.href)}
-          className="w-full glass rounded-xl px-4 py-3 text-sm text-muted-foreground
-                     hover:text-white hover:bg-surface-elevated transition-all text-left"
+          onClick={handleCopy}
+          className={clsx(
+            "flex w-full items-center gap-2.5 rounded-xl border px-3.5 py-3 text-sm transition-all duration-300",
+            copied
+              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+              : "border-white/[0.06] bg-surface-card/50 text-muted-foreground hover:border-brand/30 hover:text-white"
+          )}
         >
-          Copy link to this chart
+          {copied ? (
+            <>
+              <Check className="h-4 w-4" /> Link copied!
+            </>
+          ) : (
+            <>
+              <LinkIcon className="h-4 w-4" /> Copy link to this chart
+            </>
+          )}
         </button>
       </div>
     </div>

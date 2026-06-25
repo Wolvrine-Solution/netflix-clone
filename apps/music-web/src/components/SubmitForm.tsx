@@ -2,7 +2,15 @@
 
 import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Link2, Upload, X, Loader2, Music } from "lucide-react";
+import {
+  Link2,
+  Upload,
+  X,
+  Loader2,
+  Music,
+  AlertCircle,
+  ArrowRight,
+} from "lucide-react";
 import clsx from "clsx";
 
 type InputMode = "url" | "file";
@@ -60,29 +68,32 @@ export function SubmitForm() {
     }
   };
 
+  const disabled = loading || (mode === "url" ? !url : !file);
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="w-full max-w-xl space-y-4"
-    >
+    <form onSubmit={handleSubmit} className="w-full space-y-3">
       {/* Mode toggle */}
-      <div className="flex glass rounded-xl p-1 gap-1">
+      <div className="glass relative flex gap-1 rounded-2xl p-1.5">
         {(["url", "file"] as InputMode[]).map((m) => (
           <button
             key={m}
             type="button"
             onClick={() => setMode(m)}
             className={clsx(
-              "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all",
+              "relative flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-medium transition-all duration-300",
               mode === m
-                ? "bg-brand text-white shadow-lg shadow-brand/30"
+                ? "bg-brand-gradient text-white shadow-glow"
                 : "text-muted-foreground hover:text-white"
             )}
           >
             {m === "url" ? (
-              <><Link2 className="w-4 h-4" /> Song URL</>
+              <>
+                <Link2 className="h-4 w-4" /> Song URL
+              </>
             ) : (
-              <><Upload className="w-4 h-4" /> Upload File</>
+              <>
+                <Upload className="h-4 w-4" /> Upload File
+              </>
             )}
           </button>
         ))}
@@ -90,35 +101,40 @@ export function SubmitForm() {
 
       {/* Input area */}
       {mode === "url" ? (
-        <div className="relative">
+        <div className="group relative">
+          <Link2 className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-brand-light" />
           <input
             type="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://youtube.com/watch?v=... or any song link"
+            placeholder="https://youtube.com/watch?v=..."
             required
-            className="w-full glass rounded-xl px-4 py-4 pr-12 text-sm placeholder:text-muted-foreground
-                       focus:outline-none focus:ring-2 focus:ring-brand/50 transition-all"
+            className="glass w-full rounded-2xl py-4 pl-11 pr-12 text-sm transition-all duration-300 placeholder:text-muted-foreground/60 focus:border-brand/40 focus:shadow-glow focus:outline-none"
           />
           {url && (
             <button
               type="button"
               onClick={() => setUrl("")}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-white"
             >
-              <X className="w-4 h-4" />
+              <X className="h-4 w-4" />
             </button>
           )}
         </div>
       ) : (
         <div
-          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragging(true);
+          }}
           onDragLeave={() => setDragging(false)}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
           className={clsx(
-            "glass rounded-xl p-8 text-center cursor-pointer transition-all border-2 border-dashed",
-            dragging ? "border-brand bg-brand/10" : "border-surface-border hover:border-brand/50"
+            "relative cursor-pointer rounded-2xl border-2 border-dashed p-8 text-center transition-all duration-300",
+            dragging
+              ? "border-brand bg-brand/10 shadow-glow"
+              : "glass border-white/10 hover:border-brand/40"
           )}
         >
           <input
@@ -130,20 +146,29 @@ export function SubmitForm() {
           />
           {file ? (
             <div className="flex items-center justify-center gap-3">
-              <Music className="w-5 h-5 text-brand-light" />
-              <span className="text-sm font-medium">{file.name}</span>
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-brand/15 ring-1 ring-brand/20">
+                <Music className="h-5 w-5 text-brand-light" />
+              </div>
+              <span className="max-w-[16rem] truncate text-sm font-medium">
+                {file.name}
+              </span>
               <button
                 type="button"
-                onClick={(e) => { e.stopPropagation(); setFile(null); }}
-                className="text-muted-foreground hover:text-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFile(null);
+                }}
+                className="text-muted-foreground transition-colors hover:text-white"
               >
-                <X className="w-4 h-4" />
+                <X className="h-4 w-4" />
               </button>
             </div>
           ) : (
-            <div className="space-y-1">
-              <Upload className="w-8 h-8 mx-auto text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">
+            <div className="space-y-2">
+              <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-brand/10 ring-1 ring-brand/20">
+                <Upload className="h-6 w-6 text-brand-light" />
+              </div>
+              <p className="text-sm font-medium text-white">
                 Drop a file or click to browse
               </p>
               <p className="text-xs text-muted-foreground">
@@ -155,20 +180,26 @@ export function SubmitForm() {
       )}
 
       {error && (
-        <p className="text-sm text-red-400 glass rounded-lg px-4 py-3">{error}</p>
+        <div className="animate-slide-up flex items-center gap-2.5 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          {error}
+        </div>
       )}
 
       <button
         type="submit"
-        disabled={loading || (mode === "url" ? !url : !file)}
-        className="w-full bg-brand hover:bg-brand-dark disabled:opacity-50 disabled:cursor-not-allowed
-                   text-white font-semibold py-4 rounded-xl transition-all shadow-lg shadow-brand/30
-                   hover:shadow-brand/50 flex items-center justify-center gap-2 text-sm"
+        disabled={disabled}
+        className="btn-primary group flex w-full items-center justify-center gap-2 py-4 text-sm"
       >
         {loading ? (
-          <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" /> Analyzing audio...
+          </>
         ) : (
-          "Generate Chord Chart"
+          <>
+            Generate Chord Chart
+            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+          </>
         )}
       </button>
     </form>
