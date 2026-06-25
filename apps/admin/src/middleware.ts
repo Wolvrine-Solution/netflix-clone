@@ -1,17 +1,11 @@
 import { auth } from './lib/auth'
 import { NextResponse } from 'next/server'
+import { decideAccess } from './lib/accessGuard'
 
 export default auth((req) => {
-  const isLoggedIn = !!req.auth
-  const isLoginPage = req.nextUrl.pathname === '/login'
-  const isApiRoute = req.nextUrl.pathname.startsWith('/api')
-
-  if (isApiRoute) return NextResponse.next()
-  if (!isLoggedIn && !isLoginPage) {
-    return NextResponse.redirect(new URL('/login', req.nextUrl))
-  }
-  if (isLoggedIn && isLoginPage) {
-    return NextResponse.redirect(new URL('/', req.nextUrl))
+  const action = decideAccess({ isLoggedIn: !!req.auth, pathname: req.nextUrl.pathname })
+  if (action.type === 'redirect') {
+    return NextResponse.redirect(new URL(action.to, req.nextUrl))
   }
   return NextResponse.next()
 })
