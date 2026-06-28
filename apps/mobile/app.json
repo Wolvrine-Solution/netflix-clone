@@ -28,7 +28,6 @@
       "expo-router",
       "expo-video",
       "expo-secure-store",
-      "expo-linear-gradient",
       [
         "expo-screen-orientation",
         {
