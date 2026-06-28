@@ -25,7 +25,7 @@ npm run build:web
 echo "🌐 Serving on :8400..."
 pkill -f "http-server.*8400" 2>/dev/null || true
 sleep 1
-nohup npx --yes http-server dist -p 8400 -e html > /tmp/netflix-mobile-serve.log 2>&1 &
+nohup npx --yes http-server dist -p 8400 -e html -a 127.0.0.1 > /tmp/netflix-mobile-serve.log 2>&1 &
 SERVER_PID=$!
 sleep 2
 

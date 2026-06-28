@@ -19,7 +19,7 @@ export default defineConfig({
   },
   projects: [{ name: 'mobile-web', use: { ...devices['Pixel 7'] } }],
   webServer: {
-    command: 'npm run build:web && npx --yes http-server dist -p 8400 -e html',
+    command: 'npm run build:web && npx --yes http-server dist -p 8400 -e html -a 127.0.0.1',
     url: 'http://localhost:8400',
     reuseExistingServer: true,
     timeout: 180_000,
