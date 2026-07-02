@@ -9,7 +9,12 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:ui": "playwright test --ui",
+    "record:features": "./record-feature-videos.sh",
+    "record:features:headed": "./record-feature-videos.sh headed"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.0",
@@ -36,6 +41,7 @@
   },
   "devDependencies": {
     "@netflix/config": "workspace:*",
+    "@playwright/test": "^1.61.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",

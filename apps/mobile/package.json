@@ -8,9 +8,14 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "build": "expo export",
+    "build:web": "expo export --platform web",
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "record:features": "./record-feature-videos.sh",
+    "record:features:headed": "./record-feature-videos.sh headed"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.1.1",
@@ -29,15 +34,20 @@
     "expo-video": "~2.2.3",
     "nativewind": "^4.1.23",
     "react": "18.3.1",
+    "react-dom": "18.3.1",
     "react-native": "0.76.9",
+    "react-native-web": "~0.19.13",
+    "@expo/metro-runtime": "~4.0.1",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-reanimated": "~3.16.7",
+    "react-native-worklets": "0.10.0",
     "react-native-safe-area-context": "4.12.0",
     "react-native-screens": "~4.4.0",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@babel/core": "7.25.2",
+    "@playwright/test": "^1.61.1",
     "@testing-library/react-native": "^12.9.0",
     "@types/jest": "^29.5.14",
     "@types/react": "~18.3.12",
