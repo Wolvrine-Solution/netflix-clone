@@ -126,7 +126,7 @@ pnpm --filter @netflix/mobile test:e2e
 
 ## Build/Deploy
 
-No Dockerfile or CI workflow is present in this repository. Build artifacts are produced per app via Turborepo:
+No Dockerfile or CI workflow is present in this repository yet (planned — see `ROADMAP.md` Phase 1). Build artifacts are produced per app via Turborepo:
 
 ```bash
 pnpm build
