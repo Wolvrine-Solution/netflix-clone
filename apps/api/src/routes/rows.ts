@@ -1,9 +1,15 @@
 import { Router } from 'express'
 import { prisma } from '@netflix/db'
+import { optionalAuth } from '../middleware/optionalAuth'
+import { resolveKidProfile, KidFilterRequest } from '../middleware/kidFilter'
+import { filterByKidProfile } from '../lib/maturity'
 
 export const rowsRouter = Router()
 
-rowsRouter.get('/', async (_req, res, next) => {
+rowsRouter.use(optionalAuth)
+rowsRouter.use(resolveKidProfile)
+
+rowsRouter.get('/', async (req: KidFilterRequest, res, next) => {
   try {
     const rows = await prisma.row.findMany({
       orderBy: { order: 'asc' },
@@ -19,10 +25,8 @@ rowsRouter.get('/', async (_req, res, next) => {
         },
       },
     })
-    const data = rows.map((row) => ({
-      id: row.id,
-      title: row.title,
-      items: row.contents.map((cr) => ({
+    const data = rows.map((row) => {
+      const items = row.contents.map((cr) => ({
         id: cr.content.id,
         tmdbId: cr.content.tmdbId ?? undefined,
         title: cr.content.title,
@@ -41,8 +45,13 @@ rowsRouter.get('/', async (_req, res, next) => {
         status: cr.content.status,
         language: cr.content.language,
         cast: cr.content.cast,
-      })),
-    }))
+      }))
+      return {
+        id: row.id,
+        title: row.title,
+        items: req.isKidProfile ? filterByKidProfile(items, true) : items,
+      }
+    })
     res.json({ data })
   } catch (err) {
     next(err)

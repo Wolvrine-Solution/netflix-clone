@@ -1,5 +1,5 @@
 import NextAuth from 'next-auth'
-import { encode } from 'next-auth/jwt'
+import { SignJWT } from 'jose'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
@@ -46,11 +46,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async session({ session, token }) {
       if (token['userId']) session.user.id = token['userId'] as string
-      ;(session as { accessToken?: string }).accessToken = await encode({
-        token,
-        secret: process.env['NEXTAUTH_SECRET'] ?? '',
-        salt: 'authjs.session-token',
-      })
+      const secret = process.env['NEXTAUTH_SECRET']
+      if (secret && secret.length >= 32) {
+        ;(session as { accessToken?: string }).accessToken = await new SignJWT({
+          email: session.user?.email,
+          name: session.user?.name,
+        })
+          .setProtectedHeader({ alg: 'HS256' })
+          .setSubject(token['userId'] as string)
+          .setIssuedAt()
+          .setExpirationTime('15m')
+          .sign(new TextEncoder().encode(secret))
+      }
       return session
     },
   },

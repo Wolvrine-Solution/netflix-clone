@@ -25,6 +25,13 @@
     },
     "db:seed": {
       "cache": false
+    },
+    "db:migrate": {
+      "cache": false
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$"]
     }
   }
 }

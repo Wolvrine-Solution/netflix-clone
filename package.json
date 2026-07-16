@@ -8,8 +8,10 @@
     "typecheck": "turbo run typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
     "db:push": "turbo run db:push --filter=@netflix/db",
+    "db:migrate": "turbo run db:migrate --filter=@netflix/db",
     "db:studio": "turbo run db:studio --filter=@netflix/db",
     "db:seed": "turbo run db:seed --filter=@netflix/db",
+    "test": "turbo run test",
     "mobile": "pnpm --filter @netflix/mobile dev",
     "mobile:android": "pnpm --filter @netflix/mobile android",
     "mobile:ios": "pnpm --filter @netflix/mobile ios"

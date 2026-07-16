@@ -65,7 +65,7 @@ describe('Content routes', () => {
     await request(app).get('/content?mediaType=tv')
 
     expect(prismaMock.content.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { mediaType: 'tv' } })
+      expect.objectContaining({ where: { mediaType: 'tv', status: 'PUBLISHED' } })
     )
   })
 
@@ -78,7 +78,10 @@ describe('Content routes', () => {
 
     expect(prismaMock.content.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { genres: { some: { genre: { name: { contains: 'comedy', mode: 'insensitive' } } } } },
+        where: {
+          genres: { some: { genre: { name: { contains: 'comedy', mode: 'insensitive' } } } },
+          status: 'PUBLISHED',
+        },
       })
     )
   })
@@ -92,7 +95,7 @@ describe('Content routes', () => {
     expect(res.status).toBe(200)
     expect(res.body.data).toEqual({ id: 'c1', isFeatured: true })
     expect(prismaMock.content.findFirst).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { isFeatured: true } })
+      expect.objectContaining({ where: { isFeatured: true, status: 'PUBLISHED' } })
     )
   })
 

@@ -18,6 +18,10 @@ model User {
   hashedPassword String?
   role           Role           @default(USER)
   isSuspended    Boolean        @default(false)
+  mfaEnabled     Boolean        @default(false)
+  mfaSecret      String?
+  tosAcceptedAt  DateTime?
+  privacyAcceptedAt DateTime?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   accounts       Account[]
@@ -27,6 +31,14 @@ model User {
   notifications  Notification[]
   reviews        Review[]
   adminLogs      AdminLog[]     @relation("AdminWhoActed")
+  refreshTokens  RefreshToken[]
+  playbackSessions PlaybackSession[]
+  purchases      Purchase[]
+  eventEntitlements EventEntitlement[]
+  consentRecords ConsentRecord[]
+  dataSubjectRequests DataSubjectRequest[]
+  downloadLicenses DownloadLicense[]
+  qoeEvents      QoEEvent[]
 }
 
 enum Role {
@@ -75,6 +87,7 @@ model Profile {
   name         String
   avatarUrl    String
   isKid        Boolean        @default(false)
+  pinHash      String?
   language     String         @default("en")
   userId       String
   user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -83,6 +96,18 @@ model Profile {
   reviews      Review[]
 
   @@unique([userId, name])
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // ─────────────────────────────── SUBSCRIPTIONS ───────────────────────────────
@@ -147,6 +172,12 @@ model Content {
   rowItems       ContentRow[]
   categories     ContentCategory[]
   reviews        Review[]
+  assets         Asset[]
+  captions       Caption[]
+  trickPlaySprites TrickPlaySprite[]
+  licenseWindows LicenseWindow[]
+  purchases      Purchase[]
+  outboxEvents   OutboxEvent[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 }
@@ -364,4 +395,258 @@ model AdminLog {
   ipAddress  String?
   admin      User     @relation("AdminWhoActed", fields: [adminId], references: [id])
   createdAt  DateTime @default(now())
+}
+
+// ─────────────────────────────── VOD ASSETS & PLAYBACK ───────────────────────
+
+enum AssetStatus {
+  UPLOADED
+  TRANSCODING
+  PACKAGED
+  READY
+  FAILED
+}
+
+model Asset {
+  id          String      @id @default(cuid())
+  contentId   String?
+  episodeId   String?
+  status      AssetStatus @default(UPLOADED)
+  sourceKey   String
+  manifestUrl String?
+  hlsUrl      String?
+  dashUrl     String?
+  drmKeyId    String?
+  error       String?
+  content     Content?    @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([contentId])
+  @@index([status])
+}
+
+model Caption {
+  id        String   @id @default(cuid())
+  contentId String?
+  episodeId String?
+  language  String
+  url       String
+  content   Content? @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([contentId])
+}
+
+model TrickPlaySprite {
+  id          String  @id @default(cuid())
+  contentId   String
+  url         String
+  intervalSec Int     @default(10)
+  content     Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+model LicenseWindow {
+  id          String   @id @default(cuid())
+  contentId   String
+  territories String[] @default([])
+  startsAt    DateTime
+  endsAt      DateTime
+  content     Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@index([contentId, endsAt])
+}
+
+model QoEEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  contentId String
+  eventType String
+  metadata  Json?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+
+  @@index([contentId, createdAt])
+}
+
+// ─────────────────────────────── LIVE STREAMING ──────────────────────────────
+
+enum LiveEventStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+  CANCELLED
+}
+
+model LiveChannel {
+  id          String      @id @default(cuid())
+  name        String
+  slug        String      @unique
+  description String?     @db.Text
+  isActive    Boolean     @default(true)
+  events      LiveEvent[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model LiveEvent {
+  id                String          @id @default(cuid())
+  channelId         String
+  title             String
+  description       String?         @db.Text
+  status            LiveEventStatus @default(SCHEDULED)
+  scheduledStart    DateTime
+  scheduledEnd      DateTime?
+  ingestUrl         String?
+  playbackUrl       String?
+  dvrWindowSec      Int             @default(7200)
+  slatePreUrl       String?
+  slatePostUrl      String?
+  geoRestricted     String[]        @default([])
+  blackoutRegions   String[]        @default([])
+  archivedContentId String?
+  channel           LiveChannel     @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  entitlements      EventEntitlement[]
+  purchases         Purchase[]
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([channelId, scheduledStart])
+  @@index([status])
+}
+
+model EventEntitlement {
+  id        String    @id @default(cuid())
+  eventId   String
+  userId    String
+  event     LiveEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+
+  @@unique([eventId, userId])
+}
+
+// ─────────────────────────────── BILLING & ENTITLEMENTS ──────────────────────
+
+model StripeWebhookEvent {
+  id          String   @id @default(cuid())
+  stripeEventId String @unique
+  processedAt DateTime @default(now())
+}
+
+enum PurchaseType {
+  PPV
+  TVOD
+}
+
+model Purchase {
+  id                    String       @id @default(cuid())
+  userId                String
+  contentId             String?
+  eventId               String?
+  type                  PurchaseType
+  amountCents           Int
+  stripePaymentIntentId String?      @unique
+  user                  User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content               Content?     @relation(fields: [contentId], references: [id], onDelete: SetNull)
+  event                 LiveEvent?   @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  createdAt             DateTime     @default(now())
+
+  @@index([userId])
+}
+
+model PlaybackSession {
+  id            String   @id @default(cuid())
+  userId        String
+  profileId     String?
+  deviceId      String
+  qualityCap    String?
+  lastHeartbeat DateTime @default(now())
+  expiresAt     DateTime
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+// ─────────────────────────────── SEARCH & EVENTS ─────────────────────────────
+
+model OutboxEvent {
+  id            String    @id @default(cuid())
+  aggregateType String
+  aggregateId   String
+  eventType     String
+  payload       Json
+  processedAt   DateTime?
+  contentId     String?
+  content       Content?  @relation(fields: [contentId], references: [id], onDelete: SetNull)
+  createdAt     DateTime  @default(now())
+
+  @@index([processedAt, createdAt])
+}
+
+// ─────────────────────────────── COMPLIANCE ──────────────────────────────────
+
+enum DmcaStatus {
+  OPEN
+  RESOLVED
+  REJECTED
+}
+
+model DmcaTakedown {
+  id            String     @id @default(cuid())
+  reporterEmail String
+  contentId     String?
+  details       String     @db.Text
+  status        DmcaStatus @default(OPEN)
+  createdAt     DateTime   @default(now())
+  resolvedAt    DateTime?
+}
+
+enum DsarType {
+  EXPORT
+  DELETE
+}
+
+enum DsarStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+model ConsentRecord {
+  id          String   @id @default(cuid())
+  userId      String
+  consentType String
+  granted     Boolean
+  ipAddress   String?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@index([userId, consentType])
+}
+
+model DataSubjectRequest {
+  id          String     @id @default(cuid())
+  userId      String
+  type        DsarType
+  status      DsarStatus @default(PENDING)
+  completedAt DateTime?
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime   @default(now())
+
+  @@index([userId, status])
+}
+
+model DownloadLicense {
+  id         String   @id @default(cuid())
+  userId     String
+  contentId  String
+  licenseUrl String
+  expiresAt  DateTime
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@index([userId, expiresAt])
 }

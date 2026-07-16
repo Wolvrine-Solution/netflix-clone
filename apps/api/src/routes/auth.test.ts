@@ -4,6 +4,7 @@ import request from 'supertest'
 import * as bcrypt from 'bcryptjs'
 const prismaMock = vi.hoisted(() => ({
   user: { findUnique: vi.fn() },
+  refreshToken: { create: vi.fn().mockResolvedValue({ id: 'rt1' }) },
 })) as any
 vi.mock('@netflix/db', () => ({ prisma: prismaMock }))
 

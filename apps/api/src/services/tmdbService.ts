@@ -1,15 +1,14 @@
-import NodeCache from 'node-cache'
-import { prisma } from '@netflix/db'
-import type { ContentItem } from '@netflix/types'
-
-const cache = new NodeCache({ stdTTL: 3600 })
-const TMDB_BASE = process.env['TMDB_BASE_URL'] ?? 'https://api.themoviedb.org/3'
-const API_KEY = process.env['TMDB_API_KEY'] ?? ''
+import { getRedis } from '../lib/redis'
+import { getEnv } from './env'
 
 async function tmdbFetch<T>(path: string, params: Record<string, string> = {}): Promise<T> {
+  const env = getEnv()
+  const TMDB_BASE = env.TMDB_BASE_URL
+  const API_KEY = env.TMDB_API_KEY ?? ''
   const cacheKey = `tmdb:${path}:${JSON.stringify(params)}`
-  const cached = cache.get<T>(cacheKey)
-  if (cached) return cached
+  const redis = await getRedis()
+  const cached = await redis.get(cacheKey)
+  if (cached) return JSON.parse(cached) as T
 
   const url = new URL(`${TMDB_BASE}${path}`)
   url.searchParams.set('api_key', API_KEY)
@@ -19,11 +18,12 @@ async function tmdbFetch<T>(path: string, params: Record<string, string> = {}): 
   const res = await fetch(url.toString())
   if (!res.ok) throw new Error(`TMDB error: ${res.statusText}`)
   const data = await res.json() as T
-  cache.set(cacheKey, data)
+  await redis.set(cacheKey, JSON.stringify(data), 'EX', 3600)
   return data
 }
 
-export async function searchTMDB(query: string): Promise<ContentItem[]> {
+export async function searchTMDB(query: string): Promise<import('@netflix/types').ContentItem[]> {
+  const API_KEY = getEnv().TMDB_API_KEY ?? ''
   if (!API_KEY) return []
   const data = await tmdbFetch<{ results: Array<{ id: number; media_type: string; title?: string; name?: string; overview: string; poster_path: string | null; backdrop_path: string | null; vote_average: number; release_date?: string; first_air_date?: string }> }>('/search/multi', { query, page: '1' })
   return data.results
@@ -48,7 +48,8 @@ export async function searchTMDB(query: string): Promise<ContentItem[]> {
     }))
 }
 
-export async function getContentFromDB(id: string): Promise<ContentItem | null> {
+export async function getContentFromDB(id: string): Promise<import('@netflix/types').ContentItem | null> {
+  const { prisma } = await import('@netflix/db')
   const content = await prisma.content.findUnique({
     where: { id },
     include: {

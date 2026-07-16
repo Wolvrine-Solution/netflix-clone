@@ -1,12 +1,10 @@
 import { Router } from 'express'
 import { compare } from 'bcryptjs'
-import { SignJWT } from 'jose'
 import { prisma } from '@netflix/db'
 import { AppError } from '../middleware/errorHandler'
+import { signAccessToken, issueRefreshToken, rotateRefreshToken, revokeAllRefreshTokens } from '../lib/jwt'
 
 export const authRouter = Router()
-
-const secret = new TextEncoder().encode(process.env['NEXTAUTH_SECRET'] ?? 'fallback-secret')
 
 authRouter.post('/signin', async (req, res, next) => {
   try {
@@ -26,20 +24,17 @@ authRouter.post('/signin', async (req, res, next) => {
       throw new AppError(401, 'Invalid email or password')
     }
 
-    const token = await new SignJWT({
+    const accessToken = await signAccessToken({
       sub: user.id,
       email: user.email,
       name: user.name,
-      image: user.image,
+      role: user.role,
     })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setIssuedAt()
-      .setExpirationTime('30d')
-      .setJti(crypto.randomUUID())
-      .sign(secret)
+    const refreshToken = await issueRefreshToken(user.id)
 
     res.json({
-      token,
+      token: accessToken,
+      refreshToken,
       user: {
         id: user.id,
         name: user.name,
@@ -47,6 +42,29 @@ authRouter.post('/signin', async (req, res, next) => {
         image: user.image,
       },
     })
+  } catch (err) {
+    next(err)
+  }
+})
+
+authRouter.post('/refresh', async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body as { refreshToken?: string }
+    if (!refreshToken) throw new AppError(400, 'refreshToken required')
+    const tokens = await rotateRefreshToken(refreshToken)
+    if (!tokens) throw new AppError(401, 'Invalid refresh token')
+    res.json({ data: tokens })
+  } catch (err) {
+    next(err)
+  }
+})
+
+authRouter.post('/revoke', async (req, res, next) => {
+  try {
+    const { userId } = req.body as { userId?: string }
+    if (!userId) throw new AppError(400, 'userId required')
+    await revokeAllRefreshTokens(userId)
+    res.json({ data: { revoked: true } })
   } catch (err) {
     next(err)
   }

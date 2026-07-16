@@ -40,4 +40,22 @@ export const api = {
     update: (profileId: string, contentId: string, progress: number) =>
       apiClient.put(`/profiles/${profileId}/history`, { contentId, progress }),
   },
+  playback: {
+    token: (contentId: string, body?: { profileId?: string; episodeId?: string }) =>
+      apiClient.post(`/v1/playback/${contentId}`, body ?? {}),
+    heartbeat: (sessionId: string) =>
+      apiClient.post(`/v1/playback/sessions/${sessionId}/heartbeat`),
+    qoe: (contentId: string, eventType: string, metadata?: Record<string, unknown>) =>
+      apiClient.post('/v1/playback/qoe', { contentId, eventType, metadata }),
+  },
+  billing: {
+    subscription: () => apiClient.get('/v1/billing/subscription'),
+    checkout: (plan: string, successUrl: string, cancelUrl: string) =>
+      apiClient.post('/v1/billing/checkout', { plan, successUrl, cancelUrl }),
+    history: () => apiClient.get('/v1/billing/history'),
+  },
+  live: {
+    channels: () => apiClient.get('/v1/live/channels'),
+  },
+  recommendations: (profileId: string) => apiClient.get(`/v1/recommendations/${profileId}`),
 }
