@@ -42,20 +42,25 @@ export default function SubscriptionPage() {
 
   useEffect(() => {
     if (!session) return
-    api.history.get('_') // warm session
-      .catch(() => {})
-    // In a real app, call /api/subscriptions to get current sub
-    // For this demo, get from session if available
-    const s = (session as { subscription?: Subscription }).subscription
-    setSubscription(s ?? null)
-    setLoading(false)
+    api.billing.subscription()
+      .then((res) => setSubscription(res.data.data))
+      .catch(() => setSubscription(null))
+      .finally(() => setLoading(false))
   }, [session])
 
   async function changePlan(planId: string) {
     setUpgrading(planId)
     try {
-      // In a real app: POST /api/subscriptions/change { plan: planId }
-      await new Promise((r) => setTimeout(r, 1500)) // demo delay
+      const origin = window.location.origin
+      const res = await api.billing.checkout(
+        planId,
+        `${origin}/subscription?success=1`,
+        `${origin}/subscription`
+      )
+      if (res.data.data?.url) {
+        window.location.href = res.data.data.url
+        return
+      }
       setSubscription((s) => ({ ...s, plan: planId, status: 'ACTIVE' } as Subscription))
     } finally { setUpgrading(null) }
   }
@@ -203,9 +208,7 @@ export default function SubscriptionPage() {
         </div>
 
         <p className="text-center text-gray-600 text-xs mt-8">
-          Plans are billed monthly. Cancel anytime. Prices may vary by region.
-          <br />
-          This is a demo — no real billing is implemented.
+          Plans are billed monthly via Stripe Checkout. Cancel anytime.
         </p>
       </div>
     </div>

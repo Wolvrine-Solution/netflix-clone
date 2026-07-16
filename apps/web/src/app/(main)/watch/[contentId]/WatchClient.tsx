@@ -1,8 +1,10 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { VideoPlayer } from '@/components/player/VideoPlayer'
 import { FiList, FiX, FiPlay } from 'react-icons/fi'
+import { api } from '@/lib/api'
+import { useProfileStore } from '@/store/useProfileStore'
 import type { ContentItem } from '@netflix/types'
 
 interface EpisodeData {
@@ -26,8 +28,21 @@ interface Props {
 
 export function WatchClient({ content, videoUrl, episodeInfo, seasons, currentSeason, currentEpisode }: Props) {
   const router = useRouter()
+  const activeProfile = useProfileStore((s) => s.activeProfile)
   const [showEpisodes, setShowEpisodes] = useState(false)
   const [activeSeason, setActiveSeason] = useState(currentSeason)
+  const [playbackUrl, setPlaybackUrl] = useState<string | null>(videoUrl)
+
+  useEffect(() => {
+    const season = seasons.find((s) => s.seasonNumber === currentSeason)
+    const episode = season?.episodes.find((e) => e.episodeNumber === currentEpisode)
+    api.playback.token(content.id, {
+      profileId: activeProfile?.id,
+      episodeId: episode?.id,
+    })
+      .then((res) => setPlaybackUrl(res.data.data.manifestUrl))
+      .catch(() => setPlaybackUrl(videoUrl))
+  }, [content.id, videoUrl, activeProfile?.id, seasons, currentSeason, currentEpisode])
 
   const isTVWithSeasons = content.mediaType === 'tv' && seasons.length > 0
   const currentSeasonData = seasons.find((s) => s.seasonNumber === activeSeason) ?? seasons[0]
@@ -75,7 +90,7 @@ export function WatchClient({ content, videoUrl, episodeInfo, seasons, currentSe
     <>
       <VideoPlayer
         content={content}
-        videoUrl={videoUrl}
+        videoUrl={playbackUrl}
         episodeInfo={episodeInfo}
         onNext={next ? () => goToEpisode(next.season, next.episode) : undefined}
         onPrev={prev ? () => goToEpisode(prev.season, prev.episode) : undefined}
