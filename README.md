@@ -12,20 +12,20 @@ Netflix Clone reproduces the core experience of a subscription video-streaming s
 - **Multi-profile support** per account, including kid profiles (`Profile` model in `packages/db/prisma/schema.prisma`)
 - **Content catalog** organized into curated rows and categories, with genres, seasons, and episodes for series (`Content`, `Row`, `Season`, `Episode` models; `apps/api/src/routes/content.ts`, `rows.ts`)
 - **Server-rendered browse page** — the browse experience is a React Server Component that fetches catalog rows server-side (per `CLAUDE.md` architecture notes)
-- **Video playback** using HLS.js and Video.js/React Player wrappers (`apps/web/src/components/player`)
+- **Video playback** via a custom player: native `<video>` element with HLS.js loaded dynamically for `.m3u8` sources, progressive MP4 otherwise; falls back to a demo clip when content has no `videoUrl` (`apps/web/src/components/player/VideoPlayer.tsx`)
 - **Search** — combines local database queries with live TMDB search, cached for one hour (`apps/api/src/routes/search.ts`)
 - **My List / watchlist** with optimistic UI updates via TanStack Query (`apps/web/src/store`, `apps/api/src/routes/myList.ts`)
 - **Watch history** tracking per profile (`apps/api/src/routes/watchHistory.ts`, `WatchHistory` model)
 - **Reviews and notifications** (`apps/api/src/routes/reviews.ts`, `notifications.ts`)
 - **Admin dashboard** for managing users, content, genres, rows, and viewing analytics, with role-based access (`Role` enum, `apps/admin`, `apps/api/src/routes/admin`)
-- **Subscription and billing scaffolding** via Stripe (`Subscription` model, `STRIPE_*` variables)
+- **Subscription and billing scaffolding** — `Subscription` model, plan UI, and `STRIPE_*` variables exist, but no real billing is wired up yet (the Stripe SDK is installed but unused; see `ROADMAP.md` Phase 3)
 - **Mobile app** built with Expo Router and NativeWind, sharing types with the web app (`apps/mobile`)
 - **Content seeding** from TMDB into PostgreSQL via a seed script (`packages/db/src/seed.ts`)
 
 ## Tech Stack
 
 - **Monorepo tooling:** Turborepo, pnpm workspaces
-- **Web app (`apps/web`):** Next.js 14 (App Router), React 18, NextAuth v5, TanStack Query, Zustand, Tailwind CSS, HLS.js, Video.js, react-player, Zod
+- **Web app (`apps/web`):** Next.js 14 (App Router), React 18, NextAuth v5, TanStack Query, Zustand, Tailwind CSS, HLS.js, Zod
 - **Admin dashboard (`apps/admin`):** Next.js 14, NextAuth v5, TanStack Query, Recharts, Tailwind CSS
 - **API (`apps/api`):** Express 4, Helmet, CORS, express-rate-limit, Morgan, `jose` (JWT verification), Stripe SDK, node-cache
 - **Mobile (`apps/mobile`):** Expo (SDK 52), Expo Router, React Native 0.76, NativeWind, Zustand, TanStack Query
@@ -56,3 +56,8 @@ packages/
 ## Getting Started
 
 See [DEVELOPER.md](./DEVELOPER.md) for prerequisites, installation, configuration, and run instructions.
+
+## Architecture & Roadmap
+
+- [ARCHITECTURE.md](./ARCHITECTURE.md) — verified current architecture, known gaps (G1–G12), and the target design for running this as a real streaming service provider (VOD + live events): video pipeline, DRM, CDN, entitlements, billing, observability, and legal/compliance.
+- [ROADMAP.md](./ROADMAP.md) — phased production-readiness plan with checkboxes, from hardening (Phase 0) through live streaming and compliance.
