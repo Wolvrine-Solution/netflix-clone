@@ -14,8 +14,9 @@ export interface PlaybackTokenResult {
   sessionId: string
 }
 
-function signUrl(url: string, ttlSec = 3600): string {
-  const secret = getEnv().CDN_SIGNING_SECRET ?? getEnv().NEXTAUTH_SECRET
+/** CDN signed URL helper — exported for unit tests. */
+export function signUrl(url: string, ttlSec = 3600, secretOverride?: string): string {
+  const secret = secretOverride ?? getEnv().CDN_SIGNING_SECRET ?? getEnv().NEXTAUTH_SECRET
   const exp = Math.floor(Date.now() / 1000) + ttlSec
   const sig = createHmac('sha256', secret).update(`${url}:${exp}`).digest('hex')
   const sep = url.includes('?') ? '&' : '?'
