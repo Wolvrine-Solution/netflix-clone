@@ -9,10 +9,12 @@ vi.mock('@netflix/db', () => ({ prisma: prismaMock }))
 import { adminOnly } from './adminOnly'
 import { AppError } from './errorHandler'
 import type { AuthRequest } from './authenticate'
+import { setAdminMfaSession, resetAdminMfaSessions } from '../lib/adminMfaSession'
 
 describe('adminOnly middleware', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    resetAdminMfaSessions()
   })
 
   it('rejects when req.userId is not set (unauthenticated)', async () => {
@@ -67,7 +69,7 @@ describe('adminOnly middleware', () => {
   })
 
   it('allows an active admin through', async () => {
-    prismaMock.user.findUnique.mockResolvedValue({ role: 'ADMIN', isSuspended: false })
+    prismaMock.user.findUnique.mockResolvedValue({ role: 'ADMIN', isSuspended: false, mfaEnabled: false })
     const req = { userId: 'admin-1' } as AuthRequest
     const res = mockRes()
     const next = mockNext()
@@ -77,7 +79,32 @@ describe('adminOnly middleware', () => {
     expect(next).toHaveBeenCalledWith()
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
       where: { id: 'admin-1' },
-      select: { role: true, isSuspended: true },
+      select: { role: true, isSuspended: true, mfaEnabled: true },
     })
+  })
+
+  it('rejects an admin with MFA enabled but no verified session', async () => {
+    prismaMock.user.findUnique.mockResolvedValue({ role: 'ADMIN', isSuspended: false, mfaEnabled: true })
+    const req = { userId: 'admin-1' } as AuthRequest
+    const res = mockRes()
+    const next = mockNext()
+
+    await adminOnly(req, res, next)
+
+    const err = (next as unknown as { mock: { calls: unknown[][] } }).mock.calls[0]?.[0] as AppError
+    expect(err.statusCode).toBe(403)
+    expect(err.message).toMatch(/MFA verification required/i)
+  })
+
+  it('allows an admin with MFA enabled when session is verified', async () => {
+    prismaMock.user.findUnique.mockResolvedValue({ role: 'ADMIN', isSuspended: false, mfaEnabled: true })
+    setAdminMfaSession('admin-1')
+    const req = { userId: 'admin-1' } as AuthRequest
+    const res = mockRes()
+    const next = mockNext()
+
+    await adminOnly(req, res, next)
+
+    expect(next).toHaveBeenCalledWith()
   })
 })

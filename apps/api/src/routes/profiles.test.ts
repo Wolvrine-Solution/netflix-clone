@@ -13,6 +13,10 @@ const prismaMock = vi.hoisted(() => ({
   },
 })) as any
 vi.mock('@netflix/db', () => ({ prisma: prismaMock }))
+vi.mock('bcryptjs', () => ({
+  hash: vi.fn(async (pin: string) => `hashed:${pin}`),
+  compare: vi.fn(async (pin: string, hash: string) => hash === `hashed:${pin}`),
+}))
 
 import { profilesRouter } from './profiles'
 import { errorHandler } from '../middleware/errorHandler'
@@ -154,5 +158,64 @@ describe('Profiles routes', () => {
 
     expect(res.status).toBe(200)
     expect(prismaMock.profile.delete).toHaveBeenCalledWith({ where: { id: 'p1' } })
+  })
+
+  it('PUT /:profileId/pin returns 403 for a profile not owned by the user', async () => {
+    prismaMock.profile.findFirst.mockResolvedValue(null)
+    const token = await tokenFor('user-1')
+    const app = buildApp()
+
+    const res = await request(app)
+      .put('/profiles/not-mine/pin')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ pin: '1234' })
+
+    expect(res.status).toBe(403)
+    expect(prismaMock.profile.update).not.toHaveBeenCalled()
+  })
+
+  it('PUT /:profileId/pin sets a hashed PIN on an owned profile', async () => {
+    prismaMock.profile.findFirst.mockResolvedValue({ id: 'p1', userId: 'user-1' })
+    prismaMock.profile.update.mockResolvedValue({ id: 'p1', pinHash: 'hashed:1234' })
+    const token = await tokenFor('user-1')
+    const app = buildApp()
+
+    const res = await request(app)
+      .put('/profiles/p1/pin')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ pin: '1234' })
+
+    expect(res.status).toBe(200)
+    expect(prismaMock.profile.update).toHaveBeenCalledWith({
+      where: { id: 'p1' },
+      data: { pinHash: 'hashed:1234' },
+    })
+  })
+
+  it('POST /:profileId/pin/verify rejects an invalid PIN', async () => {
+    prismaMock.profile.findFirst.mockResolvedValue({ id: 'p1', userId: 'user-1', pinHash: 'hashed:9999' })
+    const token = await tokenFor('user-1')
+    const app = buildApp()
+
+    const res = await request(app)
+      .post('/profiles/p1/pin/verify')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ pin: '1234' })
+
+    expect(res.status).toBe(401)
+  })
+
+  it('POST /:profileId/access grants access when PIN is correct', async () => {
+    prismaMock.profile.findFirst.mockResolvedValue({ id: 'p1', userId: 'user-1', pinHash: 'hashed:1234' })
+    const token = await tokenFor('user-1')
+    const app = buildApp()
+
+    const res = await request(app)
+      .post('/profiles/p1/access')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ pin: '1234' })
+
+    expect(res.status).toBe(200)
+    expect(res.body.data.accessGranted).toBe(true)
   })
 })
