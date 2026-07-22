@@ -16,18 +16,22 @@ apiClient.interceptors.request.use(async (config) => {
 export const api = {
   auth: {
     signIn: (email: string, password: string) =>
-      apiClient.post<{ token: string; user: { id: string; name: string | null; email: string; image: string | null } }>(
-        '/auth/signin',
-        { email, password }
-      ),
+      apiClient.post<{
+        token: string
+        user: { id: string; name: string | null; email: string; image: string | null }
+      }>('/auth/signin', { email, password }),
     register: (email: string, password: string, name: string) =>
       apiClient.post<{ message: string }>('/register', { email, password, name }),
   },
   rows: () => apiClient.get<{ data: BrowseRow[] }>('/rows'),
-  content: (id: string) => apiClient.get<{ data: import('@netflix/types').ContentItem }>(`/content/${id}`),
-  featured: () => apiClient.get<{ data: import('@netflix/types').ContentItem | null }>('/content/featured'),
+  content: (id: string) =>
+    apiClient.get<{ data: import('@netflix/types').ContentItem }>(`/content/${id}`),
+  featured: () =>
+    apiClient.get<{ data: import('@netflix/types').ContentItem | null }>('/content/featured'),
   search: (q: string) =>
-    apiClient.get<{ data: import('@netflix/types').ContentItem[] }>(`/search?q=${encodeURIComponent(q)}`),
+    apiClient.get<{ data: import('@netflix/types').ContentItem[] }>(
+      `/search?q=${encodeURIComponent(q)}`
+    ),
   profiles: {
     list: () => apiClient.get<{ data: import('@netflix/types').NetflixProfile[] }>('/profiles'),
     create: (data: { name: string; avatarUrl: string; isKid?: boolean }) =>
@@ -38,7 +42,9 @@ export const api = {
   },
   myList: {
     get: (profileId: string) =>
-      apiClient.get<{ data: import('@netflix/types').ContentItem[] }>(`/profiles/${profileId}/my-list`),
+      apiClient.get<{ data: import('@netflix/types').ContentItem[] }>(
+        `/profiles/${profileId}/my-list`
+      ),
     add: (profileId: string, contentId: string) =>
       apiClient.post(`/profiles/${profileId}/my-list`, { contentId }),
     remove: (profileId: string, contentId: string) =>

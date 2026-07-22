@@ -42,16 +42,16 @@ The step-by-step execution plan that bridges the two lives in [ROADMAP.md](./ROA
 
 Four runnable apps and four shared packages in a Turborepo/pnpm monorepo:
 
-| Workspace | Role | Key facts |
-|---|---|---|
-| `apps/web` | User-facing Next.js 14 app | App Router; browse page is a React Server Component; NextAuth v5 (JWT strategy) issues tokens; TanStack Query + Zustand on the client |
-| `apps/api` | Express REST API | Verifies JWTs with `jose` + `NEXTAUTH_SECRET`; Helmet, CORS, morgan; Zod validation; per-route rate limiting on search |
-| `apps/admin` | Next.js 14 admin dashboard | Content/users/genres/rows CRUD, analytics (Recharts); guarded by `Role.ADMIN` + `adminOnly` middleware; admin actions audited in `AdminLog` |
-| `apps/mobile` | Expo Router / React Native app | NativeWind, Zustand, TanStack Query; signs in against `POST /api/auth/signin` (API-issued JWT stored in SecureStore) |
-| `packages/db` | Prisma schema + client + TMDB seed | Single schema for auth, profiles, catalog, subscriptions, reviews, notifications, audit log |
-| `packages/types` | Shared TypeScript types | content, auth, player, admin, notifications, TMDB |
-| `packages/ui` | Shared React hooks/components | Button/Modal/etc. + `useDebounce`, `useLocalStorage`, `useOnClickOutside` |
-| `packages/config` | Shared configs | ESLint, Tailwind, TS base configs |
+| Workspace         | Role                               | Key facts                                                                                                                                   |
+| ----------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web`        | User-facing Next.js 14 app         | App Router; browse page is a React Server Component; NextAuth v5 (JWT strategy) issues tokens; TanStack Query + Zustand on the client       |
+| `apps/api`        | Express REST API                   | Verifies JWTs with `jose` + `NEXTAUTH_SECRET`; Helmet, CORS, morgan; Zod validation; per-route rate limiting on search                      |
+| `apps/admin`      | Next.js 14 admin dashboard         | Content/users/genres/rows CRUD, analytics (Recharts); guarded by `Role.ADMIN` + `adminOnly` middleware; admin actions audited in `AdminLog` |
+| `apps/mobile`     | Expo Router / React Native app     | NativeWind, Zustand, TanStack Query; signs in against `POST /api/auth/signin` (API-issued JWT stored in SecureStore)                        |
+| `packages/db`     | Prisma schema + client + TMDB seed | Single schema for auth, profiles, catalog, subscriptions, reviews, notifications, audit log                                                 |
+| `packages/types`  | Shared TypeScript types            | content, auth, player, admin, notifications, TMDB                                                                                           |
+| `packages/ui`     | Shared React hooks/components      | Button/Modal/etc. + `useDebounce`, `useLocalStorage`, `useOnClickOutside`                                                                   |
+| `packages/config` | Shared configs                     | ESLint, Tailwind, TS base configs                                                                                                           |
 
 ### 1.2 Authentication & authorization
 
@@ -83,20 +83,20 @@ Four runnable apps and four shared packages in a Turborepo/pnpm monorepo:
 
 These are the deltas between "demo" and "production" that Part 2 and the roadmap address:
 
-| # | Gap | Where |
-|---|---|---|
-| G1 | JWT secret falls back to the literal `'fallback-secret'` when `NEXTAUTH_SECRET` is unset | `apps/api/src/middleware/authenticate.ts`, `apps/api/src/routes/auth.ts` |
-| G2 | Global rate limiter (`apiLimiter`) is defined but never mounted; only `/search` is rate-limited | `apps/api/src/middleware/rateLimiter.ts` |
-| G3 | No Prisma **migrations** — schema is applied with `db push`, so there is no migration history for production rollouts | `packages/db` |
-| G4 | Billing is a demo: Stripe SDK is installed but never imported; the subscription page fakes plan changes client-side; plan entitlements (screens, 4K) are not enforced anywhere | `apps/web/src/app/(main)/subscription/page.tsx`, `apps/api` |
-| G5 | Kid profiles store `isKid` but the API never filters content by `maturityRating` | `apps/api/src/routes/*` |
-| G6 | Playback uses a hardcoded demo MP4; no transcoding, packaging, DRM, signed URLs, or CDN | `VideoPlayer.tsx` (web + mobile) |
-| G7 | No CI/CD, no Dockerfile, no IaC — nothing runs on push | repo root (no `.github/`) |
-| G8 | CORS origins are hardcoded to localhost ports | `apps/api/src/index.ts` |
-| G9 | Caches are in-process (`node-cache`), so they don't survive restarts and won't be shared across API replicas | `apps/api/src/services/tmdbService.ts` |
-| G10 | Observability is `morgan('dev')` + a `/health` endpoint — no structured logs, metrics, traces, or error tracking | `apps/api/src/index.ts` |
-| G11 | Web→API token compatibility should be verified under test: NextAuth v5 `encode` produces an encrypted token while the API verifies with `jwtVerify` (signed); mobile's API-issued tokens verify cleanly | `apps/web/src/lib/auth.ts` vs `apps/api/src/middleware/authenticate.ts` |
-| G12 | No concurrent-stream/device limits, no session revocation for the 30-day mobile JWTs | `apps/api` |
+| #   | Gap                                                                                                                                                                                                     | Where                                                                    |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| G1  | JWT secret falls back to the literal `'fallback-secret'` when `NEXTAUTH_SECRET` is unset                                                                                                                | `apps/api/src/middleware/authenticate.ts`, `apps/api/src/routes/auth.ts` |
+| G2  | Global rate limiter (`apiLimiter`) is defined but never mounted; only `/search` is rate-limited                                                                                                         | `apps/api/src/middleware/rateLimiter.ts`                                 |
+| G3  | No Prisma **migrations** — schema is applied with `db push`, so there is no migration history for production rollouts                                                                                   | `packages/db`                                                            |
+| G4  | Billing is a demo: Stripe SDK is installed but never imported; the subscription page fakes plan changes client-side; plan entitlements (screens, 4K) are not enforced anywhere                          | `apps/web/src/app/(main)/subscription/page.tsx`, `apps/api`              |
+| G5  | Kid profiles store `isKid` but the API never filters content by `maturityRating`                                                                                                                        | `apps/api/src/routes/*`                                                  |
+| G6  | Playback uses a hardcoded demo MP4; no transcoding, packaging, DRM, signed URLs, or CDN                                                                                                                 | `VideoPlayer.tsx` (web + mobile)                                         |
+| G7  | No CI/CD, no Dockerfile, no IaC — nothing runs on push                                                                                                                                                  | repo root (no `.github/`)                                                |
+| G8  | CORS origins are hardcoded to localhost ports                                                                                                                                                           | `apps/api/src/index.ts`                                                  |
+| G9  | Caches are in-process (`node-cache`), so they don't survive restarts and won't be shared across API replicas                                                                                            | `apps/api/src/services/tmdbService.ts`                                   |
+| G10 | Observability is `morgan('dev')` + a `/health` endpoint — no structured logs, metrics, traces, or error tracking                                                                                        | `apps/api/src/index.ts`                                                  |
+| G11 | Web→API token compatibility should be verified under test: NextAuth v5 `encode` produces an encrypted token while the API verifies with `jwtVerify` (signed); mobile's API-issued tokens verify cleanly | `apps/web/src/lib/auth.ts` vs `apps/api/src/middleware/authenticate.ts`  |
+| G12 | No concurrent-stream/device limits, no session revocation for the 30-day mobile JWTs                                                                                                                    | `apps/api`                                                               |
 
 ---
 
@@ -160,7 +160,7 @@ The single most important change: **content stops being a URL column and becomes
 - **Ingest**: SRT (preferred) or RTMP contribution feeds into redundant ingest endpoints (AWS MediaLive, or self-managed SRT gateway + ffmpeg).
 - **Transcode/package**: live ABR ladder to **LL-HLS** (and DASH) with 2s parts for low latency; DVR window (e.g. 4h) via the packager.
 - **Event model**: new domain objects — `LiveChannel` (24/7 linear), `LiveEvent` (scheduled start/end, pre/post slates, geo/blackout rules for sports rights), `EventEntitlement` (which plans/PPV purchases can watch).
-- **Catch-up/VOD conversion**: on event end, the recording is automatically pushed through the VOD pipeline (this is exactly the kind of *legal process automation* the platform should excel at).
+- **Catch-up/VOD conversion**: on event end, the recording is automatically pushed through the VOD pipeline (this is exactly the kind of _legal process automation_ the platform should excel at).
 - **Scale pattern**: live traffic is bursty; the CDN absorbs viewers, the platform only scales the **playback-token issuing** path (stateless, Redis-backed), never the video path.
 
 ### 2.4 Entitlements, billing, and plan enforcement
@@ -190,7 +190,7 @@ Billing graduates from demo UI to a real subsystem:
 - **Global middleware**: mount `apiLimiter` (G2) with Redis store; body-size limits; request IDs; structured logging (pino) with PII redaction.
 - **Config-driven CORS** (env allowlist, G8).
 - **Caching**: Redis replaces `node-cache` (G9) — TMDB responses, rows, featured content; cache stampede protection; CDN caching for anonymous catalog endpoints with `stale-while-revalidate`.
-- **Search**: move from `ILIKE` + TMDB proxy to OpenSearch/Meilisearch indexed from the catalog via outbox events; TMDB remains a metadata *enrichment* source, used within its terms.
+- **Search**: move from `ILIKE` + TMDB proxy to OpenSearch/Meilisearch indexed from the catalog via outbox events; TMDB remains a metadata _enrichment_ source, used within its terms.
 
 ### 2.7 Data architecture
 
@@ -206,7 +206,7 @@ Billing graduates from demo UI to a real subsystem:
 - Next.js apps: strict CSP, no wildcard image domains, security headers via middleware.
 - Admin: enforce MFA (TOTP/WebAuthn), IP allowlisting optional, and keep expanding the existing `AdminLog` audit trail (good foundation already).
 - Dependency and secret scanning in CI (Dependabot/Renovate + gitleaks); SAST (CodeQL).
-- Rate limiting everywhere (Redis-backed), bot mitigation at the edge for credential stuffing (this protects the *service*; it is unrelated to the platform's own lawful automation).
+- Rate limiting everywhere (Redis-backed), bot mitigation at the edge for credential stuffing (this protects the _service_; it is unrelated to the platform's own lawful automation).
 - Regular restore drills for backups; documented incident response runbook.
 
 ### 2.9 Observability & operations

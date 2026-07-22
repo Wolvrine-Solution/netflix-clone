@@ -14,7 +14,11 @@ import { errorHandler } from '../middleware/errorHandler'
 const SECRET = new TextEncoder().encode(process.env['NEXTAUTH_SECRET'] ?? 'fallback-secret')
 
 async function tokenFor(userId: string) {
-  return new SignJWT({ sub: userId }).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('30d').sign(SECRET)
+  return new SignJWT({ sub: userId })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('30d')
+    .sign(SECRET)
 }
 
 function buildApp() {
@@ -41,10 +45,14 @@ describe('My List routes', () => {
     const token = await tokenFor('user-1')
     const app = buildApp()
 
-    const res = await request(app).get('/profiles/p1/my-list').set('Authorization', `Bearer ${token}`)
+    const res = await request(app)
+      .get('/profiles/p1/my-list')
+      .set('Authorization', `Bearer ${token}`)
 
     expect(res.status).toBe(403)
-    expect(prismaMock.profile.findFirst).toHaveBeenCalledWith({ where: { id: 'p1', userId: 'user-1' } })
+    expect(prismaMock.profile.findFirst).toHaveBeenCalledWith({
+      where: { id: 'p1', userId: 'user-1' },
+    })
   })
 
   it('GET returns the mapped content list when the profile is owned by the user', async () => {
@@ -56,7 +64,9 @@ describe('My List routes', () => {
     const token = await tokenFor('user-1')
     const app = buildApp()
 
-    const res = await request(app).get('/profiles/p1/my-list').set('Authorization', `Bearer ${token}`)
+    const res = await request(app)
+      .get('/profiles/p1/my-list')
+      .set('Authorization', `Bearer ${token}`)
 
     expect(res.status).toBe(200)
     expect(res.body.data).toEqual([
@@ -81,7 +91,11 @@ describe('My List routes', () => {
 
   it('POST creates a my-list item for an owned profile', async () => {
     prismaMock.profile.findFirst.mockResolvedValue({ id: 'p1', userId: 'user-1' })
-    prismaMock.myListItem.create.mockResolvedValue({ id: 'item-1', profileId: 'p1', contentId: 'c1' })
+    prismaMock.myListItem.create.mockResolvedValue({
+      id: 'item-1',
+      profileId: 'p1',
+      contentId: 'c1',
+    })
     const token = await tokenFor('user-1')
     const app = buildApp()
 
@@ -91,7 +105,9 @@ describe('My List routes', () => {
       .send({ contentId: 'c1' })
 
     expect(res.status).toBe(201)
-    expect(prismaMock.myListItem.create).toHaveBeenCalledWith({ data: { profileId: 'p1', contentId: 'c1' } })
+    expect(prismaMock.myListItem.create).toHaveBeenCalledWith({
+      data: { profileId: 'p1', contentId: 'c1' },
+    })
   })
 
   it('DELETE returns 403 for an unowned profile and does not delete', async () => {
@@ -118,6 +134,8 @@ describe('My List routes', () => {
       .set('Authorization', `Bearer ${token}`)
 
     expect(res.status).toBe(200)
-    expect(prismaMock.myListItem.deleteMany).toHaveBeenCalledWith({ where: { profileId: 'p1', contentId: 'c1' } })
+    expect(prismaMock.myListItem.deleteMany).toHaveBeenCalledWith({
+      where: { profileId: 'p1', contentId: 'c1' },
+    })
   })
 })

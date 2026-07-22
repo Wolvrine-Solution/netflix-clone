@@ -32,7 +32,9 @@ export function Modal({ isOpen, onClose, children, className = '' }: ModalProps)
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
-      <div className={`relative z-10 w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg bg-netflix-dark-gray shadow-2xl ${className}`}>
+      <div
+        className={`bg-netflix-dark-gray relative z-10 max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg shadow-2xl ${className}`}
+      >
         {children}
       </div>
     </div>,

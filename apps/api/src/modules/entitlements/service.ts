@@ -35,9 +35,7 @@ export async function can(
     }
     const now = new Date()
     if (content.licenseWindows.length > 0) {
-      const inWindow = content.licenseWindows.some(
-        (w) => w.startsAt <= now && w.endsAt >= now
-      )
+      const inWindow = content.licenseWindows.some((w) => w.startsAt <= now && w.endsAt >= now)
       if (!inWindow) return { allowed: false, reason: 'Outside license window' }
     }
 

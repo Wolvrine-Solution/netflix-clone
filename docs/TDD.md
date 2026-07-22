@@ -2,10 +2,10 @@
 
 ## netflix-clone
 
-| Field | Value |
-| --- | --- |
-| Status | Draft |
-| Date | 2026-07-19 |
+| Field      | Value         |
+| ---------- | ------------- |
+| Status     | Draft         |
+| Date       | 2026-07-19    |
 | Implements | `docs/SRS.md` |
 
 ## 1. Goals / non-goals
@@ -28,19 +28,19 @@ Style (pick one and stick to it): modular monolith / hexagonal / …
 
 ## 3. Technology stack
 
-| Layer | Choice | Notes |
-| --- | --- | --- |
-| Runtime | | |
-| API | | |
-| Data (default) | SQLite / memory / file | Standalone-friendly |
-| Data (prod optional) | Postgres etc. | Behind env flag |
-| Tests | | |
+| Layer                | Choice                 | Notes               |
+| -------------------- | ---------------------- | ------------------- |
+| Runtime              |                        |                     |
+| API                  |                        |                     |
+| Data (default)       | SQLite / memory / file | Standalone-friendly |
+| Data (prod optional) | Postgres etc.          | Behind env flag     |
+| Tests                |                        |                     |
 
 ## 4. Domain modules
 
 | Module | Responsibility | Key FRs |
-| --- | --- | --- |
-| | | |
+| ------ | -------------- | ------- |
+|        |                |         |
 
 ## 5. Data model
 
@@ -48,9 +48,9 @@ Entities, ownership/tenancy, important invariants.
 
 ## 6. API sketch
 
-| Method | Path | Purpose | Auth |
-| --- | --- | --- | --- |
-| GET | /healthz | Liveness | none |
+| Method | Path     | Purpose  | Auth |
+| ------ | -------- | -------- | ---- |
+| GET    | /healthz | Liveness | none |
 
 ## 7. Security & tenancy
 
@@ -58,10 +58,10 @@ Entities, ownership/tenancy, important invariants.
 
 ## 8. Testing strategy
 
-| Layer | What | Maps to |
-| --- | --- | --- |
-| Unit | Domain rules | FR-… |
-| Integration | API + store | FR-… |
+| Layer       | What         | Maps to |
+| ----------- | ------------ | ------- |
+| Unit        | Domain rules | FR-…    |
+| Integration | API + store  | FR-…    |
 
 ## 9. Deployment notes
 

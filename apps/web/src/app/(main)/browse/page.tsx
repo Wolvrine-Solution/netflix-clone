@@ -25,12 +25,21 @@ async function getBrowseData(): Promise<{ featured: ContentItem | null; rows: Br
   const mapContent = (c: typeof featuredContent): ContentItem | null => {
     if (!c) return null
     return {
-      id: c.id, tmdbId: c.tmdbId ?? undefined, title: c.title, description: c.description,
-      posterPath: c.posterPath, backdropPath: c.backdropPath, releaseDate: c.releaseDate,
-      rating: c.rating, mediaType: c.mediaType as 'movie' | 'tv', maturityRating: c.maturityRating,
-      trailerKey: c.trailerKey ?? undefined, isFeatured: c.isFeatured,
+      id: c.id,
+      tmdbId: c.tmdbId ?? undefined,
+      title: c.title,
+      description: c.description,
+      posterPath: c.posterPath,
+      backdropPath: c.backdropPath,
+      releaseDate: c.releaseDate,
+      rating: c.rating,
+      mediaType: c.mediaType as 'movie' | 'tv',
+      maturityRating: c.maturityRating,
+      trailerKey: c.trailerKey ?? undefined,
+      isFeatured: c.isFeatured,
       genres: c.genres.map((cg) => ({ id: cg.genre.id, name: cg.genre.name })),
-      runtime: c.runtime ?? undefined, seasons: c.seasons ?? undefined,
+      runtime: c.runtime ?? undefined,
+      seasons: c.seasons ?? undefined,
       status: c.status as import('@netflix/types').ContentStatus,
       language: c.language,
       cast: c.cast,
@@ -53,15 +62,19 @@ export default async function BrowsePage() {
   return (
     <>
       <HeroBanner content={featured} />
-      <div className="relative z-10 -mt-32 pb-20 space-y-8">
+      <div className="relative z-10 -mt-32 space-y-8 pb-20">
         <ContinueWatchingRow />
         {rows.map((row) => (
           <MovieRow key={row.id} title={row.title} items={row.items} />
         ))}
         {rows.length === 0 && (
-          <div className="text-center py-32 text-netflix-light-gray">
+          <div className="text-netflix-light-gray py-32 text-center">
             <p className="text-xl">No content yet.</p>
-            <p className="mt-2 text-sm">Add your TMDB API key and run <code className="bg-netflix-medium-gray px-2 py-0.5 rounded">pnpm db:seed</code> to populate content.</p>
+            <p className="mt-2 text-sm">
+              Add your TMDB API key and run{' '}
+              <code className="bg-netflix-medium-gray rounded px-2 py-0.5">pnpm db:seed</code> to
+              populate content.
+            </p>
           </div>
         )}
       </div>

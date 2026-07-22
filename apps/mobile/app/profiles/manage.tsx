@@ -63,11 +63,21 @@ export default function ManageProfilesScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.black }}>
       {/* Header */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: Colors.mediumGray }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: 16,
+          borderBottomWidth: 1,
+          borderBottomColor: Colors.mediumGray,
+        }}
+      >
         <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 16 }}>
           <Text style={{ color: Colors.white, fontSize: 24 }}>←</Text>
         </TouchableOpacity>
-        <Text style={{ color: Colors.white, fontSize: 20, fontWeight: '700' }}>Manage Profiles</Text>
+        <Text style={{ color: Colors.white, fontSize: 20, fontWeight: '700' }}>
+          Manage Profiles
+        </Text>
       </View>
 
       <View style={{ flex: 1, padding: 16 }}>
@@ -88,11 +98,18 @@ export default function ManageProfilesScreen() {
                   borderBottomColor: Colors.mediumGray,
                 }}
               >
-                <Image source={{ uri: item.avatarUrl }} style={{ width: 56, height: 56, borderRadius: 4 }} />
+                <Image
+                  source={{ uri: item.avatarUrl }}
+                  style={{ width: 56, height: 56, borderRadius: 4 }}
+                />
                 <View style={{ flex: 1, marginLeft: 12 }}>
-                  <Text style={{ color: Colors.white, fontSize: 16, fontWeight: '600' }}>{item.name}</Text>
+                  <Text style={{ color: Colors.white, fontSize: 16, fontWeight: '600' }}>
+                    {item.name}
+                  </Text>
                   {item.isKid && (
-                    <Text style={{ color: Colors.lightGray, fontSize: 12, marginTop: 2 }}>KIDS</Text>
+                    <Text style={{ color: Colors.lightGray, fontSize: 12, marginTop: 2 }}>
+                      KIDS
+                    </Text>
                   )}
                 </View>
                 <TouchableOpacity onPress={() => confirmDelete(item)} style={{ padding: 8 }}>
@@ -114,11 +131,20 @@ export default function ManageProfilesScreen() {
                       }}
                       onPress={() => setCreating(true)}
                     >
-                      <Text style={{ color: Colors.white, fontSize: 15, fontWeight: '600' }}>+ Add Profile</Text>
+                      <Text style={{ color: Colors.white, fontSize: 15, fontWeight: '600' }}>
+                        + Add Profile
+                      </Text>
                     </TouchableOpacity>
                   ) : (
                     <View>
-                      <Text style={{ color: Colors.white, fontSize: 16, fontWeight: '700', marginBottom: 12 }}>
+                      <Text
+                        style={{
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: '700',
+                          marginBottom: 12,
+                        }}
+                      >
                         New Profile
                       </Text>
                       <TextInput
@@ -136,13 +162,18 @@ export default function ManageProfilesScreen() {
                       />
 
                       {/* Avatar picker */}
-                      <Text style={{ color: Colors.lightGray, fontSize: 13, marginBottom: 8 }}>Choose Avatar</Text>
+                      <Text style={{ color: Colors.lightGray, fontSize: 13, marginBottom: 8 }}>
+                        Choose Avatar
+                      </Text>
                       <FlatList
                         data={AVATAR_OPTIONS}
                         keyExtractor={(u) => u}
                         horizontal
                         renderItem={({ item: url }) => (
-                          <TouchableOpacity onPress={() => setSelectedAvatar(url)} style={{ marginRight: 8 }}>
+                          <TouchableOpacity
+                            onPress={() => setSelectedAvatar(url)}
+                            style={{ marginRight: 8 }}
+                          >
                             <Image
                               source={{ uri: url }}
                               style={{

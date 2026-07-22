@@ -10,7 +10,7 @@ const sizeMap = { sm: 'h-4 w-4', md: 'h-8 w-8', lg: 'h-16 w-16' }
 export function Spinner({ size = 'md', className = '' }: SpinnerProps) {
   return (
     <div
-      className={`animate-spin rounded-full border-2 border-netflix-light-gray border-t-netflix-red ${sizeMap[size]} ${className}`}
+      className={`border-netflix-light-gray border-t-netflix-red animate-spin rounded-full border-2 ${sizeMap[size]} ${className}`}
       role="status"
       aria-label="Loading"
     />

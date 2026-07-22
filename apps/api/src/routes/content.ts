@@ -18,7 +18,13 @@ contentRouter.get('/', async (req: KidFilterRequest, res, next) => {
     const where = {
       status: 'PUBLISHED' as const,
       ...(mediaType ? { mediaType: mediaType as 'movie' | 'tv' } : {}),
-      ...(genre ? { genres: { some: { genre: { name: { contains: genre, mode: 'insensitive' as const } } } } } : {}),
+      ...(genre
+        ? {
+            genres: {
+              some: { genre: { name: { contains: genre, mode: 'insensitive' as const } } },
+            },
+          }
+        : {}),
       ...(req.isKidProfile ? maturityWhereForKids() : {}),
     }
     const [items, total] = await Promise.all([
@@ -31,7 +37,12 @@ contentRouter.get('/', async (req: KidFilterRequest, res, next) => {
       }),
       prisma.content.count({ where }),
     ])
-    res.json({ data: items, page: parseInt(page), totalPages: Math.ceil(total / parseInt(limit)), totalResults: total })
+    res.json({
+      data: items,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit)),
+      totalResults: total,
+    })
   } catch (err) {
     next(err)
   }

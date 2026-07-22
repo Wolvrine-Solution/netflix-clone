@@ -25,7 +25,14 @@ export default function IndexScreen() {
   }, [activeProfile])
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.black, justifyContent: 'center', alignItems: 'center' }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: Colors.black,
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       <ActivityIndicator size="large" color={Colors.red} />
     </View>
   )

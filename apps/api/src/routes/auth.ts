@@ -2,7 +2,12 @@ import { Router } from 'express'
 import { compare } from 'bcryptjs'
 import { prisma } from '@netflix/db'
 import { AppError } from '../middleware/errorHandler'
-import { signAccessToken, issueRefreshToken, rotateRefreshToken, revokeAllRefreshTokens } from '../lib/jwt'
+import {
+  signAccessToken,
+  issueRefreshToken,
+  rotateRefreshToken,
+  revokeAllRefreshTokens,
+} from '../lib/jwt'
 
 export const authRouter = Router()
 

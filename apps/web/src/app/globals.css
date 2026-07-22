@@ -18,7 +18,7 @@
   }
 
   body {
-    @apply bg-netflix-black text-white font-netflix;
+    @apply bg-netflix-black font-netflix text-white;
     font-family: 'Inter', 'Netflix Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -57,11 +57,11 @@
   }
 
   .netflix-gradient-bottom {
-    background: linear-gradient(to top, #0A0A0B 0%, transparent 100%);
+    background: linear-gradient(to top, #0a0a0b 0%, transparent 100%);
   }
 
   .netflix-gradient-right {
-    background: linear-gradient(to left, #0A0A0B 0%, transparent 100%);
+    background: linear-gradient(to left, #0a0a0b 0%, transparent 100%);
   }
 
   /* Frosted-glass surface used by navbar, dropdowns, modals, mobile nav */
@@ -128,7 +128,7 @@
 
 /* video.js overrides */
 .vjs-netflix-skin {
-  @apply w-full h-full;
+  @apply h-full w-full;
 }
 
 .vjs-netflix-skin .vjs-control-bar {

@@ -47,7 +47,10 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
     isFeatured: content.isFeatured,
     genres: content.genres.map((cg) => ({ id: cg.genre.id, name: cg.genre.name })),
     runtime: content.runtime ?? undefined,
-    seasons: content.contentSeasons.length > 0 ? content.contentSeasons.length : (content.seasons ?? undefined),
+    seasons:
+      content.contentSeasons.length > 0
+        ? content.contentSeasons.length
+        : (content.seasons ?? undefined),
     status: content.status as import('@netflix/types').ContentStatus,
     language: content.language,
     cast: content.cast,
@@ -57,13 +60,17 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
   let episodeInfo: { season: number; episode: number; title: string } | null = null
 
   if (content.mediaType === 'tv' && content.contentSeasons.length > 0) {
-    const season = content.contentSeasons.find((s) => s.seasonNumber === seasonNum)
-      ?? content.contentSeasons[0]
-    const episode = season?.episodes.find((e) => e.episodeNumber === episodeNum)
-      ?? season?.episodes[0]
+    const season =
+      content.contentSeasons.find((s) => s.seasonNumber === seasonNum) ?? content.contentSeasons[0]
+    const episode =
+      season?.episodes.find((e) => e.episodeNumber === episodeNum) ?? season?.episodes[0]
     if (episode) {
       videoUrl = episode.videoFiles[0]?.url ?? episode.videoUrl ?? videoUrl
-      episodeInfo = { season: season!.seasonNumber, episode: episode.episodeNumber, title: episode.title }
+      episodeInfo = {
+        season: season!.seasonNumber,
+        episode: episode.episodeNumber,
+        title: episode.title,
+      }
     }
   } else if (content.videoFiles.length > 0) {
     videoUrl = content.videoFiles[0]?.url ?? videoUrl
@@ -84,7 +91,7 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
   }))
 
   return (
-    <div className="fixed inset-0 bg-black z-50">
+    <div className="fixed inset-0 z-50 bg-black">
       <WatchClient
         content={contentItem}
         videoUrl={videoUrl}

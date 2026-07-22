@@ -23,7 +23,9 @@ reviewsRouter.get('/:contentId', async (req, res, next) => {
       include: { profile: { select: { name: true, avatarUrl: true } } },
     })
     res.json({ data: reviews })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })
 
 reviewsRouter.post('/:contentId', validate(reviewSchema), async (req: AuthRequest, res, next) => {
@@ -33,10 +35,18 @@ reviewsRouter.post('/:contentId', validate(reviewSchema), async (req: AuthReques
     const review = await prisma.review.upsert({
       where: { profileId_contentId: { profileId, contentId: req.params['contentId']! } },
       update: { rating, comment },
-      create: { profileId, contentId: req.params['contentId']!, userId: req.userId!, rating, comment },
+      create: {
+        profileId,
+        contentId: req.params['contentId']!,
+        userId: req.userId!,
+        rating,
+        comment,
+      },
     })
     res.status(201).json({ data: review })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })
 
 reviewsRouter.delete('/:contentId', async (req: AuthRequest, res, next) => {
@@ -51,5 +61,7 @@ reviewsRouter.delete('/:contentId', async (req: AuthRequest, res, next) => {
       where: { contentId: req.params['contentId'], profileId },
     })
     res.json({ message: 'Review deleted' })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })

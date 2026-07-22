@@ -24,12 +24,7 @@ complianceRouter.post(
   async (req: AuthRequest, res, next) => {
     try {
       const { consentType, granted } = req.body as { consentType: string; granted: boolean }
-      const record = await recordConsent(
-        req.userId!,
-        consentType,
-        granted,
-        req.ip
-      )
+      const record = await recordConsent(req.userId!, consentType, granted, req.ip)
       res.json({ data: record })
     } catch (err) {
       next(err)

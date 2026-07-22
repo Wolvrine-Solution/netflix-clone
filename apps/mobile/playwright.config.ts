@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test'
 
 // Driven through expo-router's static web export: `expo export --platform
 // web` produces a static site, served and exercised by Playwright at a
@@ -24,4 +24,4 @@ export default defineConfig({
     reuseExistingServer: true,
     timeout: 180_000,
   },
-});
+})

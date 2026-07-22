@@ -42,13 +42,13 @@ export function ContentActions({ contentId, contentTitle, isFeatured }: Props) {
       <button
         onClick={toggleFeatured}
         title={isFeatured ? 'Unfeature' : 'Set as Featured'}
-        className={`p-1.5 rounded transition ${isFeatured ? 'text-yellow-400 hover:text-yellow-300' : 'text-gray-600 hover:text-yellow-400'}`}
+        className={`rounded p-1.5 transition ${isFeatured ? 'text-yellow-400 hover:text-yellow-300' : 'text-gray-600 hover:text-yellow-400'}`}
       >
         <FiStar className="text-sm" />
       </button>
       <a
         href={`/content/${contentId}`}
-        className="p-1.5 rounded text-gray-500 hover:text-blue-400 transition"
+        className="rounded p-1.5 text-gray-500 transition hover:text-blue-400"
         title="Edit"
       >
         <FiEdit2 className="text-sm" />
@@ -56,7 +56,7 @@ export function ContentActions({ contentId, contentTitle, isFeatured }: Props) {
       <button
         onClick={handleDelete}
         disabled={deleting}
-        className="p-1.5 rounded text-gray-600 hover:text-red-400 transition disabled:opacity-40"
+        className="rounded p-1.5 text-gray-600 transition hover:text-red-400 disabled:opacity-40"
         title="Delete"
       >
         <FiTrash2 className="text-sm" />

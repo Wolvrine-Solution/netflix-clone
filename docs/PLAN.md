@@ -1,8 +1,8 @@
 # Implementation plan — netflix-clone
 
-| Field | Value |
-| --- | --- |
-| Date | 2026-07-19 |
+| Field  | Value                         |
+| ------ | ----------------------------- |
+| Date   | 2026-07-19                    |
 | Source | `docs/SRS.md` + `docs/TDD.md` |
 
 Build **one phase at a time**. Do not start phase N+1 until phase N acceptance passes.

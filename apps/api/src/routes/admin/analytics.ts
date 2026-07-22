@@ -53,7 +53,9 @@ adminAnalyticsRouter.get('/dashboard', async (_req, res, next) => {
         newContentThisMonth,
       },
     })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })
 
 adminAnalyticsRouter.get('/top-content', async (req, res, next) => {
@@ -92,7 +94,9 @@ adminAnalyticsRouter.get('/top-content', async (req, res, next) => {
     }))
 
     res.json({ data })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })
 
 adminAnalyticsRouter.get('/user-growth', async (_req, res, next) => {
@@ -117,7 +121,9 @@ adminAnalyticsRouter.get('/user-growth', async (_req, res, next) => {
     )
 
     res.json({ data: counts })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })
 
 adminAnalyticsRouter.get('/recent-logs', async (req, res, next) => {
@@ -129,5 +135,7 @@ adminAnalyticsRouter.get('/recent-logs', async (req, res, next) => {
       include: { admin: { select: { name: true, email: true } } },
     })
     res.json({ data: logs })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })

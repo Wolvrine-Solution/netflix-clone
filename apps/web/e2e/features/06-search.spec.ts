@@ -6,7 +6,10 @@ import { registerAndSignIn, uniqueEmail } from '../helpers'
 // ---------------------------------------------------------------------------
 test.describe('Search', () => {
   test('search page loads after sign-in', async ({ page }) => {
-    const signedIn = await registerAndSignIn(page, { name: 'Search Tester', email: uniqueEmail('searchtest') })
+    const signedIn = await registerAndSignIn(page, {
+      name: 'Search Tester',
+      email: uniqueEmail('searchtest'),
+    })
     test.skip(!signedIn, 'Registration/sign-in unavailable in this environment (needs API + DB)')
 
     await page.goto('/search')

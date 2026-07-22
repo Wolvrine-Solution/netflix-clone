@@ -8,17 +8,18 @@ const USER_KEY = 'netflix_user'
 // stub `{}` with none of SecureStore's methods, so any call throws on web.
 // There's no Keychain/Keystore equivalent in a browser; localStorage is the
 // standard fallback Expo's own docs point to for this exact gap.
-const store = Platform.OS === 'web'
-  ? {
-      setItemAsync: async (key: string, value: string) => {
-        window.localStorage.setItem(key, value)
-      },
-      getItemAsync: async (key: string) => window.localStorage.getItem(key),
-      deleteItemAsync: async (key: string) => {
-        window.localStorage.removeItem(key)
-      },
-    }
-  : SecureStore
+const store =
+  Platform.OS === 'web'
+    ? {
+        setItemAsync: async (key: string, value: string) => {
+          window.localStorage.setItem(key, value)
+        },
+        getItemAsync: async (key: string) => window.localStorage.getItem(key),
+        deleteItemAsync: async (key: string) => {
+          window.localStorage.removeItem(key)
+        },
+      }
+    : SecureStore
 
 export interface StoredUser {
   id: string

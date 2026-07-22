@@ -61,7 +61,10 @@ export function buildContentUpdateBody(
     ...form,
     rating: parseFloat(String(form.rating)),
     runtime: form.runtime ? parseInt(String(form.runtime), 10) : undefined,
-    cast: form.cast.split(',').map((c) => c.trim()).filter(Boolean),
+    cast: form.cast
+      .split(',')
+      .map((c) => c.trim())
+      .filter(Boolean),
     genreIds: selectedGenreIds,
   }
 }

@@ -24,42 +24,45 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gray-950 p-4">
       <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
+        <div className="mb-8 text-center">
           <span className="text-netflix-red text-3xl font-black tracking-tight">NETFLIX</span>
-          <p className="text-gray-400 text-sm mt-1">Admin Dashboard</p>
+          <p className="mt-1 text-sm text-gray-400">Admin Dashboard</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-gray-900 rounded-2xl p-8 border border-gray-800 space-y-4">
-          <h2 className="text-xl font-bold mb-2">Sign In</h2>
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 rounded-2xl border border-gray-800 bg-gray-900 p-8"
+        >
+          <h2 className="mb-2 text-xl font-bold">Sign In</h2>
 
           {error && (
-            <div className="bg-red-900/30 border border-red-700 text-red-300 text-sm px-4 py-3 rounded-lg">
+            <div className="rounded-lg border border-red-700 bg-red-900/30 px-4 py-3 text-sm text-red-300">
               {error}
             </div>
           )}
 
           <div>
-            <label className="text-sm text-gray-400 mb-1 block">Email</label>
+            <label className="mb-1 block text-sm text-gray-400">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-netflix-red transition"
+              className="focus:border-netflix-red w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white outline-none transition"
               placeholder="admin@example.com"
             />
           </div>
 
           <div>
-            <label className="text-sm text-gray-400 mb-1 block">Password</label>
+            <label className="mb-1 block text-sm text-gray-400">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white outline-none focus:border-netflix-red transition"
+              className="focus:border-netflix-red w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white outline-none transition"
               placeholder="••••••••"
             />
           </div>
@@ -67,12 +70,14 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-netflix-red hover:bg-netflix-red-hover text-white font-semibold py-2.5 rounded-lg transition disabled:opacity-60"
+            className="bg-netflix-red hover:bg-netflix-red-hover w-full rounded-lg py-2.5 font-semibold text-white transition disabled:opacity-60"
           >
             {loading ? 'Signing in…' : 'Sign In'}
           </button>
 
-          <p className="text-xs text-gray-500 text-center">Admin access only. Regular users cannot log in here.</p>
+          <p className="text-center text-xs text-gray-500">
+            Admin access only. Regular users cannot log in here.
+          </p>
         </form>
       </div>
     </div>

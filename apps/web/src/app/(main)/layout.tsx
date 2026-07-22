@@ -9,7 +9,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
   if (!session) redirect('/login')
 
   return (
-    <div className="min-h-screen bg-netflix-black">
+    <div className="bg-netflix-black min-h-screen">
       <Navbar />
       <main className="pb-20 md:pb-0">{children}</main>
       <MobileNav />

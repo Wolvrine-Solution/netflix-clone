@@ -2,7 +2,11 @@ import { Router } from 'express'
 import { z } from 'zod'
 import { authenticate, AuthRequest } from '../../middleware/authenticate'
 import { validate } from '../../middleware/validate'
-import { createCheckoutSession, createPpvPurchase, handleStripeWebhook } from '../../modules/billing/stripe'
+import {
+  createCheckoutSession,
+  createPpvPurchase,
+  handleStripeWebhook,
+} from '../../modules/billing/stripe'
 import { Plan } from '@prisma/client'
 import { prisma } from '@netflix/db'
 import { AppError } from '../../middleware/errorHandler'
@@ -75,17 +79,14 @@ billingRouter.get('/history', authenticate, async (req: AuthRequest, res, next) 
 
 export const stripeWebhookRouter = Router()
 
-stripeWebhookRouter.post(
-  '/',
-  async (req, res, next) => {
-    try {
-      const sig = req.headers['stripe-signature'] as string
-      if (!sig) throw new AppError(400, 'Missing stripe-signature')
-      const raw = (req as { rawBody?: Buffer }).rawBody ?? Buffer.from(JSON.stringify(req.body))
-      const result = await handleStripeWebhook(raw, sig)
-      res.json({ received: true, ...result })
-    } catch (err) {
-      next(err)
-    }
+stripeWebhookRouter.post('/', async (req, res, next) => {
+  try {
+    const sig = req.headers['stripe-signature'] as string
+    if (!sig) throw new AppError(400, 'Missing stripe-signature')
+    const raw = (req as { rawBody?: Buffer }).rawBody ?? Buffer.from(JSON.stringify(req.body))
+    const result = await handleStripeWebhook(raw, sig)
+    res.json({ received: true, ...result })
+  } catch (err) {
+    next(err)
   }
-)
+})

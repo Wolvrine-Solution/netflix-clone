@@ -40,23 +40,37 @@ describe('POST /auth/signin', () => {
   it('returns 401 when the user does not exist', async () => {
     prismaMock.user.findUnique.mockResolvedValue(null)
     const app = buildApp()
-    const res = await request(app).post('/auth/signin').send({ email: 'nope@b.com', password: 'secret' })
+    const res = await request(app)
+      .post('/auth/signin')
+      .send({ email: 'nope@b.com', password: 'secret' })
     expect(res.status).toBe(401)
     expect(res.body.message).toMatch(/invalid email or password/i)
   })
 
   it('returns 401 when the user has no hashedPassword (oauth-only account)', async () => {
-    prismaMock.user.findUnique.mockResolvedValue({ id: 'u1', email: 'a@b.com', hashedPassword: null })
+    prismaMock.user.findUnique.mockResolvedValue({
+      id: 'u1',
+      email: 'a@b.com',
+      hashedPassword: null,
+    })
     const app = buildApp()
-    const res = await request(app).post('/auth/signin').send({ email: 'a@b.com', password: 'secret' })
+    const res = await request(app)
+      .post('/auth/signin')
+      .send({ email: 'a@b.com', password: 'secret' })
     expect(res.status).toBe(401)
   })
 
   it('returns 401 when the password does not match', async () => {
     const hashed = await bcrypt.hash('correct-password', 10)
-    prismaMock.user.findUnique.mockResolvedValue({ id: 'u1', email: 'a@b.com', hashedPassword: hashed })
+    prismaMock.user.findUnique.mockResolvedValue({
+      id: 'u1',
+      email: 'a@b.com',
+      hashedPassword: hashed,
+    })
     const app = buildApp()
-    const res = await request(app).post('/auth/signin').send({ email: 'a@b.com', password: 'wrong-password' })
+    const res = await request(app)
+      .post('/auth/signin')
+      .send({ email: 'a@b.com', password: 'wrong-password' })
     expect(res.status).toBe(401)
   })
 
@@ -70,7 +84,9 @@ describe('POST /auth/signin', () => {
       image: null,
     })
     const app = buildApp()
-    const res = await request(app).post('/auth/signin').send({ email: 'a@b.com', password: 'correct-password' })
+    const res = await request(app)
+      .post('/auth/signin')
+      .send({ email: 'a@b.com', password: 'correct-password' })
 
     expect(res.status).toBe(200)
     expect(res.body.token).toBeTypeOf('string')
@@ -81,8 +97,12 @@ describe('POST /auth/signin', () => {
   it('looks up the user by lowercased, trimmed email', async () => {
     prismaMock.user.findUnique.mockResolvedValue(null)
     const app = buildApp()
-    await request(app).post('/auth/signin').send({ email: '  Alice@Example.COM  ', password: 'secret' })
+    await request(app)
+      .post('/auth/signin')
+      .send({ email: '  Alice@Example.COM  ', password: 'secret' })
 
-    expect(prismaMock.user.findUnique).toHaveBeenCalledWith({ where: { email: 'alice@example.com' } })
+    expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
+      where: { email: 'alice@example.com' },
+    })
   })
 })

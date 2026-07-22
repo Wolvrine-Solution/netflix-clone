@@ -28,7 +28,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-netflix-black flex flex-col">
+    <div className="bg-netflix-black flex min-h-screen flex-col">
       {/* Background */}
       <div
         className="absolute inset-0 bg-cover bg-center"
@@ -37,26 +37,26 @@ export default function LoginPage() {
             "url('https://assets.nflxext.com/ffe/siteui/vlv3/9d3533b2-0e2b-40b2-95e1-14dd7f6bdb43/en-us/home-bg.jpg')",
         }}
       />
-      <div className="absolute inset-0 bg-netflix-black/60" />
-      <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-netflix-black to-transparent" />
+      <div className="bg-netflix-black/60 absolute inset-0" />
+      <div className="from-netflix-black absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t to-transparent" />
 
       {/* Logo */}
       <nav className="relative z-10 flex items-center px-6 py-6 md:px-16">
         <Link
           href="/"
-          className="text-netflix-red text-3xl font-black tracking-tightest drop-shadow-[0_2px_10px_rgba(229,9,20,0.4)]"
+          className="text-netflix-red tracking-tightest text-3xl font-black drop-shadow-[0_2px_10px_rgba(229,9,20,0.4)]"
         >
           NETFLIX
         </Link>
       </nav>
 
       {/* Form card */}
-      <div className="relative z-10 flex-1 flex items-center justify-center px-4 pb-16">
-        <div className="glass-strong rounded-2xl p-8 sm:p-10 w-full max-w-md shadow-[0_32px_80px_rgba(0,0,0,0.7)] ring-1 ring-white/5 animate-scale-in">
-          <h1 className="text-3xl font-black mb-2">Sign In</h1>
-          <p className="text-netflix-light-gray text-sm mb-8">
+      <div className="relative z-10 flex flex-1 items-center justify-center px-4 pb-16">
+        <div className="glass-strong animate-scale-in w-full max-w-md rounded-2xl p-8 shadow-[0_32px_80px_rgba(0,0,0,0.7)] ring-1 ring-white/5 sm:p-10">
+          <h1 className="mb-2 text-3xl font-black">Sign In</h1>
+          <p className="text-netflix-light-gray mb-8 text-sm">
             New to Netflix?{' '}
-            <Link href="/register" className="text-white font-semibold hover:underline">
+            <Link href="/register" className="font-semibold text-white hover:underline">
               Sign up now
             </Link>
           </p>
@@ -79,7 +79,7 @@ export default function LoginPage() {
               required
             />
             {error && (
-              <p className="text-netflix-red text-sm bg-netflix-red/10 border border-netflix-red/30 rounded-lg px-3 py-2">
+              <p className="text-netflix-red bg-netflix-red/10 border-netflix-red/30 rounded-lg border px-3 py-2 text-sm">
                 {error}
               </p>
             )}
@@ -88,7 +88,7 @@ export default function LoginPage() {
               variant="danger"
               size="lg"
               loading={loading}
-              className="w-full !rounded-xl !font-bold hover:scale-[1.02] active:scale-98 transition-transform"
+              className="active:scale-98 w-full !rounded-xl !font-bold transition-transform hover:scale-[1.02]"
             >
               Sign In
             </Button>
@@ -99,7 +99,7 @@ export default function LoginPage() {
               <div className="w-full border-t border-white/10" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-transparent px-3 text-netflix-muted font-medium tracking-widest uppercase">
+              <span className="text-netflix-muted bg-transparent px-3 font-medium uppercase tracking-widest">
                 or continue with
               </span>
             </div>
@@ -108,13 +108,13 @@ export default function LoginPage() {
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => signIn('google', { callbackUrl: '/profiles' })}
-              className="flex items-center justify-center gap-2.5 glass rounded-xl py-3 font-semibold text-sm hover:bg-white/15 active:scale-95 transition"
+              className="glass flex items-center justify-center gap-2.5 rounded-xl py-3 text-sm font-semibold transition hover:bg-white/15 active:scale-95"
             >
               <FcGoogle className="text-xl" /> Google
             </button>
             <button
               onClick={() => signIn('github', { callbackUrl: '/profiles' })}
-              className="flex items-center justify-center gap-2.5 glass rounded-xl py-3 font-semibold text-sm hover:bg-white/15 active:scale-95 transition"
+              className="glass flex items-center justify-center gap-2.5 rounded-xl py-3 text-sm font-semibold transition hover:bg-white/15 active:scale-95"
             >
               <FaGithub className="text-xl" /> GitHub
             </button>

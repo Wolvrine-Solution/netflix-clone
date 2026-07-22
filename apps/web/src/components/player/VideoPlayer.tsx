@@ -14,7 +14,8 @@ interface VideoPlayerProps {
   episodeInfo?: { season: number; episode: number; title: string } | null
 }
 
-const DEMO_SRC = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+const DEMO_SRC =
+  'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
 
 export function VideoPlayer({ content, videoUrl, onNext, onPrev, episodeInfo }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -24,9 +25,19 @@ export function VideoPlayer({ content, videoUrl, onNext, onPrev, episodeInfo }: 
   const router = useRouter()
   const { saveProgress } = useWatchProgress(content.id)
   const {
-    isPlaying, isMuted, volume, showControls,
-    setPlaying, setMuted, setVolume, setCurrentTime,
-    setDuration, setLoading, setShowControls, setFullscreen, reset,
+    isPlaying,
+    isMuted,
+    volume,
+    showControls,
+    setPlaying,
+    setMuted,
+    setVolume,
+    setCurrentTime,
+    setDuration,
+    setLoading,
+    setShowControls,
+    setFullscreen,
+    reset,
   } = usePlayerStore()
 
   const [showSkipIntro, setShowSkipIntro] = useState(false)
@@ -41,19 +52,21 @@ export function VideoPlayer({ content, videoUrl, onNext, onPrev, episodeInfo }: 
 
     if (isHLS) {
       // Dynamically import hls.js
-      import('hls.js').then(({ default: Hls }) => {
-        if (Hls.isSupported()) {
-          const hls = new Hls({ startLevel: -1, autoStartLoad: true })
-          hls.loadSource(src)
-          hls.attachMedia(video)
-          hlsRef.current = hls
-        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-          // Native HLS (Safari)
+      import('hls.js')
+        .then(({ default: Hls }) => {
+          if (Hls.isSupported()) {
+            const hls = new Hls({ startLevel: -1, autoStartLoad: true })
+            hls.loadSource(src)
+            hls.attachMedia(video)
+            hlsRef.current = hls
+          } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            // Native HLS (Safari)
+            video.src = src
+          }
+        })
+        .catch(() => {
           video.src = src
-        }
-      }).catch(() => {
-        video.src = src
-      })
+        })
     } else {
       video.src = src
     }
@@ -82,7 +95,9 @@ export function VideoPlayer({ content, videoUrl, onNext, onPrev, episodeInfo }: 
       setShowSkipIntro(video.currentTime >= 15 && video.currentTime <= 90)
     }
     const onDurationChange = () => setDuration(video.duration)
-    const onEnded = () => { if (onNext) onNext() }
+    const onEnded = () => {
+      if (onNext) onNext()
+    }
 
     video.addEventListener('loadeddata', onLoadedData)
     video.addEventListener('play', onPlay)
@@ -128,17 +143,42 @@ export function VideoPlayer({ content, videoUrl, onNext, onPrev, episodeInfo }: 
       const video = videoRef.current
       if (!video) return
       switch (e.key) {
-        case ' ': case 'k': e.preventDefault(); setPlaying(!isPlaying); break
-        case 'f': case 'F':
-          if (document.fullscreenElement) { document.exitFullscreen(); setFullscreen(false) }
-          else { containerRef.current?.requestFullscreen(); setFullscreen(true) }
+        case ' ':
+        case 'k':
+          e.preventDefault()
+          setPlaying(!isPlaying)
           break
-        case 'm': case 'M': setMuted(!isMuted); break
-        case 'ArrowRight': video.currentTime += 10; break
-        case 'ArrowLeft': video.currentTime -= 10; break
-        case 'Escape': router.back(); break
-        case 'n': case 'N': if (onNext) onNext(); break
-        case 'p': case 'P': if (onPrev) onPrev(); break
+        case 'f':
+        case 'F':
+          if (document.fullscreenElement) {
+            document.exitFullscreen()
+            setFullscreen(false)
+          } else {
+            containerRef.current?.requestFullscreen()
+            setFullscreen(true)
+          }
+          break
+        case 'm':
+        case 'M':
+          setMuted(!isMuted)
+          break
+        case 'ArrowRight':
+          video.currentTime += 10
+          break
+        case 'ArrowLeft':
+          video.currentTime -= 10
+          break
+        case 'Escape':
+          router.back()
+          break
+        case 'n':
+        case 'N':
+          if (onNext) onNext()
+          break
+        case 'p':
+        case 'P':
+          if (onPrev) onPrev()
+          break
       }
     }
     window.addEventListener('keydown', handleKey)
@@ -148,21 +188,16 @@ export function VideoPlayer({ content, videoUrl, onNext, onPrev, episodeInfo }: 
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full bg-black"
+      className="relative h-full w-full bg-black"
       onMouseMove={resetHideTimer}
       onClick={() => setPlaying(!isPlaying)}
       style={{ cursor: showControls ? 'default' : 'none' }}
     >
-      <video
-        ref={videoRef}
-        className="w-full h-full object-contain"
-        autoPlay
-        playsInline
-      />
+      <video ref={videoRef} className="h-full w-full object-contain" autoPlay playsInline />
 
       {/* Episode badge */}
       {episodeInfo && (
-        <div className="absolute top-16 left-8 text-white/70 text-sm select-none pointer-events-none">
+        <div className="pointer-events-none absolute left-8 top-16 select-none text-sm text-white/70">
           S{episodeInfo.season} E{episodeInfo.episode} · {episodeInfo.title}
         </div>
       )}
@@ -175,7 +210,7 @@ export function VideoPlayer({ content, videoUrl, onNext, onPrev, episodeInfo }: 
             if (videoRef.current) videoRef.current.currentTime += 75
             setShowSkipIntro(false)
           }}
-          className="absolute bottom-24 right-8 border-2 border-white text-white px-6 py-2 text-sm font-semibold hover:bg-white hover:text-black transition z-10"
+          className="absolute bottom-24 right-8 z-10 border-2 border-white px-6 py-2 text-sm font-semibold text-white transition hover:bg-white hover:text-black"
         >
           Skip Intro
         </button>

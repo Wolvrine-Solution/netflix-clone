@@ -8,12 +8,18 @@ import { useProfileStore } from '@/store/useProfileStore'
 import type { ContentItem } from '@netflix/types'
 
 interface EpisodeData {
-  id: string; episodeNumber: number; title: string
-  runtime?: number | null; stillPath?: string | null; videoUrl?: string | null
+  id: string
+  episodeNumber: number
+  title: string
+  runtime?: number | null
+  stillPath?: string | null
+  videoUrl?: string | null
 }
 
 interface SeasonData {
-  id: string; seasonNumber: number; title?: string | null
+  id: string
+  seasonNumber: number
+  title?: string | null
   episodes: EpisodeData[]
 }
 
@@ -26,7 +32,14 @@ interface Props {
   currentEpisode: number
 }
 
-export function WatchClient({ content, videoUrl, episodeInfo, seasons, currentSeason, currentEpisode }: Props) {
+export function WatchClient({
+  content,
+  videoUrl,
+  episodeInfo,
+  seasons,
+  currentSeason,
+  currentEpisode,
+}: Props) {
   const router = useRouter()
   const activeProfile = useProfileStore((s) => s.activeProfile)
   const [showEpisodes, setShowEpisodes] = useState(false)
@@ -36,10 +49,11 @@ export function WatchClient({ content, videoUrl, episodeInfo, seasons, currentSe
   useEffect(() => {
     const season = seasons.find((s) => s.seasonNumber === currentSeason)
     const episode = season?.episodes.find((e) => e.episodeNumber === currentEpisode)
-    api.playback.token(content.id, {
-      profileId: activeProfile?.id,
-      episodeId: episode?.id,
-    })
+    api.playback
+      .token(content.id, {
+        profileId: activeProfile?.id,
+        episodeId: episode?.id,
+      })
       .then((res) => setPlaybackUrl(res.data.data.manifestUrl))
       .catch(() => setPlaybackUrl(videoUrl))
   }, [content.id, videoUrl, activeProfile?.id, seasons, currentSeason, currentEpisode])
@@ -100,7 +114,7 @@ export function WatchClient({ content, videoUrl, episodeInfo, seasons, currentSe
       {isTVWithSeasons && (
         <button
           onClick={() => setShowEpisodes(true)}
-          className="absolute top-4 right-4 z-20 bg-black/50 backdrop-blur-sm text-white px-3 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-black/70 transition"
+          className="absolute right-4 top-4 z-20 flex items-center gap-2 rounded-lg bg-black/50 px-3 py-2 text-sm text-white backdrop-blur-sm transition hover:bg-black/70"
         >
           <FiList /> Episodes
         </button>
@@ -108,23 +122,26 @@ export function WatchClient({ content, videoUrl, episodeInfo, seasons, currentSe
 
       {/* Episode Panel */}
       {showEpisodes && (
-        <div className="absolute inset-y-0 right-0 z-30 w-80 bg-netflix-dark-gray border-l border-gray-800 flex flex-col">
+        <div className="bg-netflix-dark-gray absolute inset-y-0 right-0 z-30 flex w-80 flex-col border-l border-gray-800">
           {/* Header */}
-          <div className="p-4 border-b border-gray-800 flex items-center justify-between flex-shrink-0">
+          <div className="flex flex-shrink-0 items-center justify-between border-b border-gray-800 p-4">
             <h3 className="font-semibold">{content.title}</h3>
-            <button onClick={() => setShowEpisodes(false)} className="text-gray-500 hover:text-white transition">
+            <button
+              onClick={() => setShowEpisodes(false)}
+              className="text-gray-500 transition hover:text-white"
+            >
               <FiX />
             </button>
           </div>
 
           {/* Season tabs */}
           {seasons.length > 1 && (
-            <div className="flex gap-1 p-3 border-b border-gray-800 overflow-x-auto flex-shrink-0">
+            <div className="flex flex-shrink-0 gap-1 overflow-x-auto border-b border-gray-800 p-3">
               {seasons.map((s) => (
                 <button
                   key={s.id}
                   onClick={() => setActiveSeason(s.seasonNumber)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition ${activeSeason === s.seasonNumber ? 'bg-netflix-red text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
+                  className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium transition ${activeSeason === s.seasonNumber ? 'bg-netflix-red text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
                 >
                   S{s.seasonNumber}
                 </button>
@@ -133,27 +150,37 @@ export function WatchClient({ content, videoUrl, episodeInfo, seasons, currentSe
           )}
 
           {/* Episode list */}
-          <div className="overflow-y-auto flex-1 p-3 space-y-2">
+          <div className="flex-1 space-y-2 overflow-y-auto p-3">
             {currentSeasonData?.episodes.map((ep) => {
               const isActive = currentSeason === activeSeason && currentEpisode === ep.episodeNumber
               return (
                 <button
                   key={ep.id}
                   onClick={() => goToEpisode(activeSeason, ep.episodeNumber)}
-                  className={`w-full flex items-start gap-3 p-3 rounded-xl text-left transition ${isActive ? 'bg-netflix-red/20 border border-netflix-red/40' : 'hover:bg-gray-800'}`}
+                  className={`flex w-full items-start gap-3 rounded-xl p-3 text-left transition ${isActive ? 'bg-netflix-red/20 border-netflix-red/40 border' : 'hover:bg-gray-800'}`}
                 >
                   {ep.stillPath ? (
-                    <img src={ep.stillPath} alt="" className="w-20 aspect-video object-cover rounded flex-shrink-0" />
+                    <img
+                      src={ep.stillPath}
+                      alt=""
+                      className="aspect-video w-20 flex-shrink-0 rounded object-cover"
+                    />
                   ) : (
-                    <div className={`w-20 aspect-video rounded flex-shrink-0 flex items-center justify-center ${isActive ? 'bg-netflix-red/30' : 'bg-gray-800'}`}>
-                      <FiPlay className={`text-sm ${isActive ? 'text-netflix-red' : 'text-gray-600'}`} />
+                    <div
+                      className={`flex aspect-video w-20 flex-shrink-0 items-center justify-center rounded ${isActive ? 'bg-netflix-red/30' : 'bg-gray-800'}`}
+                    >
+                      <FiPlay
+                        className={`text-sm ${isActive ? 'text-netflix-red' : 'text-gray-600'}`}
+                      />
                     </div>
                   )}
                   <div className="min-w-0">
-                    <p className={`text-sm font-medium leading-tight ${isActive ? 'text-netflix-red' : 'text-white'}`}>
+                    <p
+                      className={`text-sm font-medium leading-tight ${isActive ? 'text-netflix-red' : 'text-white'}`}
+                    >
                       {ep.episodeNumber}. {ep.title}
                     </p>
-                    {ep.runtime && <p className="text-xs text-gray-500 mt-0.5">{ep.runtime}m</p>}
+                    {ep.runtime && <p className="mt-0.5 text-xs text-gray-500">{ep.runtime}m</p>}
                   </div>
                 </button>
               )

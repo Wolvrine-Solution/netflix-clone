@@ -7,7 +7,11 @@ interface SearchInputProps {
   placeholder?: string
 }
 
-export function SearchInput({ value, onChangeText, placeholder = 'Titles, people, genres' }: SearchInputProps) {
+export function SearchInput({
+  value,
+  onChangeText,
+  placeholder = 'Titles, people, genres',
+}: SearchInputProps) {
   return (
     <View
       style={{

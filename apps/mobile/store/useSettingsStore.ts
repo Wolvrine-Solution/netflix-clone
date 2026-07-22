@@ -31,9 +31,12 @@ async function persist(patch: Partial<SettingsStore>) {
   } catch {}
 }
 
-function setter<K extends keyof SettingsStore>(key: K, set: (fn: (s: SettingsStore) => Partial<SettingsStore>) => void) {
+function setter<K extends keyof SettingsStore>(
+  key: K,
+  set: (fn: (s: SettingsStore) => Partial<SettingsStore>) => void
+) {
   return (value: SettingsStore[K]) => {
-    set(() => ({ [key]: value } as Partial<SettingsStore>))
+    set(() => ({ [key]: value }) as Partial<SettingsStore>)
     persist({ [key]: value })
   }
 }

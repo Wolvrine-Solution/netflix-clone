@@ -71,9 +71,7 @@ describe('useMyList', () => {
 
   it('optimistically adds an item before the API call resolves, then keeps it after success', async () => {
     let resolveAdd!: (value: unknown) => void
-    mockedApi.myList.add.mockImplementation(
-      () => new Promise((resolve) => (resolveAdd = resolve))
-    )
+    mockedApi.myList.add.mockImplementation(() => new Promise((resolve) => (resolveAdd = resolve)))
 
     const { wrapper } = makeWrapper()
     const { result } = renderHook(() => useMyList(), { wrapper })

@@ -27,7 +27,11 @@ app.use(
   express.json({
     limit: env.JSON_BODY_LIMIT,
     verify: (req, _res, buf) => {
-      if ((req as express.Request & { originalUrl?: string }).originalUrl?.startsWith('/webhooks/stripe')) {
+      if (
+        (req as express.Request & { originalUrl?: string }).originalUrl?.startsWith(
+          '/webhooks/stripe'
+        )
+      ) {
         ;(req as express.Request & { rawBody?: Buffer }).rawBody = buf
       }
     },

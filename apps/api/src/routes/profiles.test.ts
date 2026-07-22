@@ -24,7 +24,11 @@ import { errorHandler } from '../middleware/errorHandler'
 const SECRET = new TextEncoder().encode(process.env['NEXTAUTH_SECRET'] ?? 'fallback-secret')
 
 async function tokenFor(userId: string) {
-  return new SignJWT({ sub: userId }).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('30d').sign(SECRET)
+  return new SignJWT({ sub: userId })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('30d')
+    .sign(SECRET)
 }
 
 function buildApp() {
@@ -74,7 +78,12 @@ describe('Profiles routes', () => {
 
   it('POST / creates a profile when under the limit, defaulting isKid to false', async () => {
     prismaMock.profile.count.mockResolvedValue(2)
-    prismaMock.profile.create.mockResolvedValue({ id: 'p3', name: 'Kid', userId: 'user-1', isKid: false })
+    prismaMock.profile.create.mockResolvedValue({
+      id: 'p3',
+      name: 'Kid',
+      userId: 'user-1',
+      isKid: false,
+    })
     const token = await tokenFor('user-1')
     const app = buildApp()
 
@@ -143,7 +152,9 @@ describe('Profiles routes', () => {
     const token = await tokenFor('user-1')
     const app = buildApp()
 
-    const res = await request(app).delete('/profiles/not-mine').set('Authorization', `Bearer ${token}`)
+    const res = await request(app)
+      .delete('/profiles/not-mine')
+      .set('Authorization', `Bearer ${token}`)
 
     expect(res.status).toBe(404)
     expect(prismaMock.profile.delete).not.toHaveBeenCalled()
@@ -193,7 +204,11 @@ describe('Profiles routes', () => {
   })
 
   it('POST /:profileId/pin/verify rejects an invalid PIN', async () => {
-    prismaMock.profile.findFirst.mockResolvedValue({ id: 'p1', userId: 'user-1', pinHash: 'hashed:9999' })
+    prismaMock.profile.findFirst.mockResolvedValue({
+      id: 'p1',
+      userId: 'user-1',
+      pinHash: 'hashed:9999',
+    })
     const token = await tokenFor('user-1')
     const app = buildApp()
 
@@ -206,7 +221,11 @@ describe('Profiles routes', () => {
   })
 
   it('POST /:profileId/access grants access when PIN is correct', async () => {
-    prismaMock.profile.findFirst.mockResolvedValue({ id: 'p1', userId: 'user-1', pinHash: 'hashed:1234' })
+    prismaMock.profile.findFirst.mockResolvedValue({
+      id: 'p1',
+      userId: 'user-1',
+      pinHash: 'hashed:1234',
+    })
     const token = await tokenFor('user-1')
     const app = buildApp()
 

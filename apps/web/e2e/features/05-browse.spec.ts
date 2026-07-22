@@ -6,7 +6,10 @@ import { registerAndSignIn, uniqueEmail } from '../helpers'
 // ---------------------------------------------------------------------------
 test.describe('Browse', () => {
   test('browse page loads after sign-in', async ({ page }) => {
-    const signedIn = await registerAndSignIn(page, { name: 'Browse Tester', email: uniqueEmail('browsetest') })
+    const signedIn = await registerAndSignIn(page, {
+      name: 'Browse Tester',
+      email: uniqueEmail('browsetest'),
+    })
     test.skip(!signedIn, 'Registration/sign-in unavailable in this environment (needs API + DB)')
 
     await page.goto('/browse')
@@ -14,7 +17,10 @@ test.describe('Browse', () => {
   })
 
   test('movies tab loads', async ({ page }) => {
-    const signedIn = await registerAndSignIn(page, { name: 'Movies Tester', email: uniqueEmail('moviestest') })
+    const signedIn = await registerAndSignIn(page, {
+      name: 'Movies Tester',
+      email: uniqueEmail('moviestest'),
+    })
     test.skip(!signedIn, 'Registration/sign-in unavailable in this environment (needs API + DB)')
 
     await page.goto('/browse/movies')
@@ -22,7 +28,10 @@ test.describe('Browse', () => {
   })
 
   test('tv tab loads', async ({ page }) => {
-    const signedIn = await registerAndSignIn(page, { name: 'TV Tester', email: uniqueEmail('tvtest') })
+    const signedIn = await registerAndSignIn(page, {
+      name: 'TV Tester',
+      email: uniqueEmail('tvtest'),
+    })
     test.skip(!signedIn, 'Registration/sign-in unavailable in this environment (needs API + DB)')
 
     await page.goto('/browse/tv')

@@ -6,8 +6,15 @@ async function getAnalyticsData() {
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
 
   const [
-    totalUsers, totalContent, totalSubscriptions, watchEvents, myListItems,
-    topWatched, userGrowthRaw, contentByType, recentUsers
+    totalUsers,
+    totalContent,
+    totalSubscriptions,
+    watchEvents,
+    myListItems,
+    topWatched,
+    userGrowthRaw,
+    contentByType,
+    recentUsers,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.content.count({ where: { status: 'PUBLISHED' } }),
@@ -33,7 +40,14 @@ async function getAnalyticsData() {
     prisma.user.findMany({
       orderBy: { createdAt: 'desc' },
       take: 5,
-      select: { id: true, name: true, email: true, image: true, createdAt: true, subscription: { select: { plan: true } } },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        image: true,
+        createdAt: true,
+        subscription: { select: { plan: true } },
+      },
     }),
   ])
 
@@ -65,13 +79,25 @@ async function getAnalyticsData() {
 
   // Revenue estimate (BASIC=$8.99, STANDARD=$13.99, PREMIUM=$17.99)
   const subsByPlan = await prisma.subscription.groupBy({
-    by: ['plan'], _count: { id: true }, where: { status: 'ACTIVE' },
+    by: ['plan'],
+    _count: { id: true },
+    where: { status: 'ACTIVE' },
   })
   const pricing: Record<string, number> = { BASIC: 8.99, STANDARD: 13.99, PREMIUM: 17.99 }
-  const estimatedRevenue = subsByPlan.reduce((sum, s) => sum + s._count.id * (pricing[s.plan] ?? 0), 0)
+  const estimatedRevenue = subsByPlan.reduce(
+    (sum, s) => sum + s._count.id * (pricing[s.plan] ?? 0),
+    0
+  )
 
   return {
-    kpis: { totalUsers, totalContent, totalSubscriptions, estimatedRevenue, watchEvents, myListItems },
+    kpis: {
+      totalUsers,
+      totalContent,
+      totalSubscriptions,
+      estimatedRevenue,
+      watchEvents,
+      myListItems,
+    },
     topContentData,
     userGrowthData,
     contentByType: contentByType.map((c) => ({ type: c.mediaType, count: c._count.id })),

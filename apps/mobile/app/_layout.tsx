@@ -15,14 +15,18 @@ const queryClient = new QueryClient({
 
 export default function RootLayout() {
   const hydrate = useSettingsStore((s) => s.hydrate)
-  useEffect(() => { hydrate() }, [])
+  useEffect(() => {
+    hydrate()
+  }, [])
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
           <StatusBar style="light" />
-          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#141414' } }}>
+          <Stack
+            screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#141414' } }}
+          >
             <Stack.Screen name="index" />
             <Stack.Screen name="(auth)" />
             <Stack.Screen name="profiles" />

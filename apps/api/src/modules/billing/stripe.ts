@@ -22,11 +22,19 @@ function priceMap() {
   } as Record<Plan, string | undefined>
 }
 
-export async function createCheckoutSession(userId: string, plan: Plan, successUrl: string, cancelUrl: string) {
+export async function createCheckoutSession(
+  userId: string,
+  plan: Plan,
+  successUrl: string,
+  cancelUrl: string
+) {
   const s = getStripe()
   if (!s) throw new Error('Stripe not configured')
 
-  const user = await prisma.user.findUnique({ where: { id: userId }, include: { subscription: true } })
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: { subscription: true },
+  })
   if (!user) throw new Error('User not found')
 
   let customerId = user.subscription?.stripeCustomerId
@@ -102,10 +110,13 @@ export async function handleStripeWebhook(rawBody: Buffer, signature: string) {
       })
       if (local) {
         const status =
-          sub.status === 'active' ? SubStatus.ACTIVE :
-          sub.status === 'trialing' ? SubStatus.TRIALING :
-          sub.status === 'past_due' ? SubStatus.PAST_DUE :
-          SubStatus.CANCELED
+          sub.status === 'active'
+            ? SubStatus.ACTIVE
+            : sub.status === 'trialing'
+              ? SubStatus.TRIALING
+              : sub.status === 'past_due'
+                ? SubStatus.PAST_DUE
+                : SubStatus.CANCELED
         await prisma.subscription.update({
           where: { id: local.id },
           data: {

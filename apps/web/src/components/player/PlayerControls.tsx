@@ -2,8 +2,15 @@
 import { RefObject } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  FiPlay, FiPause, FiVolume2, FiVolumeX,
-  FiMaximize, FiMinimize, FiArrowLeft, FiSkipForward, FiSkipBack,
+  FiPlay,
+  FiPause,
+  FiVolume2,
+  FiVolumeX,
+  FiMaximize,
+  FiMinimize,
+  FiArrowLeft,
+  FiSkipForward,
+  FiSkipBack,
 } from 'react-icons/fi'
 import { usePlayerStore } from '@/store/usePlayerStore'
 import type { ContentItem } from '@netflix/types'
@@ -27,9 +34,17 @@ function formatTime(secs: number): string {
 
 export function PlayerControls({ videoRef, content, onBack, onNext }: PlayerControlsProps) {
   const {
-    isPlaying, isMuted, volume, currentTime, duration,
-    isFullscreen, showControls,
-    setPlaying, setMuted, setVolume, setFullscreen,
+    isPlaying,
+    isMuted,
+    volume,
+    currentTime,
+    duration,
+    isFullscreen,
+    showControls,
+    setPlaying,
+    setMuted,
+    setVolume,
+    setFullscreen,
   } = usePlayerStore()
 
   const toggleFullscreen = () => {
@@ -58,39 +73,39 @@ export function PlayerControls({ videoRef, content, onBack, onNext }: PlayerCont
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="absolute inset-0 flex flex-col justify-between pointer-events-none"
+          className="pointer-events-none absolute inset-0 flex flex-col justify-between"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Top bar */}
-          <div className="bg-gradient-to-b from-black/90 via-black/40 to-transparent p-4 md:p-6 flex items-center gap-4 pointer-events-auto">
+          <div className="pointer-events-auto flex items-center gap-4 bg-gradient-to-b from-black/90 via-black/40 to-transparent p-4 md:p-6">
             <button
               onClick={onBack}
-              className="grid place-items-center w-10 h-10 rounded-full hover:bg-white/15 text-white transition tap-highlight-none"
+              className="tap-highlight-none grid h-10 w-10 place-items-center rounded-full text-white transition hover:bg-white/15"
               aria-label="Back"
             >
               <FiArrowLeft className="text-2xl" />
             </button>
             <div>
-              <h1 className="font-bold text-base md:text-lg leading-tight">{content.title}</h1>
+              <h1 className="text-base font-bold leading-tight md:text-lg">{content.title}</h1>
               {content.mediaType === 'tv' && (
-                <p className="text-xs md:text-sm text-white/60">S1 · E1</p>
+                <p className="text-xs text-white/60 md:text-sm">S1 · E1</p>
               )}
             </div>
           </div>
 
           {/* Bottom controls */}
-          <div className="bg-gradient-to-t from-black/95 via-black/60 to-transparent px-4 md:px-8 pb-6 md:pb-8 pt-16 pointer-events-auto">
+          <div className="pointer-events-auto bg-gradient-to-t from-black/95 via-black/60 to-transparent px-4 pb-6 pt-16 md:px-8 md:pb-8">
             {/* Progress bar */}
-            <div className="relative mb-4 group cursor-pointer" onClick={seek}>
-              <div className="h-1 group-hover:h-1.5 transition-all duration-150 bg-white/25 rounded-full overflow-hidden">
+            <div className="group relative mb-4 cursor-pointer" onClick={seek}>
+              <div className="h-1 overflow-hidden rounded-full bg-white/25 transition-all duration-150 group-hover:h-1.5">
                 <div
-                  className="h-full bg-netflix-red rounded-full relative"
+                  className="bg-netflix-red relative h-full rounded-full"
                   style={{ width: `${progress}%` }}
                 />
               </div>
               {/* Thumb dot */}
               <div
-                className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition pointer-events-none"
+                className="pointer-events-none absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-white opacity-0 shadow-md transition group-hover:opacity-100"
                 style={{ left: `calc(${progress}% - 6px)` }}
               />
             </div>
@@ -100,8 +115,10 @@ export function PlayerControls({ videoRef, content, onBack, onNext }: PlayerCont
               <div className="flex items-center gap-2 md:gap-4">
                 {/* Skip back */}
                 <button
-                  onClick={() => { if (videoRef.current) videoRef.current.currentTime -= 10 }}
-                  className="grid place-items-center w-9 h-9 rounded-full hover:bg-white/15 transition tap-highlight-none"
+                  onClick={() => {
+                    if (videoRef.current) videoRef.current.currentTime -= 10
+                  }}
+                  className="tap-highlight-none grid h-9 w-9 place-items-center rounded-full transition hover:bg-white/15"
                   aria-label="-10 seconds"
                 >
                   <FiSkipBack className="text-lg md:text-xl" />
@@ -110,19 +127,22 @@ export function PlayerControls({ videoRef, content, onBack, onNext }: PlayerCont
                 {/* Play / Pause */}
                 <button
                   onClick={() => setPlaying(!isPlaying)}
-                  className="grid place-items-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 transition tap-highlight-none"
+                  className="tap-highlight-none grid h-11 w-11 place-items-center rounded-full bg-white/10 transition hover:bg-white/20"
                   aria-label={isPlaying ? 'Pause' : 'Play'}
                 >
-                  {isPlaying
-                    ? <FiPause className="text-2xl md:text-3xl" />
-                    : <FiPlay className="text-2xl md:text-3xl" />
-                  }
+                  {isPlaying ? (
+                    <FiPause className="text-2xl md:text-3xl" />
+                  ) : (
+                    <FiPlay className="text-2xl md:text-3xl" />
+                  )}
                 </button>
 
                 {/* Skip forward */}
                 <button
-                  onClick={() => { if (videoRef.current) videoRef.current.currentTime += 10 }}
-                  className="grid place-items-center w-9 h-9 rounded-full hover:bg-white/15 transition tap-highlight-none"
+                  onClick={() => {
+                    if (videoRef.current) videoRef.current.currentTime += 10
+                  }}
+                  className="tap-highlight-none grid h-9 w-9 place-items-center rounded-full transition hover:bg-white/15"
                   aria-label="+10 seconds"
                 >
                   <FiSkipForward className="text-lg md:text-xl" />
@@ -132,20 +152,24 @@ export function PlayerControls({ videoRef, content, onBack, onNext }: PlayerCont
                 {onNext && (
                   <button
                     onClick={onNext}
-                    className="hidden sm:block text-xs text-white/70 hover:text-white transition px-3 py-1 rounded-lg border border-white/20 hover:border-white/50"
+                    className="hidden rounded-lg border border-white/20 px-3 py-1 text-xs text-white/70 transition hover:border-white/50 hover:text-white sm:block"
                   >
                     Next
                   </button>
                 )}
 
                 {/* Volume — hidden on mobile */}
-                <div className="hidden sm:flex items-center gap-2 group/vol">
+                <div className="group/vol hidden items-center gap-2 sm:flex">
                   <button
                     onClick={() => setMuted(!isMuted)}
-                    className="grid place-items-center w-9 h-9 rounded-full hover:bg-white/15 transition"
+                    className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-white/15"
                     aria-label={isMuted ? 'Unmute' : 'Mute'}
                   >
-                    {isMuted || volume === 0 ? <FiVolumeX className="text-xl" /> : <FiVolume2 className="text-xl" />}
+                    {isMuted || volume === 0 ? (
+                      <FiVolumeX className="text-xl" />
+                    ) : (
+                      <FiVolume2 className="text-xl" />
+                    )}
                   </button>
                   <input
                     type="range"
@@ -153,14 +177,17 @@ export function PlayerControls({ videoRef, content, onBack, onNext }: PlayerCont
                     max={1}
                     step={0.05}
                     value={isMuted ? 0 : volume}
-                    onChange={(e) => { setVolume(parseFloat(e.target.value)); setMuted(false) }}
-                    className="w-0 group-hover/vol:w-20 opacity-0 group-hover/vol:opacity-100 transition-all duration-200 accent-netflix-red cursor-pointer"
+                    onChange={(e) => {
+                      setVolume(parseFloat(e.target.value))
+                      setMuted(false)
+                    }}
+                    className="accent-netflix-red w-0 cursor-pointer opacity-0 transition-all duration-200 group-hover/vol:w-20 group-hover/vol:opacity-100"
                     aria-label="Volume"
                   />
                 </div>
 
                 {/* Time */}
-                <span className="hidden sm:block text-xs md:text-sm text-white/70 tabular-nums">
+                <span className="hidden text-xs tabular-nums text-white/70 sm:block md:text-sm">
                   {formatTime(currentTime)} / {formatTime(duration)}
                 </span>
               </div>
@@ -168,10 +195,14 @@ export function PlayerControls({ videoRef, content, onBack, onNext }: PlayerCont
               {/* Fullscreen */}
               <button
                 onClick={toggleFullscreen}
-                className="grid place-items-center w-9 h-9 rounded-full hover:bg-white/15 transition tap-highlight-none"
+                className="tap-highlight-none grid h-9 w-9 place-items-center rounded-full transition hover:bg-white/15"
                 aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
               >
-                {isFullscreen ? <FiMinimize className="text-xl" /> : <FiMaximize className="text-xl" />}
+                {isFullscreen ? (
+                  <FiMinimize className="text-xl" />
+                ) : (
+                  <FiMaximize className="text-xl" />
+                )}
               </button>
             </div>
           </div>

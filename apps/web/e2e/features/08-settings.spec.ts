@@ -6,7 +6,10 @@ import { registerAndSignIn, uniqueEmail } from '../helpers'
 // ---------------------------------------------------------------------------
 test.describe('Settings', () => {
   test('settings page loads after sign-in', async ({ page }) => {
-    const signedIn = await registerAndSignIn(page, { name: 'Settings Tester', email: uniqueEmail('settingstest') })
+    const signedIn = await registerAndSignIn(page, {
+      name: 'Settings Tester',
+      email: uniqueEmail('settingstest'),
+    })
     test.skip(!signedIn, 'Registration/sign-in unavailable in this environment (needs API + DB)')
 
     await page.goto('/settings')

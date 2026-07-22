@@ -4,9 +4,7 @@
  * NextAuth request/session object.
  */
 
-export type GuardAction =
-  | { type: 'next' }
-  | { type: 'redirect'; to: '/login' | '/' }
+export type GuardAction = { type: 'next' } | { type: 'redirect'; to: '/login' | '/' }
 
 /**
  * Mirrors the decision tree in middleware.ts's default auth() handler:
@@ -15,10 +13,7 @@ export type GuardAction =
  * - authenticated users on /login are redirected to /
  * - everything else passes through
  */
-export function decideAccess(params: {
-  isLoggedIn: boolean
-  pathname: string
-}): GuardAction {
+export function decideAccess(params: { isLoggedIn: boolean; pathname: string }): GuardAction {
   const { isLoggedIn, pathname } = params
   const isLoginPage = pathname === '/login'
   const isApiRoute = pathname.startsWith('/api')

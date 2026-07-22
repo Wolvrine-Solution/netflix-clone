@@ -32,9 +32,17 @@ export default function NewContentPage() {
 
   // Manual create form
   const [manual, setManual] = useState({
-    title: '', mediaType: 'movie', description: '', posterPath: '',
-    backdropPath: '', releaseDate: '', rating: '7.0', maturityRating: 'TV-MA',
-    status: 'PUBLISHED', videoUrl: '', trailerKey: '',
+    title: '',
+    mediaType: 'movie',
+    description: '',
+    posterPath: '',
+    backdropPath: '',
+    releaseDate: '',
+    rating: '7.0',
+    maturityRating: 'TV-MA',
+    status: 'PUBLISHED',
+    videoUrl: '',
+    trailerKey: '',
   })
 
   async function search() {
@@ -43,7 +51,7 @@ export default function NewContentPage() {
     const res = await fetch(`${API}/api/admin/content/tmdb-search?q=${encodeURIComponent(query)}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-    const data = await res.json() as { results?: TMDBResult[] }
+    const data = (await res.json()) as { results?: TMDBResult[] }
     setResults(data.results ?? [])
     setSearching(false)
   }
@@ -56,13 +64,15 @@ export default function NewContentPage() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ tmdbId: item.id, mediaType: item.media_type }),
       })
-      const data = await res.json() as { data?: { id?: string }; message?: string }
+      const data = (await res.json()) as { data?: { id?: string }; message?: string }
       if (data.message === 'Already imported') {
         alert('This title is already in your library.')
       } else {
         router.push(`/content/${data.data?.id}`)
       }
-    } finally { setImporting(null) }
+    } finally {
+      setImporting(null)
+    }
   }
 
   async function createManual() {
@@ -71,30 +81,35 @@ export default function NewContentPage() {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify(buildManualCreateBody(manual)),
     })
-    const data = await res.json() as { data?: { id?: string } }
+    const data = (await res.json()) as { data?: { id?: string } }
     if (data.data?.id) router.push(`/content/${data.data.id}`)
   }
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <button onClick={() => router.back()} className="text-gray-500 hover:text-white text-sm mb-1">← Back</button>
+          <button
+            onClick={() => router.back()}
+            className="mb-1 text-sm text-gray-500 hover:text-white"
+          >
+            ← Back
+          </button>
           <h1 className="text-3xl font-bold">Add Content</h1>
         </div>
       </div>
 
       {/* Mode Tabs */}
-      <div className="flex gap-1 bg-gray-900 p-1 rounded-xl border border-gray-800 w-fit">
+      <div className="flex w-fit gap-1 rounded-xl border border-gray-800 bg-gray-900 p-1">
         <button
           onClick={() => setMode('tmdb')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${mode === 'tmdb' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-white'}`}
+          className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition ${mode === 'tmdb' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-white'}`}
         >
           <FiDownload /> Import from TMDB
         </button>
         <button
           onClick={() => setMode('manual')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${mode === 'manual' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-white'}`}
+          className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition ${mode === 'manual' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-white'}`}
         >
           <FiEdit3 /> Create Manually
         </button>
@@ -111,30 +126,41 @@ export default function NewContentPage() {
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && search()}
                 placeholder="Search movies or TV shows on TMDB…"
-                className="w-full bg-gray-900 border border-gray-700 rounded-lg pl-9 pr-4 py-3 text-white outline-none focus:border-netflix-red"
+                className="focus:border-netflix-red w-full rounded-lg border border-gray-700 bg-gray-900 py-3 pl-9 pr-4 text-white outline-none"
               />
             </div>
             <button
               onClick={search}
               disabled={searching}
-              className="bg-netflix-red hover:bg-netflix-red-hover text-white px-6 py-3 rounded-lg font-medium disabled:opacity-60 transition"
+              className="bg-netflix-red hover:bg-netflix-red-hover rounded-lg px-6 py-3 font-medium text-white transition disabled:opacity-60"
             >
               {searching ? 'Searching…' : 'Search'}
             </button>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {results.map((item) => (
-              <div key={item.id} className="bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-700 transition group">
+              <div
+                key={item.id}
+                className="group overflow-hidden rounded-xl border border-gray-800 bg-gray-900 transition hover:border-gray-700"
+              >
                 {item.poster_path ? (
-                  <img src={`https://image.tmdb.org/t/p/w300${item.poster_path}`} alt="" className="w-full aspect-[2/3] object-cover" />
+                  <img
+                    src={`https://image.tmdb.org/t/p/w300${item.poster_path}`}
+                    alt=""
+                    className="aspect-[2/3] w-full object-cover"
+                  />
                 ) : (
-                  <div className="w-full aspect-[2/3] bg-gray-800 flex items-center justify-center text-gray-600 text-xs p-3 text-center">No Poster</div>
+                  <div className="flex aspect-[2/3] w-full items-center justify-center bg-gray-800 p-3 text-center text-xs text-gray-600">
+                    No Poster
+                  </div>
                 )}
                 <div className="p-3">
-                  <p className="font-medium text-sm truncate">{item.title ?? item.name}</p>
-                  <div className="flex items-center justify-between mt-1.5">
-                    <span className={`text-xs px-1.5 py-0.5 rounded ${item.media_type === 'movie' ? 'bg-blue-900/50 text-blue-300' : 'bg-purple-900/50 text-purple-300'}`}>
+                  <p className="truncate text-sm font-medium">{item.title ?? item.name}</p>
+                  <div className="mt-1.5 flex items-center justify-between">
+                    <span
+                      className={`rounded px-1.5 py-0.5 text-xs ${item.media_type === 'movie' ? 'bg-blue-900/50 text-blue-300' : 'bg-purple-900/50 text-purple-300'}`}
+                    >
                       {item.media_type}
                     </span>
                     <span className="text-xs text-yellow-400">{item.vote_average.toFixed(1)}</span>
@@ -142,12 +168,16 @@ export default function NewContentPage() {
                   <button
                     onClick={() => importContent(item)}
                     disabled={importing === item.id}
-                    className="mt-2 w-full bg-netflix-red hover:bg-netflix-red-hover text-white text-xs py-1.5 rounded-lg disabled:opacity-60 transition flex items-center justify-center gap-1.5"
+                    className="bg-netflix-red hover:bg-netflix-red-hover mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs text-white transition disabled:opacity-60"
                   >
                     {importing === item.id ? (
-                      <><span className="animate-spin">↻</span> Importing…</>
+                      <>
+                        <span className="animate-spin">↻</span> Importing…
+                      </>
                     ) : (
-                      <><FiDownload /> Import</>
+                      <>
+                        <FiDownload /> Import
+                      </>
                     )}
                   </button>
                 </div>
@@ -155,7 +185,7 @@ export default function NewContentPage() {
             ))}
           </div>
           {results.length === 0 && query && !searching && (
-            <div className="text-center py-12 text-gray-600">
+            <div className="py-12 text-center text-gray-600">
               <p>No results for &quot;{query}&quot;</p>
             </div>
           )}
@@ -164,8 +194,8 @@ export default function NewContentPage() {
 
       {/* ── Manual Create ── */}
       {mode === 'manual' && (
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-5 max-w-2xl">
-          <h3 className="font-semibold text-lg">Create Content Manually</h3>
+        <div className="max-w-2xl space-y-5 rounded-xl border border-gray-800 bg-gray-900 p-6">
+          <h3 className="text-lg font-semibold">Create Content Manually</h3>
           <div className="grid grid-cols-2 gap-4">
             {[
               { k: 'title', label: 'Title', type: 'text' },
@@ -174,32 +204,46 @@ export default function NewContentPage() {
               { k: 'trailerKey', label: 'YouTube Trailer Key', type: 'text' },
             ].map(({ k, label, type }) => (
               <div key={k}>
-                <label className="text-xs text-gray-400 block mb-1">{label}</label>
-                <input type={type} value={(manual as Record<string, string>)[k]} onChange={(e) => setManual((m) => ({ ...m, [k]: e.target.value }))}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-netflix-red" />
+                <label className="mb-1 block text-xs text-gray-400">{label}</label>
+                <input
+                  type={type}
+                  value={(manual as Record<string, string>)[k]}
+                  onChange={(e) => setManual((m) => ({ ...m, [k]: e.target.value }))}
+                  className="focus:border-netflix-red w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white outline-none"
+                />
               </div>
             ))}
             <div>
-              <label className="text-xs text-gray-400 block mb-1">Media Type</label>
-              <select value={manual.mediaType} onChange={(e) => setManual((m) => ({ ...m, mediaType: e.target.value }))}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-netflix-red">
+              <label className="mb-1 block text-xs text-gray-400">Media Type</label>
+              <select
+                value={manual.mediaType}
+                onChange={(e) => setManual((m) => ({ ...m, mediaType: e.target.value }))}
+                className="focus:border-netflix-red w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white outline-none"
+              >
                 <option value="movie">Movie</option>
                 <option value="tv">TV Show</option>
               </select>
             </div>
             <div>
-              <label className="text-xs text-gray-400 block mb-1">Status</label>
-              <select value={manual.status} onChange={(e) => setManual((m) => ({ ...m, status: e.target.value }))}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-netflix-red">
+              <label className="mb-1 block text-xs text-gray-400">Status</label>
+              <select
+                value={manual.status}
+                onChange={(e) => setManual((m) => ({ ...m, status: e.target.value }))}
+                className="focus:border-netflix-red w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white outline-none"
+              >
                 <option value="PUBLISHED">Published</option>
                 <option value="DRAFT">Draft</option>
               </select>
             </div>
           </div>
           <div>
-            <label className="text-xs text-gray-400 block mb-1">Description</label>
-            <textarea value={manual.description} onChange={(e) => setManual((m) => ({ ...m, description: e.target.value }))} rows={3}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-netflix-red resize-none" />
+            <label className="mb-1 block text-xs text-gray-400">Description</label>
+            <textarea
+              value={manual.description}
+              onChange={(e) => setManual((m) => ({ ...m, description: e.target.value }))}
+              rows={3}
+              className="focus:border-netflix-red w-full resize-none rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white outline-none"
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             {[
@@ -208,17 +252,20 @@ export default function NewContentPage() {
               { k: 'videoUrl', label: 'Video URL (MP4/HLS)' },
             ].map(({ k, label }) => (
               <div key={k} className={k === 'videoUrl' ? 'col-span-2' : ''}>
-                <label className="text-xs text-gray-400 block mb-1">{label}</label>
-                <input value={(manual as Record<string, string>)[k]} onChange={(e) => setManual((m) => ({ ...m, [k]: e.target.value }))}
+                <label className="mb-1 block text-xs text-gray-400">{label}</label>
+                <input
+                  value={(manual as Record<string, string>)[k]}
+                  onChange={(e) => setManual((m) => ({ ...m, [k]: e.target.value }))}
                   placeholder="https://…"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-netflix-red" />
+                  className="focus:border-netflix-red w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white outline-none"
+                />
               </div>
             ))}
           </div>
           <button
             onClick={createManual}
             disabled={!isManualContentValid(manual)}
-            className="bg-netflix-red hover:bg-netflix-red-hover text-white px-6 py-2.5 rounded-lg font-medium transition disabled:opacity-50"
+            className="bg-netflix-red hover:bg-netflix-red-hover rounded-lg px-6 py-2.5 font-medium text-white transition disabled:opacity-50"
           >
             Create Content
           </button>

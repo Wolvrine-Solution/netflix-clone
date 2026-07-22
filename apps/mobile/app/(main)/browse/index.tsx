@@ -35,7 +35,10 @@ export default function BrowseScreen() {
           <ActivityIndicator size="large" color={Colors.red} />
         </View>
       ) : (
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 32 }}
+        >
           <HeroBanner content={featured ?? null} />
           {activeProfile && <ContinueWatchingRow profileId={activeProfile.id} />}
           {rows?.map((row) => (

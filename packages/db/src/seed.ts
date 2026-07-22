@@ -13,7 +13,9 @@ async function tmdbFetch<T = Record<string, unknown>>(path: string): Promise<T> 
 async function getTrailerKey(tmdbId: number, mediaType: 'movie' | 'tv'): Promise<string | null> {
   try {
     const data = await tmdbFetch(`/${mediaType}/${tmdbId}/videos`)
-    const trailers = (data.results as Array<{ type: string; site: string; key: string; official: boolean }>)
+    const trailers = (
+      data.results as Array<{ type: string; site: string; key: string; official: boolean }>
+    )
       .filter((v) => v.type === 'Trailer' && v.site === 'YouTube')
       .sort((a, b) => (b.official ? 1 : 0) - (a.official ? 1 : 0))
     return trailers[0]?.key ?? null
@@ -53,7 +55,7 @@ async function importContent(item: TMDBItem, mediaType: 'movie' | 'tv') {
   const trailerKey = await getTrailerKey(item.id, mediaType)
   const title = item.title ?? item.name ?? 'Unknown'
   const releaseDate = item.release_date ?? item.first_air_date ?? ''
-  const genreIds: number[] = item.genre_ids ?? (item.genres?.map((g) => g.id) ?? [])
+  const genreIds: number[] = item.genre_ids ?? item.genres?.map((g) => g.id) ?? []
 
   const content = await prisma.content.upsert({
     where: { tmdbId: item.id },
@@ -64,7 +66,9 @@ async function importContent(item: TMDBItem, mediaType: 'movie' | 'tv') {
       title,
       description: item.overview,
       posterPath: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : '',
-      backdropPath: item.backdrop_path ? `https://image.tmdb.org/t/p/original${item.backdrop_path}` : '',
+      backdropPath: item.backdrop_path
+        ? `https://image.tmdb.org/t/p/original${item.backdrop_path}`
+        : '',
       trailerKey,
       releaseDate,
       rating: item.vote_average,
@@ -95,8 +99,12 @@ async function main() {
     return
   }
 
-  interface GenreList { genres: Array<{ id: number; name: string }> }
-  interface PageResult { results?: TMDBItem[] }
+  interface GenreList {
+    genres: Array<{ id: number; name: string }>
+  }
+  interface PageResult {
+    results?: TMDBItem[]
+  }
 
   console.log('Seeding genres...')
   const movieGenres = await tmdbFetch<GenreList>('/genre/movie/list')
@@ -105,12 +113,27 @@ async function main() {
 
   const rowDefs = [
     { title: 'Trending Now', query: 'trending', order: 0, endpoint: '/trending/all/week' },
-    { title: 'Top Rated Movies', query: 'top_rated_movies', order: 1, endpoint: '/movie/top_rated' },
+    {
+      title: 'Top Rated Movies',
+      query: 'top_rated_movies',
+      order: 1,
+      endpoint: '/movie/top_rated',
+    },
     { title: 'Popular TV Shows', query: 'popular_tv', order: 2, endpoint: '/tv/popular' },
-    { title: 'Action & Adventure', query: 'action', order: 3, endpoint: '/discover/movie?with_genres=28' },
+    {
+      title: 'Action & Adventure',
+      query: 'action',
+      order: 3,
+      endpoint: '/discover/movie?with_genres=28',
+    },
     { title: 'Comedy', query: 'comedy', order: 4, endpoint: '/discover/movie?with_genres=35' },
     { title: 'Drama', query: 'drama', order: 5, endpoint: '/discover/tv?with_genres=18' },
-    { title: 'Sci-Fi & Fantasy', query: 'scifi', order: 6, endpoint: '/discover/movie?with_genres=878' },
+    {
+      title: 'Sci-Fi & Fantasy',
+      query: 'scifi',
+      order: 6,
+      endpoint: '/discover/movie?with_genres=878',
+    },
     { title: 'Horror', query: 'horror', order: 7, endpoint: '/discover/movie?with_genres=27' },
   ]
 
@@ -122,7 +145,12 @@ async function main() {
     const row = await prisma.row.upsert({
       where: { id: `row-${rowDef.query}` },
       update: { title: rowDef.title, order: rowDef.order },
-      create: { id: `row-${rowDef.query}`, title: rowDef.title, query: rowDef.query, order: rowDef.order },
+      create: {
+        id: `row-${rowDef.query}`,
+        title: rowDef.title,
+        query: rowDef.query,
+        order: rowDef.order,
+      },
     })
 
     let order = 0

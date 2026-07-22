@@ -25,11 +25,7 @@ export function ProfileCard({ profile, onSelect }: ProfileCardProps) {
           borderColor: 'transparent',
         }}
       >
-        <Image
-          source={{ uri: profile.avatarUrl }}
-          style={{ flex: 1 }}
-          contentFit="cover"
-        />
+        <Image source={{ uri: profile.avatarUrl }} style={{ flex: 1 }} contentFit="cover" />
       </View>
       <Text
         style={{

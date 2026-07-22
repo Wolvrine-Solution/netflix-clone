@@ -4,7 +4,11 @@ import { useSession } from 'next-auth/react'
 import { FiPlus, FiEdit2, FiTrash2, FiCheck, FiX } from 'react-icons/fi'
 import { isGenreNameValid, normalizeGenreName } from '@/lib/genreValidation'
 
-interface Genre { id: number; name: string; _count?: { contents: number } }
+interface Genre {
+  id: number
+  name: string
+  _count?: { contents: number }
+}
 
 export default function GenresPage() {
   const { data: session } = useSession()
@@ -20,13 +24,17 @@ export default function GenresPage() {
 
   async function load() {
     setLoading(true)
-    const res = await fetch(`${API}/api/admin/genres`, { headers: { Authorization: `Bearer ${token}` } })
-    const data = await res.json() as { data: Genre[] }
+    const res = await fetch(`${API}/api/admin/genres`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    const data = (await res.json()) as { data: Genre[] }
     setGenres(data.data ?? [])
     setLoading(false)
   }
 
-  useEffect(() => { if (token) load() }, [token])
+  useEffect(() => {
+    if (token) load()
+  }, [token])
 
   async function addGenre() {
     const name = normalizeGenreName(newName)
@@ -64,59 +72,77 @@ export default function GenresPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="max-w-2xl space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Genres</h1>
-        <p className="text-gray-400 mt-1">{genres.length} genres</p>
+        <p className="mt-1 text-gray-400">{genres.length} genres</p>
       </div>
 
       {/* Add Genre */}
-      <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
-        <h3 className="font-semibold mb-4">Add Genre</h3>
+      <div className="rounded-xl border border-gray-800 bg-gray-900 p-5">
+        <h3 className="mb-4 font-semibold">Add Genre</h3>
         <div className="flex gap-3">
           <input
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addGenre()}
             placeholder="Genre name (e.g. Action, Thriller…)"
-            className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm text-white outline-none focus:border-netflix-red"
+            className="focus:border-netflix-red flex-1 rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-sm text-white outline-none"
           />
           <button
             onClick={addGenre}
             disabled={adding || !isGenreNameValid(newName)}
-            className="bg-netflix-red hover:bg-netflix-red-hover text-white px-4 py-2 rounded-lg text-sm font-medium transition disabled:opacity-50 flex items-center gap-1.5"
+            className="bg-netflix-red hover:bg-netflix-red-hover flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-white transition disabled:opacity-50"
           >
             <FiPlus /> {adding ? 'Adding…' : 'Add'}
           </button>
         </div>
-        <p className="text-xs text-gray-600 mt-2">
+        <p className="mt-2 text-xs text-gray-600">
           Genres are auto-synced from TMDB on import. Add custom genres here for manual content.
         </p>
       </div>
 
       {/* Genre List */}
-      <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-gray-800 bg-gray-900">
         {loading ? (
-          <div className="py-12 text-center text-gray-500 text-sm">Loading genres…</div>
+          <div className="py-12 text-center text-sm text-gray-500">Loading genres…</div>
         ) : genres.length === 0 ? (
-          <div className="py-12 text-center text-gray-500 text-sm">No genres yet. Import content or add one above.</div>
+          <div className="py-12 text-center text-sm text-gray-500">
+            No genres yet. Import content or add one above.
+          </div>
         ) : (
           <div className="divide-y divide-gray-800">
             {genres.map((g) => (
-              <div key={g.id} className="flex items-center gap-4 px-5 py-3 hover:bg-gray-800/30 transition group">
-                <span className="text-gray-600 font-mono text-xs w-8">{g.id}</span>
+              <div
+                key={g.id}
+                className="group flex items-center gap-4 px-5 py-3 transition hover:bg-gray-800/30"
+              >
+                <span className="w-8 font-mono text-xs text-gray-600">{g.id}</span>
 
                 {editId === g.id ? (
                   <>
                     <input
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(g.id); if (e.key === 'Escape') setEditId(null) }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') saveEdit(g.id)
+                        if (e.key === 'Escape') setEditId(null)
+                      }}
                       autoFocus
-                      className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-1.5 text-sm text-white outline-none focus:border-netflix-red"
+                      className="focus:border-netflix-red flex-1 rounded border border-gray-700 bg-gray-800 px-3 py-1.5 text-sm text-white outline-none"
                     />
-                    <button onClick={() => saveEdit(g.id)} className="p-1.5 text-green-400 hover:text-green-300 transition"><FiCheck /></button>
-                    <button onClick={() => setEditId(null)} className="p-1.5 text-gray-500 hover:text-gray-300 transition"><FiX /></button>
+                    <button
+                      onClick={() => saveEdit(g.id)}
+                      className="p-1.5 text-green-400 transition hover:text-green-300"
+                    >
+                      <FiCheck />
+                    </button>
+                    <button
+                      onClick={() => setEditId(null)}
+                      className="p-1.5 text-gray-500 transition hover:text-gray-300"
+                    >
+                      <FiX />
+                    </button>
                   </>
                 ) : (
                   <>
@@ -124,15 +150,22 @@ export default function GenresPage() {
                     {g._count !== undefined && (
                       <span className="text-xs text-gray-500">{g._count.contents} items</span>
                     )}
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+                    <div className="flex items-center gap-1 opacity-0 transition group-hover:opacity-100">
                       <button
-                        onClick={() => { setEditId(g.id); setEditName(g.name) }}
-                        className="p-1.5 text-gray-500 hover:text-blue-400 transition"
-                      ><FiEdit2 className="text-sm" /></button>
+                        onClick={() => {
+                          setEditId(g.id)
+                          setEditName(g.name)
+                        }}
+                        className="p-1.5 text-gray-500 transition hover:text-blue-400"
+                      >
+                        <FiEdit2 className="text-sm" />
+                      </button>
                       <button
                         onClick={() => deleteGenre(g.id, g.name)}
-                        className="p-1.5 text-gray-600 hover:text-red-400 transition"
-                      ><FiTrash2 className="text-sm" /></button>
+                        className="p-1.5 text-gray-600 transition hover:text-red-400"
+                      >
+                        <FiTrash2 className="text-sm" />
+                      </button>
                     </div>
                   </>
                 )}

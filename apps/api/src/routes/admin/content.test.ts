@@ -24,7 +24,11 @@ import { errorHandler } from '../../middleware/errorHandler'
 const SECRET = new TextEncoder().encode(process.env['NEXTAUTH_SECRET'] ?? 'fallback-secret')
 
 async function tokenFor(userId: string) {
-  return new SignJWT({ sub: userId }).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('30d').sign(SECRET)
+  return new SignJWT({ sub: userId })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('30d')
+    .sign(SECRET)
 }
 
 function buildApp() {
@@ -129,7 +133,11 @@ describe('Admin content routes', () => {
       expect(res.status).toBe(201)
       expect(prismaMock.adminLog.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({ adminId: 'admin-1', action: 'CREATE', resource: 'Content' }),
+          data: expect.objectContaining({
+            adminId: 'admin-1',
+            action: 'CREATE',
+            resource: 'Content',
+          }),
         })
       )
     })
@@ -192,7 +200,9 @@ describe('Admin content routes', () => {
       prismaMock.content.findUnique.mockResolvedValue(null)
       const app = buildApp()
 
-      const res = await request(app).get('/admin/content/missing').set('Authorization', `Bearer ${token}`)
+      const res = await request(app)
+        .get('/admin/content/missing')
+        .set('Authorization', `Bearer ${token}`)
 
       expect(res.status).toBe(404)
     })
@@ -216,7 +226,9 @@ describe('Admin content routes', () => {
       prismaMock.content.findUnique.mockResolvedValue(null)
       const app = buildApp()
 
-      const res = await request(app).delete('/admin/content/missing').set('Authorization', `Bearer ${token}`)
+      const res = await request(app)
+        .delete('/admin/content/missing')
+        .set('Authorization', `Bearer ${token}`)
 
       expect(res.status).toBe(404)
       expect(prismaMock.content.delete).not.toHaveBeenCalled()
@@ -238,7 +250,10 @@ describe('Admin content routes', () => {
         where: { isFeatured: true },
         data: { isFeatured: false },
       })
-      expect(prismaMock.content.update).toHaveBeenCalledWith({ where: { id: 'c2' }, data: { isFeatured: true } })
+      expect(prismaMock.content.update).toHaveBeenCalledWith({
+        where: { id: 'c2' },
+        data: { isFeatured: true },
+      })
     })
 
     it('PATCH /:id/featured does not unset others when isFeatured is false', async () => {

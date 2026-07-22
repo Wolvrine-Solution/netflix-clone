@@ -9,7 +9,8 @@ apiClient.interceptors.request.use(async (config) => {
   if (typeof window !== 'undefined') {
     const session = await getSession()
     if (session) {
-      config.headers['Authorization'] = `Bearer ${(session as { accessToken?: string }).accessToken ?? ''}`
+      config.headers['Authorization'] =
+        `Bearer ${(session as { accessToken?: string }).accessToken ?? ''}`
     }
   }
   return config

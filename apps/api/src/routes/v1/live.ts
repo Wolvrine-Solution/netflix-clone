@@ -35,35 +35,31 @@ liveRouter.get('/events/:eventId', async (req, res, next) => {
   }
 })
 
-liveRouter.post(
-  '/events/:eventId/playback',
-  authenticate,
-  async (req: AuthRequest, res, next) => {
-    try {
-      const event = await getLiveEvent(req.params['eventId']!)
-      if (!event) throw new AppError(404, 'Event not found')
-      const region = (req.query['region'] as string) ?? undefined
-      if (!checkGeoRestriction(event, region)) {
-        throw new AppError(403, 'Geo-restricted')
-      }
-      if (event.archivedContentId) {
-        const token = await issuePlaybackToken(req.userId!, event.archivedContentId, {})
-        return res.json({ data: { ...token, mode: 'dvr' } })
-      }
-      res.json({
-        data: {
-          manifestUrl: event.playbackUrl,
-          mode: event.status === LiveEventStatus.LIVE ? 'live' : 'slate',
-          slatePreUrl: event.slatePreUrl,
-          slatePostUrl: event.slatePostUrl,
-          dvrWindowSec: event.dvrWindowSec,
-        },
-      })
-    } catch (err) {
-      next(err)
+liveRouter.post('/events/:eventId/playback', authenticate, async (req: AuthRequest, res, next) => {
+  try {
+    const event = await getLiveEvent(req.params['eventId']!)
+    if (!event) throw new AppError(404, 'Event not found')
+    const region = (req.query['region'] as string) ?? undefined
+    if (!checkGeoRestriction(event, region)) {
+      throw new AppError(403, 'Geo-restricted')
     }
+    if (event.archivedContentId) {
+      const token = await issuePlaybackToken(req.userId!, event.archivedContentId, {})
+      return res.json({ data: { ...token, mode: 'dvr' } })
+    }
+    res.json({
+      data: {
+        manifestUrl: event.playbackUrl,
+        mode: event.status === LiveEventStatus.LIVE ? 'live' : 'slate',
+        slatePreUrl: event.slatePreUrl,
+        slatePostUrl: event.slatePostUrl,
+        dvrWindowSec: event.dvrWindowSec,
+      },
+    })
+  } catch (err) {
+    next(err)
   }
-)
+})
 
 liveRouter.post(
   '/events',
@@ -99,20 +95,15 @@ liveRouter.post(
   }
 )
 
-liveRouter.post(
-  '/events/:eventId/archive',
-  authenticate,
-  adminOnly,
-  async (req, res, next) => {
-    try {
-      await prisma.liveEvent.update({
-        where: { id: req.params['eventId'] },
-        data: { status: LiveEventStatus.ENDED },
-      })
-      const contentId = await archiveEndedEvent(req.params['eventId']!)
-      res.json({ data: { contentId } })
-    } catch (err) {
-      next(err)
-    }
+liveRouter.post('/events/:eventId/archive', authenticate, adminOnly, async (req, res, next) => {
+  try {
+    await prisma.liveEvent.update({
+      where: { id: req.params['eventId'] },
+      data: { status: LiveEventStatus.ENDED },
+    })
+    const contentId = await archiveEndedEvent(req.params['eventId']!)
+    res.json({ data: { contentId } })
+  } catch (err) {
+    next(err)
   }
-)
+})

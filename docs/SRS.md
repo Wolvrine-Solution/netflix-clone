@@ -2,10 +2,10 @@
 
 ## netflix-clone
 
-| Field | Value |
-| --- | --- |
-| Status | Draft |
-| Date | 2026-07-19 |
+| Field     | Value         |
+| --------- | ------------- |
+| Status    | Draft         |
+| Date      | 2026-07-19    |
 | One-liner | Netflix Clone |
 
 ## 1. Introduction
@@ -27,14 +27,14 @@ What this product does for end user and why it exists.
 ### 1.3 Definitions
 
 | Term | Meaning |
-| --- | --- |
-| | |
+| ---- | ------- |
+|      |         |
 
 ## 2. Personas & goals
 
-| Persona | Goals | Non-goals |
-| --- | --- | --- |
-| end user | | |
+| Persona  | Goals | Non-goals |
+| -------- | ----- | --------- |
+| end user |       |           |
 
 ## 3. Functional requirements
 

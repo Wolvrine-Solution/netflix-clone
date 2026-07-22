@@ -42,7 +42,17 @@ export function HeroBanner({ content }: HeroBannerProps) {
       {/* Content info */}
       <View style={{ position: 'absolute', bottom: 24, left: 16, right: 80 }}>
         {/* Title */}
-        <Text style={{ color: Colors.white, fontSize: 28, fontWeight: '900', marginBottom: 8, textShadowColor: 'rgba(0,0,0,0.8)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }}>
+        <Text
+          style={{
+            color: Colors.white,
+            fontSize: 28,
+            fontWeight: '900',
+            marginBottom: 8,
+            textShadowColor: 'rgba(0,0,0,0.8)',
+            textShadowOffset: { width: 0, height: 1 },
+            textShadowRadius: 3,
+          }}
+        >
           {content.title}
         </Text>
 
@@ -59,7 +69,14 @@ export function HeroBanner({ content }: HeroBannerProps) {
               {formatRuntime(content.runtime)}
             </Text>
           ) : null}
-          <View style={{ borderWidth: 1, borderColor: Colors.lightGray, paddingHorizontal: 4, paddingVertical: 1 }}>
+          <View
+            style={{
+              borderWidth: 1,
+              borderColor: Colors.lightGray,
+              paddingHorizontal: 4,
+              paddingVertical: 1,
+            }}
+          >
             <Text style={{ color: Colors.lightGray, fontSize: 10 }}>{content.maturityRating}</Text>
           </View>
         </View>

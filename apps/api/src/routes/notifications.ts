@@ -13,7 +13,9 @@ notificationsRouter.get('/', async (req: AuthRequest, res, next) => {
       take: 30,
     })
     res.json({ data: notifications })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })
 
 notificationsRouter.patch('/:id/read', async (req: AuthRequest, res, next) => {
@@ -23,7 +25,9 @@ notificationsRouter.patch('/:id/read', async (req: AuthRequest, res, next) => {
       data: { read: true },
     })
     res.json({ message: 'Marked as read' })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })
 
 notificationsRouter.post('/read-all', async (req: AuthRequest, res, next) => {
@@ -33,5 +37,7 @@ notificationsRouter.post('/read-all', async (req: AuthRequest, res, next) => {
       data: { read: true },
     })
     res.json({ message: 'All notifications marked as read' })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })

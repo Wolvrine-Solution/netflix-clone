@@ -2,11 +2,11 @@
 
 ## Severity levels
 
-| Level | Example | Response time |
-|-------|---------|---------------|
-| SEV1 | Playback down for all users | 15 min |
-| SEV2 | Billing webhooks failing | 1 hour |
-| SEV3 | Elevated API 5xx | 4 hours |
+| Level | Example                     | Response time |
+| ----- | --------------------------- | ------------- |
+| SEV1  | Playback down for all users | 15 min        |
+| SEV2  | Billing webhooks failing    | 1 hour        |
+| SEV3  | Elevated API 5xx            | 4 hours       |
 
 ## Playback outage
 

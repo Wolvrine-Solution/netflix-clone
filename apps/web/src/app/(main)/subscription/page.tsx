@@ -6,27 +6,43 @@ import { FiCheck, FiX, FiAlertCircle, FiCreditCard, FiZap } from 'react-icons/fi
 import { api } from '@/lib/api'
 
 interface Subscription {
-  plan: string; status: string; currentPeriodEnd?: string; cancelAtPeriodEnd?: boolean
+  plan: string
+  status: string
+  currentPeriodEnd?: string
+  cancelAtPeriodEnd?: boolean
 }
 
 const PLANS = [
   {
-    id: 'BASIC', name: 'Basic', price: 8.99,
+    id: 'BASIC',
+    name: 'Basic',
+    price: 8.99,
     features: ['HD available', '720p quality', '1 screen at a time', 'Ad-supported'],
     limits: ['No 4K', 'No downloads'],
     color: 'border-gray-700',
     popular: false,
   },
   {
-    id: 'STANDARD', name: 'Standard', price: 13.99,
+    id: 'STANDARD',
+    name: 'Standard',
+    price: 13.99,
     features: ['Full HD', '1080p quality', '2 screens at a time', 'No ads'],
     limits: ['No 4K'],
     color: 'border-gray-700',
     popular: true,
   },
   {
-    id: 'PREMIUM', name: 'Premium', price: 17.99,
-    features: ['Ultra HD', '4K quality', '4 screens at a time', 'No ads', 'Spatial Audio', 'Downloads'],
+    id: 'PREMIUM',
+    name: 'Premium',
+    price: 17.99,
+    features: [
+      'Ultra HD',
+      '4K quality',
+      '4 screens at a time',
+      'No ads',
+      'Spatial Audio',
+      'Downloads',
+    ],
     limits: [],
     color: 'border-netflix-red',
     popular: false,
@@ -42,7 +58,8 @@ export default function SubscriptionPage() {
 
   useEffect(() => {
     if (!session) return
-    api.billing.subscription()
+    api.billing
+      .subscription()
       .then((res) => setSubscription(res.data.data))
       .catch(() => setSubscription(null))
       .finally(() => setLoading(false))
@@ -61,8 +78,10 @@ export default function SubscriptionPage() {
         window.location.href = res.data.data.url
         return
       }
-      setSubscription((s) => ({ ...s, plan: planId, status: 'ACTIVE' } as Subscription))
-    } finally { setUpgrading(null) }
+      setSubscription((s) => ({ ...s, plan: planId, status: 'ACTIVE' }) as Subscription)
+    } finally {
+      setUpgrading(null)
+    }
   }
 
   const currentPlan = subscription?.plan
@@ -70,22 +89,27 @@ export default function SubscriptionPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-netflix-black flex items-center justify-center">
-        <div className="animate-spin text-3xl text-netflix-red">↻</div>
+      <div className="bg-netflix-black flex min-h-screen items-center justify-center">
+        <div className="text-netflix-red animate-spin text-3xl">↻</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-netflix-black text-white">
-      <div className="max-w-5xl mx-auto px-4 py-12">
-        <div className="flex items-center justify-between mb-10">
+    <div className="bg-netflix-black min-h-screen text-white">
+      <div className="mx-auto max-w-5xl px-4 py-12">
+        <div className="mb-10 flex items-center justify-between">
           <div>
-            <button onClick={() => router.back()} className="text-gray-500 hover:text-white text-sm mb-1">← Back</button>
+            <button
+              onClick={() => router.back()}
+              className="mb-1 text-sm text-gray-500 hover:text-white"
+            >
+              ← Back
+            </button>
             <h1 className="text-3xl font-bold">Subscription</h1>
           </div>
           {isActive && (
-            <div className="flex items-center gap-2 text-green-400 text-sm bg-green-900/20 border border-green-700/30 px-4 py-2 rounded-xl">
+            <div className="flex items-center gap-2 rounded-xl border border-green-700/30 bg-green-900/20 px-4 py-2 text-sm text-green-400">
               <FiZap className="flex-shrink-0" />
               {subscription?.status === 'TRIALING' ? 'Free Trial Active' : 'Subscription Active'}
             </div>
@@ -94,45 +118,52 @@ export default function SubscriptionPage() {
 
         {/* Current Plan Summary */}
         {subscription ? (
-          <div className="bg-netflix-dark-gray rounded-2xl border border-gray-800 p-6 mb-10">
+          <div className="bg-netflix-dark-gray mb-10 rounded-2xl border border-gray-800 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-400">Current Plan</p>
-                <div className="flex items-center gap-3 mt-1">
+                <div className="mt-1 flex items-center gap-3">
                   <h2 className="text-2xl font-bold">{currentPlan}</h2>
-                  <span className={`text-xs px-2 py-0.5 rounded font-medium ${
-                    subscription.status === 'ACTIVE' ? 'bg-green-900/40 text-green-400' :
-                    subscription.status === 'TRIALING' ? 'bg-blue-900/40 text-blue-400' :
-                    'bg-yellow-900/40 text-yellow-400'
-                  }`}>{subscription.status}</span>
+                  <span
+                    className={`rounded px-2 py-0.5 text-xs font-medium ${
+                      subscription.status === 'ACTIVE'
+                        ? 'bg-green-900/40 text-green-400'
+                        : subscription.status === 'TRIALING'
+                          ? 'bg-blue-900/40 text-blue-400'
+                          : 'bg-yellow-900/40 text-yellow-400'
+                    }`}
+                  >
+                    {subscription.status}
+                  </span>
                 </div>
                 {subscription.currentPeriodEnd && (
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="mt-1 text-sm text-gray-500">
                     {subscription.cancelAtPeriodEnd ? 'Cancels' : 'Renews'} on{' '}
                     {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
                   </p>
                 )}
               </div>
               <div className="flex gap-3">
-                <button className="bg-netflix-medium-gray hover:bg-gray-700 text-white text-sm px-4 py-2 rounded-lg transition flex items-center gap-2">
+                <button className="bg-netflix-medium-gray flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition hover:bg-gray-700">
                   <FiCreditCard /> Billing History
                 </button>
-                <button className="text-red-400 hover:text-red-300 text-sm px-4 py-2 rounded-lg transition">
+                <button className="rounded-lg px-4 py-2 text-sm text-red-400 transition hover:text-red-300">
                   Cancel Subscription
                 </button>
               </div>
             </div>
 
             {subscription.cancelAtPeriodEnd && (
-              <div className="mt-4 flex items-center gap-2 text-yellow-400 text-sm">
+              <div className="mt-4 flex items-center gap-2 text-sm text-yellow-400">
                 <FiAlertCircle />
-                Your subscription will end at the current billing period. Resubscribe to keep access.
+                Your subscription will end at the current billing period. Resubscribe to keep
+                access.
               </div>
             )}
           </div>
         ) : (
-          <div className="bg-netflix-dark-gray rounded-2xl border border-gray-800 p-6 mb-10 flex items-center gap-4">
-            <FiAlertCircle className="text-yellow-400 text-2xl flex-shrink-0" />
+          <div className="bg-netflix-dark-gray mb-10 flex items-center gap-4 rounded-2xl border border-gray-800 p-6">
+            <FiAlertCircle className="flex-shrink-0 text-2xl text-yellow-400" />
             <div>
               <p className="font-semibold">No active subscription</p>
               <p className="text-sm text-gray-400">Choose a plan below to start watching.</p>
@@ -141,47 +172,47 @@ export default function SubscriptionPage() {
         )}
 
         {/* Plan Cards */}
-        <h2 className="text-xl font-semibold mb-6">
+        <h2 className="mb-6 text-xl font-semibold">
           {subscription ? 'Change Plan' : 'Choose a Plan'}
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {PLANS.map((plan) => {
             const isCurrent = currentPlan === plan.id
             const isUpgrading = upgrading === plan.id
             return (
               <div
                 key={plan.id}
-                className={`relative bg-netflix-dark-gray rounded-2xl border-2 p-6 flex flex-col ${isCurrent ? 'border-netflix-red' : plan.color}`}
+                className={`bg-netflix-dark-gray relative flex flex-col rounded-2xl border-2 p-6 ${isCurrent ? 'border-netflix-red' : plan.color}`}
               >
                 {plan.popular && !isCurrent && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-netflix-red text-white text-xs font-semibold px-4 py-1 rounded-full">
+                  <div className="bg-netflix-red absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full px-4 py-1 text-xs font-semibold text-white">
                     Most Popular
                   </div>
                 )}
                 {isCurrent && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-netflix-red text-white text-xs font-semibold px-4 py-1 rounded-full flex items-center gap-1">
+                  <div className="bg-netflix-red absolute -top-3.5 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full px-4 py-1 text-xs font-semibold text-white">
                     <FiCheck className="text-[10px]" /> Current Plan
                   </div>
                 )}
 
                 <div className="mb-5">
                   <h3 className="text-lg font-bold">{plan.name}</h3>
-                  <div className="flex items-end gap-1 mt-1">
+                  <div className="mt-1 flex items-end gap-1">
                     <span className="text-3xl font-bold">${plan.price}</span>
-                    <span className="text-gray-500 text-sm mb-1">/month</span>
+                    <span className="mb-1 text-sm text-gray-500">/month</span>
                   </div>
                 </div>
 
-                <div className="space-y-2 flex-1 mb-6">
+                <div className="mb-6 flex-1 space-y-2">
                   {plan.features.map((f) => (
                     <div key={f} className="flex items-center gap-2 text-sm">
-                      <FiCheck className="text-green-400 flex-shrink-0" />
+                      <FiCheck className="flex-shrink-0 text-green-400" />
                       <span className="text-gray-300">{f}</span>
                     </div>
                   ))}
                   {plan.limits.map((f) => (
                     <div key={f} className="flex items-center gap-2 text-sm">
-                      <FiX className="text-gray-600 flex-shrink-0" />
+                      <FiX className="flex-shrink-0 text-gray-600" />
                       <span className="text-gray-600">{f}</span>
                     </div>
                   ))}
@@ -190,9 +221,9 @@ export default function SubscriptionPage() {
                 <button
                   onClick={() => !isCurrent && changePlan(plan.id)}
                   disabled={isCurrent || isUpgrading}
-                  className={`w-full py-2.5 rounded-xl font-semibold text-sm transition ${
+                  className={`w-full rounded-xl py-2.5 text-sm font-semibold transition ${
                     isCurrent
-                      ? 'bg-netflix-red/20 text-netflix-red cursor-default border border-netflix-red/30'
+                      ? 'bg-netflix-red/20 text-netflix-red border-netflix-red/30 cursor-default border'
                       : 'bg-netflix-red hover:bg-netflix-red-hover text-white disabled:opacity-60'
                   }`}
                 >
@@ -200,14 +231,18 @@ export default function SubscriptionPage() {
                     <span className="flex items-center justify-center gap-2">
                       <span className="animate-spin">↻</span> Updating…
                     </span>
-                  ) : isCurrent ? 'Your Plan' : `Switch to ${plan.name}`}
+                  ) : isCurrent ? (
+                    'Your Plan'
+                  ) : (
+                    `Switch to ${plan.name}`
+                  )}
                 </button>
               </div>
             )
           })}
         </div>
 
-        <p className="text-center text-gray-600 text-xs mt-8">
+        <p className="mt-8 text-center text-xs text-gray-600">
           Plans are billed monthly via Stripe Checkout. Cancel anytime.
         </p>
       </div>

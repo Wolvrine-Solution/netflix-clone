@@ -47,7 +47,9 @@ export async function issueRefreshToken(userId: string): Promise<string> {
   return raw
 }
 
-export async function rotateRefreshToken(raw: string): Promise<{ accessToken: string; refreshToken: string } | null> {
+export async function rotateRefreshToken(
+  raw: string
+): Promise<{ accessToken: string; refreshToken: string } | null> {
   const tokenHash = hashToken(raw)
   const existing = await prisma.refreshToken.findUnique({ where: { tokenHash } })
   if (!existing || existing.revokedAt || existing.expiresAt < new Date()) return null

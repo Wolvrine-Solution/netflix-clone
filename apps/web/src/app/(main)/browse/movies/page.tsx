@@ -8,17 +8,27 @@ async function getMovies() {
     include: { genres: { include: { genre: true } } },
     orderBy: { rating: 'desc' },
   })
-  return contents.map((c): ContentItem => ({
-    id: c.id, tmdbId: c.tmdbId ?? undefined, title: c.title, description: c.description,
-    posterPath: c.posterPath, backdropPath: c.backdropPath, releaseDate: c.releaseDate,
-    rating: c.rating, mediaType: c.mediaType as 'movie' | 'tv', maturityRating: c.maturityRating,
-    trailerKey: c.trailerKey ?? undefined, isFeatured: c.isFeatured,
-    genres: c.genres.map((cg) => ({ id: cg.genre.id, name: cg.genre.name })),
-    runtime: c.runtime ?? undefined,
-    status: c.status as import('@netflix/types').ContentStatus,
-    language: c.language,
-    cast: c.cast,
-  }))
+  return contents.map(
+    (c): ContentItem => ({
+      id: c.id,
+      tmdbId: c.tmdbId ?? undefined,
+      title: c.title,
+      description: c.description,
+      posterPath: c.posterPath,
+      backdropPath: c.backdropPath,
+      releaseDate: c.releaseDate,
+      rating: c.rating,
+      mediaType: c.mediaType as 'movie' | 'tv',
+      maturityRating: c.maturityRating,
+      trailerKey: c.trailerKey ?? undefined,
+      isFeatured: c.isFeatured,
+      genres: c.genres.map((cg) => ({ id: cg.genre.id, name: cg.genre.name })),
+      runtime: c.runtime ?? undefined,
+      status: c.status as import('@netflix/types').ContentStatus,
+      language: c.language,
+      cast: c.cast,
+    })
+  )
 }
 
 export default async function MoviesPage() {
@@ -31,12 +41,14 @@ export default async function MoviesPage() {
   }, {})
 
   return (
-    <div className="pt-24 pb-20 space-y-8">
-      <h1 className="px-4 md:px-16 text-3xl font-bold">Movies</h1>
+    <div className="space-y-8 pb-20 pt-24">
+      <h1 className="px-4 text-3xl font-bold md:px-16">Movies</h1>
       <MovieRow title="All Movies" items={movies.slice(0, 20)} />
-      {Object.entries(byGenre).slice(0, 6).map(([genre, items]) => (
-        <MovieRow key={genre} title={genre} items={items} />
-      ))}
+      {Object.entries(byGenre)
+        .slice(0, 6)
+        .map(([genre, items]) => (
+          <MovieRow key={genre} title={genre} items={items} />
+        ))}
     </div>
   )
 }

@@ -43,7 +43,7 @@ describe('Content routes', () => {
   })
 
   it('GET / computes skip correctly for page 3, limit 10', async () => {
-    prismaMock.content.findMany.mockResolvedValue([]);
+    prismaMock.content.findMany.mockResolvedValue([])
     prismaMock.content.count.mockResolvedValue(45)
     const app = buildApp()
 

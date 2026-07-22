@@ -22,6 +22,7 @@ pnpm dev
 ```
 
 **Apps run on:**
+
 - `http://localhost:3000` — Main web app
 - `http://localhost:3001` — Admin dashboard
 - `http://localhost:4000` — REST API
@@ -44,15 +45,15 @@ packages/
 
 ## Required Environment Variables
 
-| Variable | Description |
-|---|---|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `NEXTAUTH_SECRET` | Random secret — `openssl rand -base64 32` |
-| `NEXTAUTH_URL` | App URL (default: `http://localhost:3000`) |
-| `TMDB_API_KEY` | Get free key at themoviedb.org |
-| `GOOGLE_CLIENT_ID/SECRET` | Optional — Google OAuth |
-| `GITHUB_CLIENT_ID/SECRET` | Optional — GitHub OAuth |
-| `NEXT_PUBLIC_API_URL` | API URL (default: `http://localhost:4000`) |
+| Variable                  | Description                                |
+| ------------------------- | ------------------------------------------ |
+| `DATABASE_URL`            | PostgreSQL connection string               |
+| `NEXTAUTH_SECRET`         | Random secret — `openssl rand -base64 32`  |
+| `NEXTAUTH_URL`            | App URL (default: `http://localhost:3000`) |
+| `TMDB_API_KEY`            | Get free key at themoviedb.org             |
+| `GOOGLE_CLIENT_ID/SECRET` | Optional — Google OAuth                    |
+| `GITHUB_CLIENT_ID/SECRET` | Optional — GitHub OAuth                    |
+| `NEXT_PUBLIC_API_URL`     | API URL (default: `http://localhost:4000`) |
 
 ## Common Commands
 

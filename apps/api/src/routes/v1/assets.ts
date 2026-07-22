@@ -28,20 +28,15 @@ assetsRouter.post(
   }
 )
 
-assetsRouter.post(
-  '/:assetId/transcode',
-  authenticate,
-  adminOnly,
-  async (req, res, next) => {
-    try {
-      await runTranscodeJob(req.params['assetId']!)
-      const asset = await prisma.asset.findUnique({ where: { id: req.params['assetId'] } })
-      res.json({ data: asset })
-    } catch (err) {
-      next(err)
-    }
+assetsRouter.post('/:assetId/transcode', authenticate, adminOnly, async (req, res, next) => {
+  try {
+    await runTranscodeJob(req.params['assetId']!)
+    const asset = await prisma.asset.findUnique({ where: { id: req.params['assetId'] } })
+    res.json({ data: asset })
+  } catch (err) {
+    next(err)
   }
-)
+})
 
 assetsRouter.get('/:contentId', authenticate, adminOnly, async (req, res, next) => {
   try {

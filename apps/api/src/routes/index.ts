@@ -14,7 +14,11 @@ export const router = Router()
 
 router.use((req, res, next) => {
   res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300')
-  if (!req.path.startsWith('/content') && !req.path.startsWith('/rows') && !req.path.startsWith('/search')) {
+  if (
+    !req.path.startsWith('/content') &&
+    !req.path.startsWith('/rows') &&
+    !req.path.startsWith('/search')
+  ) {
     res.setHeader('Cache-Control', 'no-store')
   }
   next()

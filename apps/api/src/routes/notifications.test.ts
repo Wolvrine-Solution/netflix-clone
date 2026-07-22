@@ -13,7 +13,11 @@ import { errorHandler } from '../middleware/errorHandler'
 const SECRET = new TextEncoder().encode(process.env['NEXTAUTH_SECRET'] ?? 'fallback-secret')
 
 async function tokenFor(userId: string) {
-  return new SignJWT({ sub: userId }).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('30d').sign(SECRET)
+  return new SignJWT({ sub: userId })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('30d')
+    .sign(SECRET)
 }
 
 function buildApp() {
@@ -58,7 +62,9 @@ describe('Notifications routes', () => {
     const token = await tokenFor('user-1')
     const app = buildApp()
 
-    const res = await request(app).patch('/notifications/n1/read').set('Authorization', `Bearer ${token}`)
+    const res = await request(app)
+      .patch('/notifications/n1/read')
+      .set('Authorization', `Bearer ${token}`)
 
     expect(res.status).toBe(200)
     expect(prismaMock.notification.updateMany).toHaveBeenCalledWith({
@@ -72,7 +78,9 @@ describe('Notifications routes', () => {
     const token = await tokenFor('user-1')
     const app = buildApp()
 
-    const res = await request(app).post('/notifications/read-all').set('Authorization', `Bearer ${token}`)
+    const res = await request(app)
+      .post('/notifications/read-all')
+      .set('Authorization', `Bearer ${token}`)
 
     expect(res.status).toBe(200)
     expect(prismaMock.notification.updateMany).toHaveBeenCalledWith({

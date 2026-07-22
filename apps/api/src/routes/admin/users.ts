@@ -16,7 +16,12 @@ adminUsersRouter.get('/', async (req, res, next) => {
     const q = String(req.query['q'] ?? '').trim()
 
     const where = q
-      ? { OR: [{ email: { contains: q, mode: 'insensitive' as const } }, { name: { contains: q, mode: 'insensitive' as const } }] }
+      ? {
+          OR: [
+            { email: { contains: q, mode: 'insensitive' as const } },
+            { name: { contains: q, mode: 'insensitive' as const } },
+          ],
+        }
       : {}
 
     const [users, total] = await Promise.all([
@@ -45,7 +50,9 @@ adminUsersRouter.get('/', async (req, res, next) => {
     }))
 
     res.json({ data, page, totalPages: Math.ceil(total / limit), totalResults: total })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })
 
 adminUsersRouter.get('/:id', async (req, res, next) => {
@@ -60,7 +67,9 @@ adminUsersRouter.get('/:id', async (req, res, next) => {
     })
     if (!user) throw new AppError(404, 'User not found')
     res.json({ data: user })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })
 
 const updateSchema = z.object({
@@ -76,7 +85,9 @@ adminUsersRouter.put('/:id', validate(updateSchema), async (req, res, next) => {
       data: req.body as z.infer<typeof updateSchema>,
     })
     res.json({ data: user })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })
 
 adminUsersRouter.delete('/:id', async (req, res, next) => {
@@ -84,18 +95,25 @@ adminUsersRouter.delete('/:id', async (req, res, next) => {
     const id = req.params['id']!
     await prisma.user.delete({ where: { id } })
     res.json({ message: 'User deleted' })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })
 
 // Reset subscription
 adminUsersRouter.post('/:id/subscription', async (req, res, next) => {
   try {
-    const { plan, status } = req.body as { plan: 'BASIC' | 'STANDARD' | 'PREMIUM'; status: 'ACTIVE' | 'CANCELED' | 'PAST_DUE' }
+    const { plan, status } = req.body as {
+      plan: 'BASIC' | 'STANDARD' | 'PREMIUM'
+      status: 'ACTIVE' | 'CANCELED' | 'PAST_DUE'
+    }
     const sub = await prisma.subscription.upsert({
       where: { userId: req.params['id'] },
       update: { plan, status },
       create: { userId: req.params['id']!, plan, status },
     })
     res.json({ data: sub })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })

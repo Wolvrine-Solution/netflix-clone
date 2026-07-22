@@ -8,7 +8,13 @@ import { api } from '@/lib/api'
 import type { NetflixProfile } from '@netflix/types'
 import { FiTrash2 } from 'react-icons/fi'
 
-const AVATARS = ['/avatars/1.png', '/avatars/2.png', '/avatars/3.png', '/avatars/4.png', '/avatars/5.png']
+const AVATARS = [
+  '/avatars/1.png',
+  '/avatars/2.png',
+  '/avatars/3.png',
+  '/avatars/4.png',
+  '/avatars/5.png',
+]
 
 export default function ManageProfilesPage() {
   const { status } = useSession()
@@ -55,28 +61,41 @@ export default function ManageProfilesPage() {
   }
 
   if (status === 'loading' || loading) {
-    return <div className="min-h-screen bg-netflix-black flex items-center justify-center"><Spinner size="lg" /></div>
+    return (
+      <div className="bg-netflix-black flex min-h-screen items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-netflix-black py-16 px-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+    <div className="bg-netflix-black min-h-screen px-8 py-16">
+      <div className="mx-auto max-w-2xl">
+        <div className="mb-8 flex items-center justify-between">
           <h1 className="text-3xl font-bold">Manage Profiles</h1>
-          <Link href="/profiles" className="text-netflix-light-gray hover:text-white text-sm">← Back</Link>
+          <Link href="/profiles" className="text-netflix-light-gray text-sm hover:text-white">
+            ← Back
+          </Link>
         </div>
 
-        <div className="space-y-4 mb-10">
+        <div className="mb-10 space-y-4">
           {profiles.map((profile, i) => (
-            <div key={profile.id} className="flex items-center gap-4 bg-netflix-dark-gray p-4 rounded-lg">
-              <img src={profile.avatarUrl || AVATARS[i % AVATARS.length] || ''} alt={profile.name} className="w-16 h-16 rounded" />
+            <div
+              key={profile.id}
+              className="bg-netflix-dark-gray flex items-center gap-4 rounded-lg p-4"
+            >
+              <img
+                src={profile.avatarUrl || AVATARS[i % AVATARS.length] || ''}
+                alt={profile.name}
+                className="h-16 w-16 rounded"
+              />
               <div className="flex-1">
                 <p className="font-semibold">{profile.name}</p>
-                {profile.isKid && <span className="text-xs text-netflix-red">KIDS</span>}
+                {profile.isKid && <span className="text-netflix-red text-xs">KIDS</span>}
               </div>
               <button
                 onClick={() => handleDelete(profile.id)}
-                className="text-netflix-light-gray hover:text-red-500 transition p-2"
+                className="text-netflix-light-gray p-2 transition hover:text-red-500"
               >
                 <FiTrash2 />
               </button>
@@ -86,39 +105,39 @@ export default function ManageProfilesPage() {
 
         {profiles.length < 5 && (
           <div className="bg-netflix-dark-gray rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Add New Profile</h2>
+            <h2 className="mb-4 text-xl font-semibold">Add New Profile</h2>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
-                <label className="block text-sm text-netflix-light-gray mb-2">Name</label>
+                <label className="text-netflix-light-gray mb-2 block text-sm">Name</label>
                 <input
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="Profile name"
-                  className="w-full bg-netflix-medium-gray rounded px-4 py-3 text-white outline-none focus:ring-1 focus:ring-netflix-red"
+                  className="bg-netflix-medium-gray focus:ring-netflix-red w-full rounded px-4 py-3 text-white outline-none focus:ring-1"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm text-netflix-light-gray mb-2">Choose Avatar</label>
+                <label className="text-netflix-light-gray mb-2 block text-sm">Choose Avatar</label>
                 <div className="flex gap-3">
                   {AVATARS.map((src, i) => (
                     <button
                       key={i}
                       type="button"
                       onClick={() => setSelectedAvatar(i)}
-                      className={`rounded overflow-hidden ${selectedAvatar === i ? 'ring-2 ring-netflix-red' : ''}`}
+                      className={`overflow-hidden rounded ${selectedAvatar === i ? 'ring-netflix-red ring-2' : ''}`}
                     >
-                      <img src={src} alt={`Avatar ${i + 1}`} className="w-14 h-14 object-cover" />
+                      <img src={src} alt={`Avatar ${i + 1}`} className="h-14 w-14 object-cover" />
                     </button>
                   ))}
                 </div>
               </div>
-              <label className="flex items-center gap-3 cursor-pointer">
+              <label className="flex cursor-pointer items-center gap-3">
                 <input
                   type="checkbox"
                   checked={isKid}
                   onChange={(e) => setIsKid(e.target.checked)}
-                  className="accent-netflix-red w-4 h-4"
+                  className="accent-netflix-red h-4 w-4"
                 />
                 <span className="text-sm">Kid profile (restricts content)</span>
               </label>

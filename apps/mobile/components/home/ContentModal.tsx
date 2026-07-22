@@ -118,7 +118,7 @@ export function ContentModal() {
                 gap: 8,
                 marginBottom: 16,
               }}
-              onPress={() => inList ? removeFromList(content.id) : addToList(content.id)}
+              onPress={() => (inList ? removeFromList(content.id) : addToList(content.id))}
             >
               <Text style={{ color: Colors.white, fontSize: 18 }}>{inList ? '✓' : '+'}</Text>
               <Text style={{ color: Colors.white, fontWeight: '600', fontSize: 15 }}>
@@ -127,7 +127,15 @@ export function ContentModal() {
             </TouchableOpacity>
 
             {/* Meta row */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 8,
+                marginBottom: 12,
+                flexWrap: 'wrap',
+              }}
+            >
               <Text style={{ color: '#46D369', fontSize: 13, fontWeight: '700' }}>
                 {Math.round(content.rating * 10)}% Match
               </Text>
@@ -144,8 +152,17 @@ export function ContentModal() {
                   {content.seasons} Season{content.seasons !== 1 ? 's' : ''}
                 </Text>
               ) : null}
-              <View style={{ borderWidth: 1, borderColor: Colors.lightGray, paddingHorizontal: 4, paddingVertical: 1 }}>
-                <Text style={{ color: Colors.lightGray, fontSize: 10 }}>{content.maturityRating}</Text>
+              <View
+                style={{
+                  borderWidth: 1,
+                  borderColor: Colors.lightGray,
+                  paddingHorizontal: 4,
+                  paddingVertical: 1,
+                }}
+              >
+                <Text style={{ color: Colors.lightGray, fontSize: 10 }}>
+                  {content.maturityRating}
+                </Text>
               </View>
             </View>
 

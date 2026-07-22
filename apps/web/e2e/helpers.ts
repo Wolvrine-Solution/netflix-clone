@@ -7,7 +7,10 @@ export function uniqueEmail(prefix: string): string {
 // Registers a fresh account through the UI and signs in, returning whether
 // it actually landed past auth (false if registration/sign-in failed, so
 // callers can skip rather than fail noisily on environments without a DB).
-export async function registerAndSignIn(page: Page, opts: { name: string; email: string; password?: string }): Promise<boolean> {
+export async function registerAndSignIn(
+  page: Page,
+  opts: { name: string; email: string; password?: string }
+): Promise<boolean> {
   await page.goto('/register')
   const nameInput = page.getByLabel('Name')
   await nameInput.waitFor({ state: 'visible', timeout: 5000 }).catch(() => null)

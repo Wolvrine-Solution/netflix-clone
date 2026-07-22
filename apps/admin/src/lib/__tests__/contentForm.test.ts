@@ -53,7 +53,10 @@ describe('buildContentUpdateBody', () => {
   })
 
   it('splits cast on commas and trims whitespace', () => {
-    const body = buildContentUpdateBody(baseForm({ cast: ' Tom Hardy ,  Elliot Page,Ken Watanabe' }), [])
+    const body = buildContentUpdateBody(
+      baseForm({ cast: ' Tom Hardy ,  Elliot Page,Ken Watanabe' }),
+      []
+    )
     expect(body.cast).toEqual(['Tom Hardy', 'Elliot Page', 'Ken Watanabe'])
   })
 

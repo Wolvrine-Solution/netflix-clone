@@ -69,7 +69,11 @@ describe('adminOnly middleware', () => {
   })
 
   it('allows an active admin through', async () => {
-    prismaMock.user.findUnique.mockResolvedValue({ role: 'ADMIN', isSuspended: false, mfaEnabled: false })
+    prismaMock.user.findUnique.mockResolvedValue({
+      role: 'ADMIN',
+      isSuspended: false,
+      mfaEnabled: false,
+    })
     const req = { userId: 'admin-1' } as AuthRequest
     const res = mockRes()
     const next = mockNext()
@@ -84,7 +88,11 @@ describe('adminOnly middleware', () => {
   })
 
   it('rejects an admin with MFA enabled but no verified session', async () => {
-    prismaMock.user.findUnique.mockResolvedValue({ role: 'ADMIN', isSuspended: false, mfaEnabled: true })
+    prismaMock.user.findUnique.mockResolvedValue({
+      role: 'ADMIN',
+      isSuspended: false,
+      mfaEnabled: true,
+    })
     const req = { userId: 'admin-1' } as AuthRequest
     const res = mockRes()
     const next = mockNext()
@@ -97,7 +105,11 @@ describe('adminOnly middleware', () => {
   })
 
   it('allows an admin with MFA enabled when session is verified', async () => {
-    prismaMock.user.findUnique.mockResolvedValue({ role: 'ADMIN', isSuspended: false, mfaEnabled: true })
+    prismaMock.user.findUnique.mockResolvedValue({
+      role: 'ADMIN',
+      isSuspended: false,
+      mfaEnabled: true,
+    })
     setAdminMfaSession('admin-1')
     const req = { userId: 'admin-1' } as AuthRequest
     const res = mockRes()

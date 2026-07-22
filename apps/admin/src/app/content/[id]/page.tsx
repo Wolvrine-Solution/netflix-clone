@@ -2,7 +2,9 @@ import { prisma } from '@netflix/db'
 import { notFound } from 'next/navigation'
 import { ContentEditForm } from './ContentEditForm'
 
-interface Props { params: { id: string } }
+interface Props {
+  params: { id: string }
+}
 
 export default async function ContentEditPage({ params }: Props) {
   const { id } = params
@@ -23,10 +25,5 @@ export default async function ContentEditPage({ params }: Props) {
 
   const allGenres = await prisma.genre.findMany({ orderBy: { name: 'asc' } })
 
-  return (
-    <ContentEditForm
-      content={JSON.parse(JSON.stringify(content))}
-      allGenres={allGenres}
-    />
-  )
+  return <ContentEditForm content={JSON.parse(JSON.stringify(content))} allGenres={allGenres} />
 }

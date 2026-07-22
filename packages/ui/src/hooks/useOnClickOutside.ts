@@ -1,10 +1,7 @@
 'use client'
 import { useEffect, RefObject } from 'react'
 
-export function useOnClickOutside<T extends HTMLElement>(
-  ref: RefObject<T>,
-  handler: () => void
-) {
+export function useOnClickOutside<T extends HTMLElement>(ref: RefObject<T>, handler: () => void) {
   useEffect(() => {
     const listener = (event: MouseEvent | TouchEvent) => {
       if (!ref.current || ref.current.contains(event.target as Node)) return

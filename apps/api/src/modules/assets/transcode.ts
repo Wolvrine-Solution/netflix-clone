@@ -8,13 +8,17 @@ export async function createAsset(contentId: string, sourceKey: string) {
   })
 }
 
-export async function advanceAsset(assetId: string, status: AssetStatus, data?: {
-  manifestUrl?: string
-  hlsUrl?: string
-  dashUrl?: string
-  drmKeyId?: string
-  error?: string
-}) {
+export async function advanceAsset(
+  assetId: string,
+  status: AssetStatus,
+  data?: {
+    manifestUrl?: string
+    hlsUrl?: string
+    dashUrl?: string
+    drmKeyId?: string
+    error?: string
+  }
+) {
   const asset = await prisma.asset.update({
     where: { id: assetId },
     data: { status, ...data },

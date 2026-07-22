@@ -28,24 +28,24 @@ cp .env.example .env.local
 
 Variables used by the web app, admin app, and API (see `.env.example`):
 
-| Variable | Purpose |
-|---|---|
-| `DATABASE_URL` | PostgreSQL connection string used by Prisma |
-| `NEXTAUTH_URL` | Base URL of the web app (used by NextAuth) |
-| `NEXTAUTH_SECRET` | Secret used to sign NextAuth JWTs; also used by the API to verify tokens |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Optional Google OAuth credentials |
-| `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | Optional GitHub OAuth credentials |
-| `TMDB_API_KEY` | API key for The Movie Database, used for seeding and live search |
-| `TMDB_BASE_URL` | TMDB REST API base URL |
-| `TMDB_IMAGE_BASE_URL` | TMDB image CDN base URL |
-| `NEXT_PUBLIC_API_URL` | URL the web app uses to reach the API server |
-| `API_SECRET` | Shared secret for internal API calls |
-| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` / `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Optional, for Stripe billing |
+| Variable                                                                             | Purpose                                                                  |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| `DATABASE_URL`                                                                       | PostgreSQL connection string used by Prisma                              |
+| `NEXTAUTH_URL`                                                                       | Base URL of the web app (used by NextAuth)                               |
+| `NEXTAUTH_SECRET`                                                                    | Secret used to sign NextAuth JWTs; also used by the API to verify tokens |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`                                          | Optional Google OAuth credentials                                        |
+| `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET`                                          | Optional GitHub OAuth credentials                                        |
+| `TMDB_API_KEY`                                                                       | API key for The Movie Database, used for seeding and live search         |
+| `TMDB_BASE_URL`                                                                      | TMDB REST API base URL                                                   |
+| `TMDB_IMAGE_BASE_URL`                                                                | TMDB image CDN base URL                                                  |
+| `NEXT_PUBLIC_API_URL`                                                                | URL the web app uses to reach the API server                             |
+| `API_SECRET`                                                                         | Shared secret for internal API calls                                     |
+| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` / `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Optional, for Stripe billing                                             |
 
 The mobile app has its own environment file at `apps/mobile/.env.example`:
 
-| Variable | Purpose |
-|---|---|
+| Variable              | Purpose                                                                                                                                                    |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `EXPO_PUBLIC_API_URL` | Base URL of the API server, reachable from the device/simulator (see comments in the file for iOS simulator, Android emulator, and physical device values) |
 
 Copy it as needed:
@@ -72,6 +72,7 @@ pnpm dev
 ```
 
 This runs, via Turborepo:
+
 - Web app at `http://localhost:3000` (`next dev -p 3000`)
 - Admin dashboard at `http://localhost:3001` (`next dev -p 3001`)
 - API server at `http://localhost:4000` (default `PORT`, overridable via the `PORT` env var; health check at `GET /health`)

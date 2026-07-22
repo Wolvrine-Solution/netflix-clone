@@ -21,10 +21,7 @@ export function ProfileGrid({ profiles, onSelect, onManage }: ProfileGridProps) 
         renderItem={({ item }) => <ProfileCard profile={item} onSelect={onSelect} />}
         ListFooterComponent={
           profiles.length < 5 ? (
-            <TouchableOpacity
-              onPress={onManage}
-              style={{ alignItems: 'center', margin: 12 }}
-            >
+            <TouchableOpacity onPress={onManage} style={{ alignItems: 'center', margin: 12 }}>
               <View
                 style={{
                   width: 100,
@@ -40,7 +37,9 @@ export function ProfileGrid({ profiles, onSelect, onManage }: ProfileGridProps) 
               >
                 <Text style={{ color: Colors.lightGray, fontSize: 32 }}>+</Text>
               </View>
-              <Text style={{ color: Colors.lightGray, fontSize: 14, marginTop: 8 }}>Add Profile</Text>
+              <Text style={{ color: Colors.lightGray, fontSize: 14, marginTop: 8 }}>
+                Add Profile
+              </Text>
             </TouchableOpacity>
           ) : null
         }
@@ -57,7 +56,9 @@ export function ProfileGrid({ profiles, onSelect, onManage }: ProfileGridProps) 
           borderRadius: 4,
         }}
       >
-        <Text style={{ color: Colors.lightGray, fontSize: 14, fontWeight: '600', letterSpacing: 1 }}>
+        <Text
+          style={{ color: Colors.lightGray, fontSize: 14, fontWeight: '600', letterSpacing: 1 }}
+        >
           MANAGE PROFILES
         </Text>
       </TouchableOpacity>

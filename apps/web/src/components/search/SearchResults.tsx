@@ -23,36 +23,40 @@ export function SearchResults({ query }: SearchResultsProps) {
   if (!results.length) {
     return (
       <div className="py-20 text-center">
-        <p className="text-2xl text-netflix-light-gray">No results for &quot;{query}&quot;</p>
-        <p className="mt-2 text-sm text-netflix-light-gray">Try a different title or keyword</p>
+        <p className="text-netflix-light-gray text-2xl">No results for &quot;{query}&quot;</p>
+        <p className="text-netflix-light-gray mt-2 text-sm">Try a different title or keyword</p>
       </div>
     )
   }
 
   return (
     <div>
-      <p className="text-sm text-netflix-light-gray mb-6">{results.length} results for &quot;{query}&quot;</p>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+      <p className="text-netflix-light-gray mb-6 text-sm">
+        {results.length} results for &quot;{query}&quot;
+      </p>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         {results.map((item: ContentItem) => (
           <button
             key={item.id}
             onClick={() => openModal(item)}
-            className="group relative aspect-video overflow-hidden rounded cursor-pointer"
+            className="group relative aspect-video cursor-pointer overflow-hidden rounded"
           >
             {item.posterPath ? (
               <img
                 src={item.posterPath}
                 alt={item.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
             ) : (
-              <div className="w-full h-full bg-netflix-medium-gray flex items-center justify-center">
-                <span className="text-xs text-center px-2 text-netflix-light-gray">{item.title}</span>
+              <div className="bg-netflix-medium-gray flex h-full w-full items-center justify-center">
+                <span className="text-netflix-light-gray px-2 text-center text-xs">
+                  {item.title}
+                </span>
               </div>
             )}
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition" />
-            <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition">
-              <p className="text-xs font-semibold truncate">{item.title}</p>
+            <div className="absolute inset-0 bg-black/0 transition group-hover:bg-black/30" />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-2 opacity-0 transition group-hover:opacity-100">
+              <p className="truncate text-xs font-semibold">{item.title}</p>
             </div>
           </button>
         ))}

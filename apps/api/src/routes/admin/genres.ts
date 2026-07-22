@@ -15,7 +15,9 @@ adminGenresRouter.get('/', async (_req, res, next) => {
       include: { _count: { select: { contents: true } } },
     })
     res.json({ data: genres })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })
 
 const genreSchema = z.object({ id: z.number().int().positive(), name: z.string().min(1) })
@@ -28,7 +30,9 @@ adminGenresRouter.post('/', validate(genreSchema), async (req, res, next) => {
       create: req.body as { id: number; name: string },
     })
     res.status(201).json({ data: genre })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })
 
 adminGenresRouter.put('/:id', async (req, res, next) => {
@@ -38,12 +42,16 @@ adminGenresRouter.put('/:id', async (req, res, next) => {
       data: { name: (req.body as { name: string }).name },
     })
     res.json({ data: genre })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })
 
 adminGenresRouter.delete('/:id', async (req, res, next) => {
   try {
     await prisma.genre.delete({ where: { id: parseInt(req.params['id']!) } })
     res.json({ message: 'Genre deleted' })
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err)
+  }
 })

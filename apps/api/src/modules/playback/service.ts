@@ -40,7 +40,9 @@ export async function issuePlaybackToken(
       assets: { where: { status: 'READY' } },
       captions: true,
       contentSeasons: opts.episodeId
-        ? { include: { episodes: { where: { id: opts.episodeId }, include: { videoFiles: true } } } }
+        ? {
+            include: { episodes: { where: { id: opts.episodeId }, include: { videoFiles: true } } },
+          }
         : false,
     },
   })
@@ -66,7 +68,8 @@ export async function issuePlaybackToken(
   }
 
   if (!manifestUrl) {
-    manifestUrl = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+    manifestUrl =
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
   }
 
   const history = opts.profileId

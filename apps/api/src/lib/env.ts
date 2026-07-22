@@ -45,7 +45,9 @@ export function getEnv(): Env {
 export function getCorsOrigins(): string[] {
   const env = getEnv()
   if (env.CORS_ORIGINS) {
-    return env.CORS_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean)
+    return env.CORS_ORIGINS.split(',')
+      .map((o) => o.trim())
+      .filter(Boolean)
   }
   return [
     process.env['NEXTAUTH_URL'] ?? 'http://localhost:3000',

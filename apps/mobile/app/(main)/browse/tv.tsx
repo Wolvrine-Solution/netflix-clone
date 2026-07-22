@@ -10,10 +10,11 @@ import { Colors } from '../../../constants/colors'
 export default function TVShowsScreen() {
   const { data, isLoading } = useQuery({
     queryKey: ['content', 'tv'],
-    queryFn: () => api.rows().then((r) => {
-      const allItems = r.data.data.flatMap((row) => row.items)
-      return allItems.filter((c) => c.mediaType === 'tv')
-    }),
+    queryFn: () =>
+      api.rows().then((r) => {
+        const allItems = r.data.data.flatMap((row) => row.items)
+        return allItems.filter((c) => c.mediaType === 'tv')
+      }),
     staleTime: 1000 * 60 * 10,
   })
 
@@ -21,7 +22,16 @@ export default function TVShowsScreen() {
     <View style={{ flex: 1, backgroundColor: Colors.black }}>
       <Navbar />
       <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
-        <Text style={{ color: Colors.white, fontSize: 22, fontWeight: '700', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 12 }}>
+        <Text
+          style={{
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: '700',
+            paddingHorizontal: 16,
+            paddingTop: 16,
+            paddingBottom: 12,
+          }}
+        >
           TV Shows
         </Text>
         {isLoading ? (

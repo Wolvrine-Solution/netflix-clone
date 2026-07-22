@@ -32,7 +32,10 @@ export function useMyList() {
     onMutate: async (contentId) => {
       await queryClient.cancelQueries({ queryKey: key })
       const prev = queryClient.getQueryData<ContentItem[]>(key)
-      queryClient.setQueryData<ContentItem[]>(key, (old) => old?.filter((c) => c.id !== contentId) ?? [])
+      queryClient.setQueryData<ContentItem[]>(
+        key,
+        (old) => old?.filter((c) => c.id !== contentId) ?? []
+      )
       return { prev }
     },
     onError: (_err, _contentId, ctx) => {

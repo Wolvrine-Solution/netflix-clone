@@ -46,11 +46,21 @@ export default function LoginScreen() {
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 24 }}>
         {/* Logo */}
-        <Text style={{ color: Colors.red, fontSize: 36, fontWeight: '900', textAlign: 'center', marginBottom: 48 }}>
+        <Text
+          style={{
+            color: Colors.red,
+            fontSize: 36,
+            fontWeight: '900',
+            textAlign: 'center',
+            marginBottom: 48,
+          }}
+        >
           NETFLIX
         </Text>
 
-        <Text style={{ color: Colors.white, fontSize: 28, fontWeight: '700', marginBottom: 24 }}>Sign In</Text>
+        <Text style={{ color: Colors.white, fontSize: 28, fontWeight: '700', marginBottom: 24 }}>
+          Sign In
+        </Text>
 
         {/* Email */}
         <View style={{ marginBottom: 16 }}>
@@ -118,7 +128,9 @@ export default function LoginScreen() {
           <Text style={{ color: Colors.lightGray, fontSize: 14 }}>New to Netflix?</Text>
           <Link href="/(auth)/register" asChild>
             <TouchableOpacity>
-              <Text style={{ color: Colors.white, fontSize: 14, fontWeight: '700' }}>Sign up now.</Text>
+              <Text style={{ color: Colors.white, fontSize: 14, fontWeight: '700' }}>
+                Sign up now.
+              </Text>
             </TouchableOpacity>
           </Link>
         </View>

@@ -17,7 +17,7 @@ async function tmdbFetch<T>(path: string, params: Record<string, string> = {}): 
 
   const res = await fetch(url.toString())
   if (!res.ok) throw new Error(`TMDB error: ${res.statusText}`)
-  const data = await res.json() as T
+  const data = (await res.json()) as T
   await redis.set(cacheKey, JSON.stringify(data), 'EX', 3600)
   return data
 }
@@ -25,7 +25,20 @@ async function tmdbFetch<T>(path: string, params: Record<string, string> = {}): 
 export async function searchTMDB(query: string): Promise<import('@netflix/types').ContentItem[]> {
   const API_KEY = getEnv().TMDB_API_KEY ?? ''
   if (!API_KEY) return []
-  const data = await tmdbFetch<{ results: Array<{ id: number; media_type: string; title?: string; name?: string; overview: string; poster_path: string | null; backdrop_path: string | null; vote_average: number; release_date?: string; first_air_date?: string }> }>('/search/multi', { query, page: '1' })
+  const data = await tmdbFetch<{
+    results: Array<{
+      id: number
+      media_type: string
+      title?: string
+      name?: string
+      overview: string
+      poster_path: string | null
+      backdrop_path: string | null
+      vote_average: number
+      release_date?: string
+      first_air_date?: string
+    }>
+  }>('/search/multi', { query, page: '1' })
   return data.results
     .filter((r) => r.media_type === 'movie' || r.media_type === 'tv')
     .slice(0, 20)
@@ -48,7 +61,9 @@ export async function searchTMDB(query: string): Promise<import('@netflix/types'
     }))
 }
 
-export async function getContentFromDB(id: string): Promise<import('@netflix/types').ContentItem | null> {
+export async function getContentFromDB(
+  id: string
+): Promise<import('@netflix/types').ContentItem | null> {
   const { prisma } = await import('@netflix/db')
   const content = await prisma.content.findUnique({
     where: { id },
@@ -79,7 +94,10 @@ export async function getContentFromDB(id: string): Promise<import('@netflix/typ
     mediaType: content.mediaType,
     genres: content.genres.map((cg) => ({ id: cg.genre.id, name: cg.genre.name })),
     runtime: content.runtime ?? undefined,
-    seasons: content.contentSeasons.length > 0 ? content.contentSeasons.length : (content.seasons ?? undefined),
+    seasons:
+      content.contentSeasons.length > 0
+        ? content.contentSeasons.length
+        : (content.seasons ?? undefined),
     episodes: content.episodes ?? undefined,
     maturityRating: content.maturityRating,
     trailerKey: content.trailerKey ?? undefined,

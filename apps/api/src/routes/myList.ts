@@ -38,17 +38,21 @@ myListRouter.post('/:profileId/my-list', authenticate, async (req: AuthRequest, 
   }
 })
 
-myListRouter.delete('/:profileId/my-list/:contentId', authenticate, async (req: AuthRequest, res, next) => {
-  try {
-    const profile = await prisma.profile.findFirst({
-      where: { id: req.params['profileId'], userId: req.userId },
-    })
-    if (!profile) throw new AppError(403, 'Forbidden')
-    await prisma.myListItem.deleteMany({
-      where: { profileId: req.params['profileId'], contentId: req.params['contentId'] },
-    })
-    res.json({ message: 'Removed from list' })
-  } catch (err) {
-    next(err)
+myListRouter.delete(
+  '/:profileId/my-list/:contentId',
+  authenticate,
+  async (req: AuthRequest, res, next) => {
+    try {
+      const profile = await prisma.profile.findFirst({
+        where: { id: req.params['profileId'], userId: req.userId },
+      })
+      if (!profile) throw new AppError(403, 'Forbidden')
+      await prisma.myListItem.deleteMany({
+        where: { profileId: req.params['profileId'], contentId: req.params['contentId'] },
+      })
+      res.json({ message: 'Removed from list' })
+    } catch (err) {
+      next(err)
+    }
   }
-})
+)

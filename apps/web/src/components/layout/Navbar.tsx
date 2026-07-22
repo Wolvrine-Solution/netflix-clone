@@ -32,7 +32,7 @@ export function Navbar() {
   return (
     <nav
       className={cn(
-        'fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 md:px-16 transition-all duration-500',
+        'fixed left-0 right-0 top-0 z-40 flex items-center justify-between px-4 transition-all duration-500 md:px-16',
         isScrolled
           ? 'glass-strong py-3 shadow-lg shadow-black/40'
           : 'bg-gradient-to-b from-black/80 via-black/40 to-transparent py-5'
@@ -42,11 +42,11 @@ export function Navbar() {
       <div className="flex items-center gap-10">
         <Link
           href="/browse"
-          className="text-netflix-red text-2xl md:text-3xl font-black tracking-tightest shrink-0 drop-shadow-[0_2px_10px_rgba(229,9,20,0.45)] transition-transform hover:scale-105"
+          className="text-netflix-red tracking-tightest shrink-0 text-2xl font-black drop-shadow-[0_2px_10px_rgba(229,9,20,0.45)] transition-transform hover:scale-105 md:text-3xl"
         >
           NETFLIX
         </Link>
-        <div className="hidden md:flex items-center gap-7 text-sm">
+        <div className="hidden items-center gap-7 text-sm md:flex">
           {LINKS.map((link) => {
             const active = pathname === link.href
             return (
@@ -55,12 +55,12 @@ export function Navbar() {
                 href={link.href}
                 className={cn(
                   'relative transition-colors duration-200',
-                  active ? 'text-white font-semibold' : 'text-white/70 hover:text-white'
+                  active ? 'font-semibold text-white' : 'text-white/70 hover:text-white'
                 )}
               >
                 {link.label}
                 {active && (
-                  <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 rounded-full bg-netflix-red" />
+                  <span className="bg-netflix-red absolute -bottom-1.5 left-0 right-0 h-0.5 rounded-full" />
                 )}
               </Link>
             )
@@ -73,17 +73,17 @@ export function Navbar() {
         <SearchInput />
         <button
           aria-label="Notifications"
-          className="relative hidden sm:grid place-items-center w-9 h-9 rounded-full text-white/80 hover:text-white hover:bg-white/10 transition"
+          className="relative hidden h-9 w-9 place-items-center rounded-full text-white/80 transition hover:bg-white/10 hover:text-white sm:grid"
         >
           <FiBell className="text-lg" />
-          <span className="absolute top-1.5 right-2 w-1.5 h-1.5 rounded-full bg-netflix-red" />
+          <span className="bg-netflix-red absolute right-2 top-1.5 h-1.5 w-1.5 rounded-full" />
         </button>
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="flex items-center gap-1.5 group tap-highlight-none"
+            className="tap-highlight-none group flex items-center gap-1.5"
           >
-            <div className="w-8 h-8 rounded-lg bg-gradient-brand grid place-items-center ring-1 ring-white/10 shadow-glow/30 transition-transform group-hover:scale-105">
+            <div className="bg-gradient-brand shadow-glow/30 grid h-8 w-8 place-items-center rounded-lg ring-1 ring-white/10 transition-transform group-hover:scale-105">
               <FiUser className="text-sm" />
             </div>
             <FiChevronDown
@@ -93,10 +93,10 @@ export function Navbar() {
           {showMenu && (
             <>
               <div className="fixed inset-0 z-0" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 top-12 z-10 glass-strong rounded-xl shadow-2xl w-56 py-2 text-sm animate-slide-up overflow-hidden">
+              <div className="glass-strong animate-slide-up absolute right-0 top-12 z-10 w-56 overflow-hidden rounded-xl py-2 text-sm shadow-2xl">
                 {activeProfile && (
-                  <div className="px-4 py-3 border-b border-white/10">
-                    <p className="text-xs text-netflix-light-gray">Watching as</p>
+                  <div className="border-b border-white/10 px-4 py-3">
+                    <p className="text-netflix-light-gray text-xs">Watching as</p>
                     <p className="font-semibold">{activeProfile.name}</p>
                   </div>
                 )}
@@ -112,7 +112,7 @@ export function Navbar() {
                       setShowMenu(false)
                       router.push(item.to)
                     }}
-                    className="w-full text-left px-4 py-2.5 hover:bg-white/10 transition text-white/85"
+                    className="w-full px-4 py-2.5 text-left text-white/85 transition hover:bg-white/10"
                   >
                     {item.label}
                   </button>
@@ -122,7 +122,7 @@ export function Navbar() {
                     setActiveProfile(null)
                     signOut({ callbackUrl: '/' })
                   }}
-                  className="w-full text-left px-4 py-2.5 hover:bg-white/10 transition text-netflix-light-gray border-t border-white/10 mt-1"
+                  className="text-netflix-light-gray mt-1 w-full border-t border-white/10 px-4 py-2.5 text-left transition hover:bg-white/10"
                 >
                   Sign out
                 </button>

@@ -9,7 +9,7 @@ export default function SearchPage({ searchParams }: SearchPageProps) {
   const query = searchParams.q ?? ''
 
   return (
-    <div className="pt-24 pb-20 px-4 md:px-16">
+    <div className="px-4 pb-20 pt-24 md:px-16">
       {query ? (
         <Suspense fallback={<p className="text-netflix-light-gray">Searching...</p>}>
           <SearchResults query={query} />

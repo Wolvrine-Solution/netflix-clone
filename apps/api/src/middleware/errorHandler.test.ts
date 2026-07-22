@@ -44,7 +44,8 @@ describe('errorHandler middleware', () => {
 
     errorHandler(err, {} as Request, res, next)
 
-    const jsonCall = (res.json as unknown as { mock: { calls: unknown[][] } }).mock.calls[0]?.[0] as { message: string }
+    const jsonCall = (res.json as unknown as { mock: { calls: unknown[][] } }).mock
+      .calls[0]?.[0] as { message: string }
     expect(jsonCall.message).not.toContain('leaked secret')
   })
 })

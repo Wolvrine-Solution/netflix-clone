@@ -9,7 +9,8 @@ import { PlayerControls } from './PlayerControls'
 import { Colors } from '../../constants/colors'
 import type { ContentItem } from '@netflix/types'
 
-const DEMO_SRC = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+const DEMO_SRC =
+  'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
 
 interface VideoPlayerProps {
   content: ContentItem
@@ -21,14 +22,30 @@ interface VideoPlayerProps {
   onShowEpisodes?: () => void
 }
 
-export function VideoPlayer({ content, videoUrl, episodeInfo, onBack, onNext, onPrev, onShowEpisodes }: VideoPlayerProps) {
+export function VideoPlayer({
+  content,
+  videoUrl,
+  episodeInfo,
+  onBack,
+  onNext,
+  onPrev,
+  onShowEpisodes,
+}: VideoPlayerProps) {
   const [showControls, setShowControls] = useState(true)
   const [showSkipIntro, setShowSkipIntro] = useState(false)
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const onNextRef = useRef(onNext)
   onNextRef.current = onNext
 
-  const { setPlaying, setCurrentTime, setDuration, setLoading, setFullscreen, isMuted, isFullscreen } = usePlayerStore()
+  const {
+    setPlaying,
+    setCurrentTime,
+    setDuration,
+    setLoading,
+    setFullscreen,
+    isMuted,
+    isFullscreen,
+  } = usePlayerStore()
   const { playbackQuality, setPlaybackQuality } = useSettingsStore()
   const { saveProgress, flushProgress } = useWatchProgress(content.id)
 
@@ -88,17 +105,13 @@ export function VideoPlayer({ content, videoUrl, episodeInfo, onBack, onNext, on
 
   function handleQuality() {
     const options: Array<typeof playbackQuality> = ['auto', '1080p', '720p', '480p', '360p']
-    Alert.alert(
-      'Playback Quality',
-      'Higher quality uses more data.',
-      [
-        ...options.map((q) => ({
-          text: q === playbackQuality ? `${q} ✓` : q,
-          onPress: () => setPlaybackQuality(q),
-        })),
-        { text: 'Cancel', style: 'cancel' as const },
-      ],
-    )
+    Alert.alert('Playback Quality', 'Higher quality uses more data.', [
+      ...options.map((q) => ({
+        text: q === playbackQuality ? `${q} ✓` : q,
+        onPress: () => setPlaybackQuality(q),
+      })),
+      { text: 'Cancel', style: 'cancel' as const },
+    ])
   }
 
   const subtitleText = episodeInfo
@@ -138,13 +151,22 @@ export function VideoPlayer({ content, videoUrl, episodeInfo, onBack, onNext, on
               <TouchableOpacity
                 onPress={onShowEpisodes}
                 style={{
-                  position: 'absolute', top: 16, right: 80,
-                  backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8,
-                  flexDirection: 'row', alignItems: 'center', gap: 4,
+                  position: 'absolute',
+                  top: 16,
+                  right: 80,
+                  backgroundColor: 'rgba(0,0,0,0.6)',
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 8,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 4,
                 }}
                 activeOpacity={0.8}
               >
-                <Text style={{ color: Colors.white, fontSize: 13, fontWeight: '600' }}>≡ Episodes</Text>
+                <Text style={{ color: Colors.white, fontSize: 13, fontWeight: '600' }}>
+                  ≡ Episodes
+                </Text>
               </TouchableOpacity>
             )}
           </>
@@ -154,12 +176,19 @@ export function VideoPlayer({ content, videoUrl, episodeInfo, onBack, onNext, on
         {showSkipIntro && showControls && (
           <TouchableOpacity
             style={{
-              position: 'absolute', bottom: 80, right: 24,
-              borderWidth: 2, borderColor: Colors.white,
-              paddingHorizontal: 16, paddingVertical: 8,
+              position: 'absolute',
+              bottom: 80,
+              right: 24,
+              borderWidth: 2,
+              borderColor: Colors.white,
+              paddingHorizontal: 16,
+              paddingVertical: 8,
               backgroundColor: Colors.overlay,
             }}
-            onPress={() => { player.currentTime = 91; setShowSkipIntro(false) }}
+            onPress={() => {
+              player.currentTime = 91
+              setShowSkipIntro(false)
+            }}
           >
             <Text style={{ color: Colors.white, fontWeight: '700', fontSize: 14 }}>Skip Intro</Text>
           </TouchableOpacity>

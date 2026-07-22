@@ -15,7 +15,10 @@ async function tmdbFetch<T>(path: string, params: Record<string, string> = {}): 
   return res.json() as Promise<T>
 }
 
-export function imageUrl(path: string | null, size: 'w300' | 'w500' | 'w780' | 'original' = 'w500') {
+export function imageUrl(
+  path: string | null,
+  size: 'w300' | 'w500' | 'w780' | 'original' = 'w500'
+) {
   if (!path) return '/placeholder.jpg'
   return `${IMAGE_BASE}/${size}${path}`
 }
@@ -51,7 +54,7 @@ export function mapMovieToContentItem(movie: TMDBMovieDetails): ContentItem {
     genres: movie.genres,
     runtime: movie.runtime,
     maturityRating: 'R',
-    trailerKey: movie.videos ? getTrailerKey(movie.videos.results) ?? undefined : undefined,
+    trailerKey: movie.videos ? (getTrailerKey(movie.videos.results) ?? undefined) : undefined,
     isFeatured: false,
     status: 'PUBLISHED',
     language: 'en',

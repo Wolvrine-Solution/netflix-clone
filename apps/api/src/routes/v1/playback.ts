@@ -3,7 +3,11 @@ import { prisma } from '@netflix/db'
 import { authenticate, AuthRequest } from '../../middleware/authenticate'
 import { validate } from '../../middleware/validate'
 import { z } from 'zod'
-import { issuePlaybackToken, recordQoEEvent, generateUploadUrls } from '../../modules/playback/service'
+import {
+  issuePlaybackToken,
+  recordQoEEvent,
+  generateUploadUrls,
+} from '../../modules/playback/service'
 import { heartbeatSession } from '../../modules/sessions/service'
 import { AppError } from '../../middleware/errorHandler'
 
@@ -14,12 +18,14 @@ playbackRouter.post(
   authenticate,
   validate({
     params: z.object({ contentId: z.string() }),
-    body: z.object({
-      profileId: z.string().optional(),
-      deviceId: z.string().optional(),
-      episodeId: z.string().optional(),
-      region: z.string().optional(),
-    }).optional(),
+    body: z
+      .object({
+        profileId: z.string().optional(),
+        deviceId: z.string().optional(),
+        episodeId: z.string().optional(),
+        region: z.string().optional(),
+      })
+      .optional(),
   }),
   async (req: AuthRequest, res, next) => {
     try {
@@ -29,11 +35,7 @@ playbackRouter.post(
         episodeId?: string
         region?: string
       }
-      const result = await issuePlaybackToken(
-        req.userId!,
-        req.params['contentId']!,
-        body
-      )
+      const result = await issuePlaybackToken(req.userId!, req.params['contentId']!, body)
       res.json({ data: result })
     } catch (err) {
       if (err instanceof Error && err.message.includes('entitled')) {

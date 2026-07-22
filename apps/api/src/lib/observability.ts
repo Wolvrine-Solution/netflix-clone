@@ -9,10 +9,7 @@ export function initObservability() {
   }
 
   if (env.OTEL_EXPORTER_OTLP_ENDPOINT) {
-    logger.info(
-      { endpoint: env.OTEL_EXPORTER_OTLP_ENDPOINT },
-      'OpenTelemetry endpoint configured'
-    )
+    logger.info({ endpoint: env.OTEL_EXPORTER_OTLP_ENDPOINT }, 'OpenTelemetry endpoint configured')
   }
 }
 

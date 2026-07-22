@@ -17,7 +17,11 @@ import { resetAdminMfaSessions, setAdminMfaSession } from '../../lib/adminMfaSes
 const SECRET = new TextEncoder().encode(process.env['NEXTAUTH_SECRET'] ?? 'fallback-secret')
 
 async function tokenFor(userId: string) {
-  return new SignJWT({ sub: userId }).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('30d').sign(SECRET)
+  return new SignJWT({ sub: userId })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('30d')
+    .sign(SECRET)
 }
 
 function buildApp() {
@@ -48,9 +52,7 @@ describe('Admin MFA routes', () => {
     const token = await tokenFor('admin-1')
     const app = buildApp()
 
-    const res = await request(app)
-      .post('/admin/mfa/setup')
-      .set('Authorization', `Bearer ${token}`)
+    const res = await request(app).post('/admin/mfa/setup').set('Authorization', `Bearer ${token}`)
 
     expect(res.status).toBe(200)
     expect(res.body.data.secret).toBeTruthy()
