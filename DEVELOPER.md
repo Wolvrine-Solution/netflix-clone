@@ -18,6 +18,8 @@ pnpm install
 
 The repo uses pnpm workspaces (`apps/*`, `packages/*`) orchestrated by Turborepo.
 
+After cloning, run `pre-commit install` once to activate this repo's lint/format git hooks.
+
 ## Configuration
 
 Copy the root environment file and fill in values:
