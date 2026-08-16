@@ -2,6 +2,7 @@
   "name": "netflix-clone",
   "private": true,
   "scripts": {
+    "ci": "pnpm run lint && pnpm run test && pnpm run build",
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",

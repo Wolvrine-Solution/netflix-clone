@@ -21,3 +21,13 @@ repos:
         entry: npx eslint --fix
         language: system
         types_or: [javascript, jsx, ts, tsx]
+
+  - repo: local
+    hooks:
+      - id: local-ci
+        name: local-ci pre-push gate (mirrors GitHub Actions CI, runs locally)
+        entry: pnpm run ci
+        language: system
+        stages: [pre-push]
+        pass_filenames: false
+        always_run: true

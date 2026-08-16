@@ -1,9 +1,9 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
-  pull_request:
+  # CI runs locally via pre-push hook; GitHub Actions runs it only on demand.
+  # Hub rule: .cursor/rules/ci-local-cd-remote.mdc (save GitHub Free minutes).
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}
