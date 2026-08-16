@@ -1,0 +1,41 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/ci-local-cd-remote.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: CI runs locally (pre-commit + pre-push hook); GitHub Actions runs deploys only — conserve Actions minutes on GitHub Free
+alwaysApply: true
+scope: shared
+---
+
+# CI local, CD remote
+
+To conserve GitHub Actions minutes (we are on **GitHub Free** — see `github-free-plan`), **CI runs on the developer's machine, not in Actions.** GitHub Actions is reserved for **deploys (CD)** and for the few jobs that genuinely cannot run locally.
+
+## The split
+
+- **Local (developer machine)** — lint, format check, typecheck, test, build. Enforced by pre-commit:
+  - format/lint on staged files at commit time (existing hooks), and
+  - a **`pre-push` hook** that runs the full CI before any push leaves the machine.
+- **GitHub Actions** — deploy/release workflows only, plus a minimal build/health gate inside the deploy job so a broken build can't ship. Jobs that can't run locally (CodeQL, secret scanning) stay in Actions on a **schedule**, never per-push.
+
+## Rules for every Wolvrine-owned repo
+
+- **Never** add a `push:` or `pull_request:` trigger to a lint/test/build workflow. Product `ci.yml` is **`workflow_dispatch:`-only** — kept for on-demand runs, but never auto-consumes minutes.
+- Every repo has a `ci` script that runs the same checks the old CI did:
+  - Node/TS: `"ci": "npm run lint && npm run format:check && npm test && npm run build"` (drop any step the repo genuinely lacks).
+  - Python: `ruff check . && ruff format --check . && pytest`.
+  - Bun: the `bun run` equivalent of the above.
+  - JVM: `mvn verify` / `./gradlew check`.
+- Every repo's `.pre-commit-config.yaml` has a `stages: [pre-push]` hook that runs that `ci` command. After cloning, run both `pre-commit install` **and** `pre-commit install --hook-type pre-push`.
+- **Deploy workflows are untouched** — they keep their `push` / `workflow_dispatch` triggers. CD stays in Actions.
+- Security/analysis that can't run locally (CodeQL, gitleaks) lives in its **own** workflow on a weekly `schedule:` + `workflow_dispatch:`, never per-push.
+
+## Excluded / special
+
+- `food-delivery-multivendor`, `erp-lite` — excluded from hub tooling standards (see `doc-pack-exclusions`); leave their workflows as-is.
+- `The-Street-King` — no CI at all; nothing to change.
+- `open-claw-setup/rotate-oci-api-key.yml` — scheduled maintenance, untouchable (see `open-claw-setup-secrets`).
+
+## Supersedes
+
+This supersedes the "Shared CI workflows … called via `workflow_call` from each submodule" decision in [`docs/TOOLING_STANDARDIZATION_PLAN.md`](../docs/TOOLING_STANDARDIZATION_PLAN.md): CI no longer runs in Actions on push/PR. The hub's `lint-test-build-{node,python,bun}.yml` reusable workflows remain callable via `workflow_dispatch` for occasional manual runs, but callers no longer auto-trigger them.

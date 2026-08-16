@@ -1,0 +1,38 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/standalone-apps.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: Every product under this hub must be standalone — no hard deps on sibling services or external platforms
+alwaysApply: true
+scope: shared
+---
+
+# Standalone apps (hub + all submodules)
+
+Every application in this hub is a **self-contained product**. It must run, test, and develop without requiring other Wolvrine apps, shared org platforms, or mandatory external infra.
+
+## Hard rules
+
+1. **No sibling-service coupling** — Do not call, import, or require another hub submodule / org product at runtime (no shared “platform auth”, no hard-wired microservice mesh between products).
+2. **No mandatory third-party platforms** — Optional integrations (Stripe, GHL, IdP, webhooks) must be behind config flags / stubs with safe defaults. Core paths must work when those are unset or disabled.
+3. **Local defaults = zero external services** — Dev and unit tests must work with in-process or file-backed storage (e.g. SQLite, embedded/memory cache). Postgres/Redis/object stores may exist as **optional** profiles, never as required for `test` / default `dev`.
+4. **One repo = one deployable unit** — Each product owns its API, data model, CI, `.env.example`, and docs. Do not assume a monorepo “platform” service is already running.
+5. **Language runtime is fine** — Node, Python, JVM, etc. are the app’s implementation, not “external services.” Prefer the stack already in that repo; do not rewrite languages unless the user asks. Fix install/docs/`uv sync`/`pnpm install` friction instead of treating the runtime as a forbidden dependency.
+
+## Agent checklist
+
+- Before marking leftovers done: `test` (and typecheck if present) must pass with **only** the app’s own install — no Docker DB/Redis required unless the test job itself starts them.
+- If you add Redis/Postgres/S3/IdP: gate with env (`REDIS_URL=off`, etc.), document the optional path, keep the default standalone.
+- Do not add `workspace:` / git submodule imports of another product’s code into a different product’s runtime.
+
+## Examples
+
+```text
+❌ BAD — governance API requires Centripe IdP + shared platform-auth to boot
+❌ BAD — unit tests fail unless docker compose postgres/redis are up
+❌ BAD — e-commerce imports types/runtime from another hub app
+
+✅ GOOD — SQLite + in-process cache by default; Redis/Postgres via optional profile
+✅ GOOD — Stripe/GHL keys in .env.example but payment/CRM paths no-op or mock when unset
+✅ GOOD — Docker Compose “api only” works; “full” profile adds optional infra
+```

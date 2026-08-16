@@ -1,0 +1,28 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/docs-first-agentic.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: Docs-first agentic coding — follow hub docs/AGENTIC_DOC_PACK.md (excludes food-delivery + erp-lite)
+alwaysApply: true
+scope: shared
+---
+
+# Docs-first agentic coding
+
+**Single source of truth:** [docs/AGENTIC_DOC_PACK.md](../../docs/AGENTIC_DOC_PACK.md)
+
+Do not duplicate that guide here. For every product under this hub workspace:
+
+1. Read and follow `docs/AGENTIC_DOC_PACK.md`.
+2. Required docs include `docs/ARCHITECTURE.md` as a **text flowchart overview** (not a second TDD).
+3. Scaffold from `docs/agentic-templates/` (skill `new-product-spec-pack`).
+4. Still obey: `standalone-apps`, `env-secret-sync`, `github-free-plan`, `feature-registry`.
+
+## Exclusions
+
+**Do not** require or auto-scaffold the agentic doc pack for:
+
+- `food-delivery-multivendor` — external fork, excluded from hub doc standards
+- `erp-lite` — legacy product, excluded from hub doc standards
+
+Hub layout flowchart: [docs/ARCHITECTURE.md](../../docs/ARCHITECTURE.md).

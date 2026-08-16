@@ -1,0 +1,28 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/feature-registry.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: Feature registry — docs/FEATURES.md tracks shipped features per product; auto-append when Leftover items complete
+alwaysApply: true
+scope: shared
+---
+
+# Feature registry
+
+Every in-scope product maintains `docs/FEATURES.md` — a living, flat list of shipped features (name + one-line description). It answers "what can this app actually do today," not "what changed" (that's git history) or "what's planned" (that's `docs/PLAN.md` / `docs/LEFTOVER_CHECKLIST.md`).
+
+## Rule: keep it in sync automatically
+
+Whenever a `docs/LEFTOVER_CHECKLIST.md` item is marked `[x]` (done, with proving tests per the doc-pack rule), add a one-line row to `docs/FEATURES.md` **in the same commit** — not as a separate follow-up task. If the completed item is not user-facing (pure refactor, internal tooling, config, dependency bump), skip the entry; don't pad the registry with non-features.
+
+Same applies in reverse: when new PLAN-phase work ships a feature directly (without ever being a Leftover item), add the row when that work lands.
+
+## Required for every in-scope product
+
+`docs/FEATURES.md` is part of the required doc pack (see [`docs/AGENTIC_DOC_PACK.md`](../../docs/AGENTIC_DOC_PACK.md) §2). Scaffold new products from [`docs/agentic-templates/FEATURES.md`](../../docs/agentic-templates/FEATURES.md).
+
+For existing products where `docs/FEATURES.md` doesn't exist yet, reverse-engineer it once from the current codebase (routes, modules, README, SRS FR-IDs) rather than starting blank — then keep it in sync going forward per the rule above.
+
+## Exclusions
+
+Same exclusions as the doc pack (see [`doc-pack-exclusions.mdc`](./doc-pack-exclusions.mdc)): `food-delivery-multivendor`, `erp-lite`.

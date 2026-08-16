@@ -1,0 +1,20 @@
+# Machine-readable metadata spine (Backstage schema). Seeded by
+# scripts/scaffold-catalog-info.mjs from detected data — REVIEW and hand-correct.
+# Read by the hub into docs/registry.json. Doc-style rule: doc-style.mdc
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: netflix-clone
+  description: Netflix Clone
+  tags: [pnpm, node]
+  annotations:
+    stack: "Prisma"
+    deploy-target: "k8s"
+    status: "active"
+    docs: "./docs"
+spec:
+  type: service
+  lifecycle: experimental
+  owner: afsan
+  system: client
+  dependsOn: []

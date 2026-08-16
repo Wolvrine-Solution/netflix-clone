@@ -1,0 +1,66 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/doc-style.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: Master doc-style rule — every product carries catalog-info.yaml, AGENTS.md as SSOT, a CLAUDE.md @AGENTS.md stub, ADRs under docs/adr/, and a C4 diagram in ARCHITECTURE.md
+alwaysApply: true
+scope: shared
+---
+
+# Doc style (master rule — inherited by every product)
+
+Every in-scope product is understood the same way. Five artifacts make a repo
+self-describing to humans and agents alike. Templates live in the hub under
+`docs/agentic-templates/`; this rule is the single source of truth for the style
+and is propagated into each submodule's `.cursor/rules/` by
+`scripts/propagate-shared-rules.mjs`.
+
+## The five required artifacts
+
+1. **`catalog-info.yaml`** (repo root) — machine-readable spine, Backstage
+   `Component` schema. Hand-maintained metadata: `spec.type`, `spec.lifecycle`,
+   `spec.owner`, `spec.system` (product group from `hub/projects.yaml` tags),
+   and `annotations` for `stack` / `deploy-target` / `status` / `docs`. The hub
+   registry generator reads this into `docs/registry.json`, so keep it accurate.
+
+2. **`AGENTS.md`** (repo root) — the **single source of truth** for agent and
+   human onboarding: what the product is, how to run/test/build it, constraints,
+   and where the deeper docs live. Everything an agent needs to work here starts
+   in AGENTS.md.
+
+3. **`CLAUDE.md`** (repo root) — a **stub that imports AGENTS.md**, not a second
+   copy. Its body is `@AGENTS.md` (Claude Code import, resolution depth ≤ 5) plus
+   only genuinely Claude-specific lines that don't belong in the shared AGENTS.md.
+   Never duplicate onboarding prose between the two — AGENTS.md owns it.
+
+4. **`docs/adr/NNNN-title.md`** — Architecture Decision Records (MADR-lite:
+   Context / Decision / Consequences). One file per significant decision,
+   zero-padded sequential number. Start from
+   `docs/agentic-templates/adr/0001-record-architecture-decisions.md`.
+
+5. **C4 diagram in `docs/ARCHITECTURE.md`** — at least a Container-level
+   `C4Container` Mermaid block (renders on GitHub and in the org dashboard). Keep
+   Context/Container as the default zoom; go deeper only when it earns its keep.
+
+## Conventions
+
+- **Diátaxis** organizes prose docs (tutorial / how-to / reference / explanation)
+  as a guideline — don't force empty files, but sort content into the right mode.
+- Prose lives under `docs/`; the five artifacts above are mandatory, the rest of
+  the doc pack (SRS/TDD/PLAN/FEATURES/LEFTOVER_CHECKLIST) is governed by
+  `docs-first-agentic` and `feature-registry`.
+- When a decision changes an ADR's outcome, add a new ADR that supersedes it —
+  never silently rewrite history.
+
+## Exclusions
+
+Same as the doc pack: `food-delivery-multivendor`, `erp-lite` (see
+[`doc-pack-exclusions.mdc`](./doc-pack-exclusions.mdc)). These do not carry the
+five artifacts and are skipped by the propagation script.
+
+## Related
+
+- Full doc pack policy: [`docs/AGENTIC_DOC_PACK.md`](../../docs/AGENTIC_DOC_PACK.md)
+- Templates: [`docs/agentic-templates/`](../../docs/agentic-templates/)
+- Machine feed built from `catalog-info.yaml`: `docs/registry.json` (see
+  [`org-registry.mdc`](./org-registry.mdc))

@@ -1,0 +1,32 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/no-license.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: No-license policy — Wolvrine products carry no LICENSE file (proprietary/internal); external forks keep their upstream license
+alwaysApply: true
+scope: shared
+---
+
+# No-license policy (hub + all submodules)
+
+Every product Wolvrine Solution **owns** is proprietary and internal. It ships with **no `LICENSE`/`LICENCE`/`COPYING` file** and is not licensed for external use.
+
+## Hard rules
+
+1. **No LICENSE file** — Do not add `LICENSE`, `LICENCE`, or `COPYING` to the hub or to any Wolvrine-owned submodule. If one exists, remove it.
+2. **Package manifests declare proprietary** — Where a manifest has a license field, set it to the ecosystem's "no license" marker, not an OSI license:
+   - `package.json` → `"license": "UNLICENSED"` (and `"private": true` where applicable)
+   - `pyproject.toml` / `Cargo.toml` / `composer.json` → omit the license, or mark it proprietary
+   - Never leave `"MIT"`, `"Apache-2.0"`, etc. on an owned product.
+3. **README License section states it explicitly** — Per [docs/README_TEMPLATE.md](../../docs/README_TEMPLATE.md), the License section must say the product is proprietary / internal with no LICENSE file — it is **not** omitted.
+4. **Never suggest choosing an open-source license** for an owned product. Don't recommend "add a LICENSE" in reviews.
+
+## Exception — external forks (keep their upstream license)
+
+If a submodule is a **fork of a third-party project**, its upstream license (and copyright notice) **must be retained** — removing it violates that license (e.g. MIT/Apache require keeping the notice). These are already out of hub scope via [`doc-pack-exclusions`](./doc-pack-exclusions.mdc).
+
+| Product | Upstream license | Action |
+|---|---|---|
+| `food-delivery-multivendor` | MIT — `Copyright (c) 2023 Ninjas Code` | **Keep `LICENSE` as-is.** Do not remove. |
+
+Before removing any `LICENSE` file, confirm the copyright holder is Wolvrine Solution. If it names a third party, it's an upstream notice — leave it.
