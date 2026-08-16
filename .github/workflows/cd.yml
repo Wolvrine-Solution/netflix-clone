@@ -1,10 +1,9 @@
 name: CD
 
-# Manual-only — stub CD must not burn GitHub Free minutes on every push
-# (hub rule .cursor/rules/ci-internal-deploys.mdc).
-# Run: gh workflow run cd.yml --ref main
 on:
-  workflow_dispatch:
+  push:
+    branches: [main]
+  workflow_dispatch: # manual fallback when auto-deploy on push is unavailable
 
 jobs:
   deploy-staging:
