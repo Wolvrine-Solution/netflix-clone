@@ -1,0 +1,69 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/ci-internal-deploys.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: CI/deploy spend policy — no production deploy auto-fires on push; prefer self-hosted runners once org runner exists (hub + all submodules)
+alwaysApply: true
+scope: shared
+---
+
+# CI / deploy spend (hub + all submodules)
+
+The org is on the **GitHub Free** Actions tier. GitHub-hosted `ubuntu-latest` /
+`windows-latest` / `macos-latest` minutes are a scarce resource. Protect them.
+
+## Hard rules
+
+1. **No production deploy on push** — A push to `main` / `master` must never
+   auto-trigger a production deploy workflow on a GitHub-hosted runner. Deploy
+   workflows stay `workflow_dispatch` (+ optionally `workflow_call` / `release`)
+   only. Deploys that used to fire on push must be run manually from the
+   Actions tab or via `gh workflow run`.
+2. **Prefer self-hosted once available** — When a runner is registered to the
+   org, move jobs to `runs-on: [self-hosted, linux, x64]` (and the repo's
+   arch/labels). Do not point workflows at a runner label that does not exist.
+3. **Non-deploy CI stays lean** — lint / test / build on GitHub-hosted runners
+   is acceptable, but must use path filters or `workflow_dispatch` where a full
+   run is wasteful. Long soak / e2e / Lighthouse jobs are manual only.
+4. **Cron workflows need a reason** — Scheduled workflows must be documented in
+   the product README/DEVELOPER with the expected cadence and cost.
+5. **Do not re-add push triggers** to a deploy workflow without an explicit
+   user decision recorded in that repo's `docs/LEFTOVER_CHECKLIST.md` or PLAN.
+
+## Exceptions
+
+- `food-delivery-multivendor` (external fork) and `erp-lite` (legacy) follow
+  their own upstream/legacy workflow setup unless the user says otherwise.
+- Pure stub / echo CD workflows that do not touch a real environment may keep
+  push triggers if they are near-zero cost, but prefer `workflow_dispatch`
+  anyway so the pattern is uniform.
+
+## Deploy workflow template (copy shape)
+
+```yaml
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Deploy environment
+        required: false
+        default: production
+        type: string
+  # push:  # <- do not enable without an explicit decision
+  #   branches: [main]
+```
+
+## When a self-hosted runner exists
+
+1. Register it to the org (or the specific repo) with labels, e.g.
+   `[self-hosted, linux, x64]`.
+2. Flip `runs-on` in CI + deploy workflows from `ubuntu-latest` to the label
+   array.
+3. Keep `runs-on: ubuntu-latest` only for jobs that must run in GitHub's
+   network (e.g. some OIDC/provider flows) — document why.
+
+## Related
+
+- `ci-local-cd-remote` — lint/test/build run locally (pre-push); Actions is for CD only
+- `github-free-plan` — never require paid branch protection
+- `standalone-apps` — each repo owns its own CI / deploy story

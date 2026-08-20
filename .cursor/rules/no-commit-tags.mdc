@@ -1,0 +1,52 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/no-commit-tags.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: No commit trailers/tags — commit messages must be plain subject + optional body; no Co-Authored-By, Signed-off-by, AI attribution, or other trailers (hub + all submodules)
+alwaysApply: true
+scope: shared
+---
+
+# No commit tags (hub + all submodules)
+
+Commit messages across the hub and every submodule must stay **plain**: subject line, optional blank line, optional body. Do **not** append git trailers, attribution tags, or tool watermarks.
+
+## Hard rules
+
+1. **No trailers / tags** — Never add lines such as:
+   - `Co-Authored-By: …`
+   - `Co-authored-by: …`
+   - `Signed-off-by: …`
+   - `Reviewed-by: …`
+   - `Acked-by: …`
+   - `Helped-by: …`
+   - `Generated-by: …` / `Generated with …`
+   - `Made-with: …` / `Made with Cursor` / similar
+   - Any other `Key: value` trailer after the body
+2. **No AI/tool attribution** — Do not credit Claude, Cursor, Copilot, GPT, or any other assistant in the commit message (subject, body, or footer).
+3. **Author is the human** — Git `author` / `committer` stay as configured by the user. Do not invent co-authors or rewrite identity via message tags.
+4. **Applies everywhere** — Hub repo and all nested product submodules. Same standard when committing from any workspace that uses these hub rules.
+
+## Do instead
+
+```text
+❌ BAD
+fix: reconnect ADB after sleep
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+❌ BAD
+feat: add inventory export
+
+Made-with: Cursor
+
+✅ GOOD
+fix: reconnect ADB after sleep
+
+✅ GOOD
+feat: add inventory export
+
+Write JSON snapshots under inventory/ for later diffing.
+```
+
+When drafting `git commit` HEREDOCs, end after the subject/body — no trailer block.

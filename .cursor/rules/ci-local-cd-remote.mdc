@@ -27,7 +27,7 @@ To conserve GitHub Actions minutes (we are on **GitHub Free** — see `github-fr
   - Bun: the `bun run` equivalent of the above.
   - JVM: `mvn verify` / `./gradlew check`.
 - Every repo's `.pre-commit-config.yaml` has a `stages: [pre-push]` hook that runs that `ci` command. After cloning, run both `pre-commit install` **and** `pre-commit install --hook-type pre-push`.
-- **Deploy workflows are untouched** — they keep their `push` / `workflow_dispatch` triggers. CD stays in Actions.
+- **Deploy workflows stay in Actions** but are **`workflow_dispatch`-only** — no auto-deploy on push (see `ci-internal-deploys`).
 - Security/analysis that can't run locally (CodeQL, gitleaks) lives in its **own** workflow on a weekly `schedule:` + `workflow_dispatch:`, never per-push.
 
 ## Excluded / special
