@@ -1,0 +1,26 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/session-start.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: Load repo-root AGENTS.md before any work — it is the SSOT; CLAUDE.md is a stub
+alwaysApply: true
+scope: shared
+---
+
+# Session start — read AGENTS.md first
+
+Before coding, searching, committing, provisioning cloud, or answering:
+**read the repo-root `AGENTS.md`**. That file is the single source of truth
+for agents.
+
+Then confirm **`.cursor/rules/no-paid-cloud.mdc`**: never auto-select a paid
+cloud SKU. Always Free / $0 only; **ask the owner in this session** before
+any invoiceable VM, disk, IP, NAT, database, paid API, or claimer.
+
+- `CLAUDE.md` is a stub (`@AGENTS.md`) plus Claude-only notes. Do not treat it
+  as a second policy.
+- `.cursor/rules/*.mdc` are either thin pointers to `AGENTS.md`, generated
+  copies of hub shared rules, or product-only ops. They must not disagree
+  with `AGENTS.md`.
+
+Do not start work first and read the rules later.

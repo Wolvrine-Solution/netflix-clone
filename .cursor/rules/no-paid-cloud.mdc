@@ -1,0 +1,55 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/no-paid-cloud.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: Never auto-select paid cloud SKUs — Always Free / $0 only unless the owner explicitly approves spend in this session (live-server repos + all products)
+alwaysApply: true
+scope: shared
+---
+
+# No paid cloud unless the owner says yes
+
+**Read this before provisioning, claiming, resizing, or enabling any cloud
+resource.** Do not start a VM, disk, IP, database, NAT, load balancer, paid
+API, or billing change first and "mention it later."
+
+Live-server repos today (strictest): `open-claw-setup`, `opencode-24-7-hub`,
+`wolverine-solution-landing-page`. The same rule applies to every product
+and to the hub — OpenCode / Cursor must not pick a paid SKU anywhere.
+
+## Hard rules
+
+1. **Never auto-select a paid option.** Prefer Always Free / $0 / already-running
+   free-tier. If the work needs anything that will invoice, **stop and ask**.
+2. **Ask in this session**, with the SKU, estimated monthly cost, and a $0
+   alternative. Do not treat silence, an old leftover, or "the script exists"
+   as approval.
+3. **"Always Free" is not automatically $0.** Check the gotcha before creating:
+   - GCP `e2-micro` in `us-west1` / `us-central1` / `us-east1` is free compute;
+     the **in-use external IPv4 is not** (~CA$4/mo).
+   - GCP `e2-medium`, `asia-south1`, `pd-balanced` over free disk, Cloud NAT,
+     Cloud SQL, GKE, static IPs = paid.
+   - OCI `VM.Standard.E2.1.Micro` and Ampere A1 (2 OCPU / 12 GB) are Always
+     Free. Pay As You Go / bigger shapes = ask.
+4. **Do not wire paid (or "free but IP-billed") claimers to cron / systemd / CI.**
+   `pnpm gcp:claim` is **manual only**, never a VPS timer. The only allowed
+   auto-claimer is the documented OCI Ampere timer (`pnpm oci:ampere:claim`),
+   which is Always Free $0.
+5. **Do not re-create deleted paid hosts** (`opencode-24-7`,
+   `openclaw-gcp-monitor`) without a fresh yes this session.
+
+## Allowed without asking
+
+- Stay on the existing Always Free OCI VPS (`open-claw-vps`).
+- Stay on Vercel Hobby / Cloudflare Workers **free quota** already in use.
+- Use free-quota APIs already enabled (Gmail Pub/Sub, GSC, GA4) with no new
+  billable SKU.
+- Run the OCI Ampere claimer (Always Free).
+
+## What happened (why this exists)
+
+2026-08 OpenCode / agents provisioned `opencode-24-7` as `e2-medium` in
+`asia-south1` (~CA$50/mo) and left `openclaw-gcp-monitor`'s external IP billing
+~CA$4/mo for an idle box. Both deleted 2026-08-25 after the owner asked.
+
+Inventory: hub `docs/INFRASTRUCTURE.md`. Product SSOT: that repo's `AGENTS.md`.
