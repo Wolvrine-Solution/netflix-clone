@@ -13,9 +13,9 @@ Build **one phase at a time**. Do not start phase N+1 until phase N acceptance p
 
 **Ship**
 
-- [ ] Project skeleton + DEVELOPER run/test
-- [ ] …
-- [ ] Tests proving FR subset
+- [x] Project skeleton + DEVELOPER run/test — pnpm/turborepo monorepo (`apps/web`, `apps/api`, `apps/mobile`, `packages/`), root scripts `pnpm run test` / `ci` match DEVELOPER.md
+- [x] Auth, multi-profile, catalog, playback, search, My List, watch history, admin dashboard shipped — per `docs/FEATURES.md`
+- [x] Tests proving FR subset — 47 test/spec files across apps, CI (`.github/workflows/ci.yml`) runs them; not run locally (needs pnpm >=10, local is 9.x)
 
 **Done when**
 
