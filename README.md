@@ -59,7 +59,7 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full current/target architectur
 
 ### Built With
 
-* Turborepo, pnpm workspaces
+* Turborepo, bun workspaces
 * **Web (`apps/web`):** Next.js 14 (App Router), React 18, NextAuth v5, TanStack Query, Zustand, Tailwind CSS, HLS.js, Zod
 * **Admin (`apps/admin`):** Next.js 14, NextAuth v5, TanStack Query, Recharts, Tailwind CSS
 * **API (`apps/api`):** Express 4, Helmet, CORS, express-rate-limit, Morgan, `jose` (JWT verification), Stripe SDK, node-cache
@@ -77,7 +77,7 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full current/target architectur
 ### Prerequisites
 
 * Node.js `>=22`
-* pnpm `>=10` (repo pinned to `pnpm@10.33.0` via `packageManager`)
+* bun `1.3.x` (repo pinned via `packageManager`)
 * A PostgreSQL database (local or remote)
 * A [TMDB](https://www.themoviedb.org/) API key (for seeding and live search)
 * For mobile development: Xcode/Android Studio for simulators (Expo dev server needs no separate global install)
@@ -88,9 +88,9 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full current/target architectur
    ```sh
    git clone https://github.com/Wolvrine-Solution/netflix-clone.git
    ```
-2. Install dependencies (pnpm workspaces, orchestrated by Turborepo):
+2. Install dependencies (bun workspaces, orchestrated by Turborepo):
    ```sh
-   pnpm install
+   bun install
    ```
 3. Copy the env file and fill in values (see [DEVELOPER.md](./DEVELOPER.md) for the full variable reference):
    ```sh
@@ -98,8 +98,8 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full current/target architectur
    ```
 4. Push the DB schema and seed content from TMDB:
    ```sh
-   pnpm db:push
-   pnpm db:seed
+   bun run db:push
+   bun run db:seed
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -109,23 +109,23 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full current/target architectur
 
 Start all apps in dev mode:
 ```sh
-pnpm dev
+bun run dev
 ```
 
 Apps run on:
 - `http://localhost:3000` — Main web app
 - `http://localhost:3001` — Admin dashboard
 - `http://localhost:4000` — REST API
-- `http://localhost:8081` — Mobile (Expo dev server, via `pnpm mobile`)
+- `http://localhost:8081` — Mobile (Expo dev server, via `bun run mobile`)
 
 Other common commands:
 ```sh
-pnpm build                  # Build all apps
-pnpm lint                   # Lint all apps
-pnpm typecheck              # TypeCheck all apps
-pnpm db:studio              # Open Prisma Studio
-pnpm --filter @netflix/web dev   # Filter to a specific app
-pnpm mobile:ios / pnpm mobile:android
+bun run build                  # Build all apps
+bun run lint                   # Lint all apps
+bun run typecheck              # TypeCheck all apps
+bun run db:studio              # Open Prisma Studio
+bun run --filter @netflix/web dev   # Filter to a specific app
+bun run mobile:ios / bun run mobile:android
 ```
 
 See [DEVELOPER.md](./DEVELOPER.md) for full setup and configuration detail.

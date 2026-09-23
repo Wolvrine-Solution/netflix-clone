@@ -3,20 +3,20 @@
 ## Prerequisites
 
 - Node.js `>=22` (see `engines` in `package.json`)
-- pnpm `>=10` (repo is pinned to `pnpm@10.33.0` via `packageManager`)
+- bun `1.3.x` (repo is pinned via `packageManager`)
 - A PostgreSQL database (local or remote)
 - A [TMDB](https://www.themoviedb.org/) API key (for seeding and live search)
-- For mobile development: Expo tooling (`expo start` is invoked via pnpm scripts; no separate global install is required to run the dev server, but Xcode/Android Studio are needed for simulators)
+- For mobile development: Expo tooling (`expo start` is invoked via bun scripts; no separate global install is required to run the dev server, but Xcode/Android Studio are needed for simulators)
 
 ## Installation
 
 ```bash
 git clone <repository-url>
 cd netflix-clone
-pnpm install
+bun install
 ```
 
-The repo uses pnpm workspaces (`apps/*`, `packages/*`) orchestrated by Turborepo.
+The repo uses bun workspaces (`apps/*`, `packages/*`) orchestrated by Turborepo.
 
 After cloning, run `pre-commit install` once to activate this repo's lint/format git hooks.
 
@@ -63,14 +63,14 @@ Never commit `.env`, `.env.local`, or any file containing real credentials.
 Push the Prisma schema to your database, then seed content from TMDB:
 
 ```bash
-pnpm db:push
-pnpm db:seed
+bun run db:push
+bun run db:seed
 ```
 
 Start all apps in development mode:
 
 ```bash
-pnpm dev
+bun run dev
 ```
 
 This runs, via Turborepo:
@@ -82,26 +82,26 @@ This runs, via Turborepo:
 To run a single app instead of everything:
 
 ```bash
-pnpm --filter @netflix/web dev
-pnpm --filter @netflix/admin dev
-pnpm --filter @netflix/api dev
+bun run --filter @netflix/web dev
+bun run --filter @netflix/admin dev
+bun run --filter @netflix/api dev
 ```
 
 For the mobile app:
 
 ```bash
-pnpm mobile          # expo start
-pnpm mobile:android  # expo start --android
-pnpm mobile:ios      # expo start --ios
+bun run mobile          # expo start
+bun run mobile:android  # expo start --android
+bun run mobile:ios      # expo start --ios
 ```
 
 Other useful commands:
 
 ```bash
-pnpm build           # Build all apps (turbo run build)
-pnpm lint            # Lint all apps
-pnpm typecheck       # Type-check all apps
-pnpm db:studio       # Open Prisma Studio
+bun run build           # Build all apps (turbo run build)
+bun run lint            # Lint all apps
+bun run typecheck       # Type-check all apps
+bun run db:studio       # Open Prisma Studio
 ```
 
 ## Running Tests
@@ -109,22 +109,22 @@ pnpm db:studio       # Open Prisma Studio
 Unit/integration tests (Vitest) exist for the web, admin, and API apps; run per app:
 
 ```bash
-pnpm --filter @netflix/web test
-pnpm --filter @netflix/admin test
-pnpm --filter @netflix/api test
+bun run --filter @netflix/web test
+bun run --filter @netflix/admin test
+bun run --filter @netflix/api test
 ```
 
 The mobile app uses Jest (via `jest-expo`):
 
 ```bash
-pnpm --filter @netflix/mobile test
+bun run --filter @netflix/mobile test
 ```
 
 End-to-end tests (Playwright) exist for the web and mobile apps:
 
 ```bash
-pnpm --filter @netflix/web test:e2e
-pnpm --filter @netflix/mobile test:e2e
+bun run --filter @netflix/web test:e2e
+bun run --filter @netflix/mobile test:e2e
 ```
 
 ## Build/Deploy
@@ -132,7 +132,7 @@ pnpm --filter @netflix/mobile test:e2e
 No Dockerfile or CI workflow is present in this repository yet (planned — see `ROADMAP.md` Phase 1). Build artifacts are produced per app via Turborepo:
 
 ```bash
-pnpm build
+bun run build
 ```
 
 - `apps/web` and `apps/admin` build with `next build` and start with `next start` (admin on port 3001).
@@ -143,4 +143,4 @@ pnpm build
 
 - **API rejects requests with CORS errors:** the API's allowed origins are hardcoded in `apps/api/src/index.ts` (`localhost:3000`, `3001`, `8081`, `19006`). If you run an app on a different host/port, requests will be blocked.
 - **JWT verification fails between web and API:** the API verifies NextAuth JWTs using `jose` with `NEXTAUTH_SECRET`. Ensure the web app and API use the exact same `NEXTAUTH_SECRET` value.
-- **Empty catalog after setup:** the browse page reads from PostgreSQL, not TMDB directly. Run `pnpm db:seed` (requires a valid `TMDB_API_KEY`) after `pnpm db:push` before expecting content to appear.
+- **Empty catalog after setup:** the browse page reads from PostgreSQL, not TMDB directly. Run `bun run db:seed` (requires a valid `TMDB_API_KEY`) after `bun run db:push` before expecting content to appear.

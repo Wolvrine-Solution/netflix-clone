@@ -1,0 +1,52 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/node-package-manager.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: Every Node/TS product must use bun as its package manager; pnpm only if bun genuinely can't run it; npm is never used
+alwaysApply: true
+scope: shared
+---
+
+# Node package manager (hub + all submodules)
+
+**Default: bun.** Every Node/TypeScript product installs, runs scripts, and locks
+dependencies with `bun` (`bun install`, `bun run <script>`, `bun test`,
+`bun.lock` committed). This is the org standard — do not introduce npm or add a
+new pnpm project without first trying bun.
+
+**Fallback: pnpm.** Use pnpm only when bun genuinely cannot run the project —
+verified incompatibility, not preference: a native addon that only builds
+correctly under pnpm/npm's node-gyp flow, a pnpm-workspace-specific feature the
+code actually depends on, or a dependency that fails to resolve under bun's
+installer after a real attempt. Record *why* in the repo's DEVELOPER.md
+(one line: "pnpm — bun install fails on X") so the next person doesn't
+re-litigate it.
+
+**Never npm.** No `package-lock.json`, no `npm install`/`npm run` in scripts,
+CI, DEVELOPER.md, or Dockerfiles. If a repo still has `package-lock.json`,
+that's drift — migrate it (bun first, pnpm only if bun fails) rather than
+leaving it.
+
+## Agent checklist
+
+- New Node product: `bun init` / `bun install`, commit `bun.lock`, set
+  `"packageManager": "bun@<version>"` in `package.json`.
+- Touching an existing npm/pnpm repo: don't silently swap package managers
+  mid-unrelated-change — migrate it deliberately (own commit, verify the test
+  suite still passes under the new manager) or leave a one-line TODO if it's
+  out of scope for the current task.
+- CI: use the hub's `lint-test-build-bun.yml` reusable workflow (see
+  `docs/agentic-templates/tooling/ci-caller.template.yml`) for bun repos;
+  `lint-test-build-node.yml` (pnpm) only for the pnpm-fallback repos.
+- Docker: `oven/bun` base image for bun repos, not `node:*` + npm.
+
+## Examples
+
+```text
+❌ BAD  — package-lock.json committed, DEVELOPER.md says `npm install`
+❌ BAD  — new repo scaffolded with `npm init` "because that's the tsrc default"
+❌ BAD  — switched a repo from bun to pnpm because a script felt slower, no real incompatibility
+
+✅ GOOD — bun.lock committed, "packageManager": "bun@1.3.x", DEVELOPER.md says `bun install` / `bun run dev` / `bun test`
+✅ GOOD — pnpm-lock.yaml with a one-line DEVELOPER.md note: "pnpm — bun install fails on <native addon X>, see <issue/log>"
+```

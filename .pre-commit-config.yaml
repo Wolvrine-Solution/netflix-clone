@@ -12,13 +12,13 @@ repos:
     hooks:
       - id: prettier
         name: prettier
-        entry: npx prettier --write
+        entry: bunx prettier --write
         language: system
         types_or: [javascript, jsx, ts, tsx, json, css, scss, markdown, yaml]
 
       - id: eslint
         name: eslint
-        entry: npx eslint --fix
+        entry: bunx eslint --fix
         language: system
         types_or: [javascript, jsx, ts, tsx]
 
@@ -26,7 +26,7 @@ repos:
     hooks:
       - id: local-ci
         name: local-ci pre-push gate (mirrors GitHub Actions CI, runs locally)
-        entry: pnpm run ci
+        entry: bun run ci
         language: system
         stages: [pre-push]
         pass_filenames: false
