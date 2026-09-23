@@ -32,7 +32,7 @@ app.use(
           '/webhooks/stripe'
         )
       ) {
-        ;(req as express.Request & { rawBody?: Buffer }).rawBody = buf
+        (req as express.Request & { rawBody?: Buffer }).rawBody = buf
       }
     },
   })
