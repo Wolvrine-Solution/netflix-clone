@@ -1,0 +1,27 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/deliverables-markdown-only.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: Deliverables are plain Markdown in the repo — never styled HTML, never cloud artifacts
+alwaysApply: true
+scope: shared
+---
+
+# Deliverables — Markdown in the repo
+
+Reports, docs and diagrams are delivered as plain `.md` files committed into the
+relevant repo.
+
+- **Never** publish via a cloud artifact tool (e.g. claude.ai Artifacts).
+- **Never** generate a styled `.html` report — no self-contained pages with
+  embedded CSS, no light/dark theme blocks, no "same design an Artifact would
+  have used".
+- If a Markdown file and an HTML twin would say the same thing, write only the
+  Markdown one.
+- Diagrams go in fenced code blocks as ASCII, or Mermaid where the host renders it.
+
+Why: the HTML twins are unreadable in review, unreadable in a diff, and duplicate
+content that already lives in the `.md`. One file, one source of truth.
+
+Hub push exception still applies: in `new-project-idea` and `opencode-24-7-hub`,
+commit locally only — don't `git push` unless the owner asks in that session.
