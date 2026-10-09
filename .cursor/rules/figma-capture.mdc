@@ -1,0 +1,24 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/figma-capture.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: Uploading a web UI to Figma — use the figma-capture skill (live capture, trailing-slash/404 guards, ?m=design). Applies to every product repo.
+alwaysApply: false
+scope: shared
+---
+
+# Figma capture
+
+To put a repo's running web UI into Figma, follow the **`figma-capture`** skill
+(`.cursor/skills/figma-capture/SKILL.md` in the hub; `~/.claude*/skills/figma-capture`
+for Claude Code). Do not improvise.
+
+- File via `create_new_file` on the team `planKey` (Drafts). Free tier only.
+- Capture with `generate_figma_design` + Playwright injection; **never edit repo
+  source** to add the capture script.
+- Before capturing, confirm each route returns **200 at the exact URL** (mind
+  `trailingSlash`, redirects, feature flags). After capturing, list frames and
+  delete any 404 capture.
+- Open Figma links with `?m=design` — Dev Mode (`?m=dev`) hides Figma's AI.
+- Leave the repo working tree unchanged; stop the dev server; delete `.playwright-mcp/`.
+- Never commit a `FIGMA_TOKEN`.

@@ -22,5 +22,7 @@ any invoiceable VM, disk, IP, NAT, database, paid API, or claimer.
 - `.cursor/rules/*.mdc` are either thin pointers to `AGENTS.md`, generated
   copies of hub shared rules, or product-only ops. They must not disagree
   with `AGENTS.md`.
+- When the workspace is the **hub** (`new-project-idea`): after pushing any
+  submodule product, bump and push the hub pin — `.cursor/rules/hub-submodule-pins.mdc`.
 
 Do not start work first and read the rules later.

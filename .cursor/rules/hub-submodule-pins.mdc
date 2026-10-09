@@ -1,0 +1,41 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/hub-submodule-pins.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: After pushing any hub submodule product repo, bump and push the hub pin in the same session
+alwaysApply: true
+scope: shared
+---
+
+# Hub submodule pins (mother repo)
+
+The hub (`new-project-idea`) is a **binder**: each product under `Wolvrine-Solution/<name>` is a **git submodule** pinned to a specific commit. Fresh clones and `bun run sync` only see what the hub records — not “latest on GitHub” unless the pin was updated.
+
+## Hard rules (agents)
+
+1. **Every org product that lives as a hub submodule** — when you push new commits to that product’s default branch (`main` or `master`), **update the hub pointer in the same session** before you consider the task done.
+2. **Order:** product repo — commit → push → hub — `bun run bump-pins -- --only <path>` (or `git submodule update --remote --merge -- <path>`) → `git add <path>` → hub commit → **push hub `main`** immediately. Do not leave a local-only pin bump.
+3. **Dirty submodule exception:** If that submodule still has uncommitted or untracked work, finish or stash it first — do not record a hub pin that hides dirty state.
+4. **New product:** `git submodule add` + row in [README.md](../../README.md) + entry in [hub/projects.yaml](../../hub/projects.yaml) + initial pin commit on hub (same session as the product repo exists on GitHub).
+5. **Working inside a product only:** If the workspace root is a single product repo (not the hub), you cannot bump the pin there — note in your handoff that the hub needs `bun run bump-pins -- --only <name>` after merge.
+
+## Commands
+
+```bash
+# See stale pins (no writes)
+git diff --submodule
+bun run status
+
+# Bump one product after its push
+bun run bump-pins -- --only wolverine-solution-landing-design
+git add wolverine-solution-landing-design
+git commit -m "chore: bump wolverine-solution-landing-design submodule"
+git push origin main
+```
+
+Hub SSOT for workflow: [DEVELOPER.md](../../DEVELOPER.md) §2, [docs/HUB_WORKSPACE.md](../../docs/HUB_WORKSPACE.md).
+
+## Related
+
+- [CLAUDE.md](../../CLAUDE.md) — pointer pushes on hub
+- `standalone-apps` — products stay independent; the pin is index only, not a runtime import
