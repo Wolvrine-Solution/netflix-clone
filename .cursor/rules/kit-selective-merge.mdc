@@ -1,0 +1,26 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/kit-selective-merge.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: Adopt agent-repo-kit by selective merge only — never a blind install over project rules
+alwaysApply: true
+scope: shared
+---
+
+# Adopting agent-repo-kit — selective merge only (owner 2026-10-10)
+
+The org's common agent layer lives in [agent-repo-kit](https://github.com/sumitbd/agent-repo-kit).
+A repo takes it by **merging only the pieces it needs** into its own rules — never by running the
+kit's `install.sh` or `kit-sync.sh --apply` over a repo that already has project rules (they
+overwrite `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.claude/settings.json`).
+
+1. Diff the kit template against the repo; take the process rules, agents and skills the project
+   will use. Skip what conflicts with org rules (org rules win) or with the repo's stack.
+2. Merge chosen rules into the repo's `AGENTS.md` under "Org process rules (merged from
+   agent-repo-kit)"; copy chosen `.claude/agents/` and `.claude/skills/` as-is.
+3. Record the kit commit and what was taken in `.kit/kit.json` (`$comment`), so
+   `sync-consumers.py` tracks the repo without overwriting project files.
+4. Kit moves on → run the report, merge by hand what applies. Generic improvements found in a
+   product go **upstream to the kit by PR**, never only into one repo.
+
+Full text and reference adoption: hub `AGENTS.md` § "Adopting agent-repo-kit".

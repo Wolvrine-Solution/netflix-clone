@@ -1,0 +1,24 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/stack-rules.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: Each repo follows the rules of its own tech stack and tools — kept in the repo, one section per stack
+alwaysApply: true
+scope: shared
+---
+
+# Stack rules live with the stack (owner 2026-10-10)
+
+Org rules are stack-agnostic. Every repo also has rules for **its own** technology:
+
+- The repo's `AGENTS.md` carries one `## <Stack> rules` section per framework/language/tool it
+  actually uses (e.g. `Astro rules`, `Java rules`, `Android rules`, `Spring Boot rules`), written
+  as checkable rules: what to use, what to avoid, which test/lint/hook enforces it.
+- An agent working in a repo follows the org rules **plus that repo's own stack sections** — never
+  another stack's rules. Do not copy a stack section into a repo that does not use that stack.
+- Starting work in a repo whose stack has no section yet: add one from that stack's official best
+  practices (cite the source) before or alongside the first change, and keep it short.
+- Rules that apply to every repo of a stack and are not project-specific go upstream (kit PR or
+  a hub shared rule), the repo keeps only its project specifics.
+
+Reference: `wolverine-solution-landing-page/AGENTS.md` § "Astro rules (static marketing site)".
