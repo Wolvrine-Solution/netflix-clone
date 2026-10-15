@@ -16,12 +16,12 @@
     "db:generate": "prisma generate"
   },
   "dependencies": {
-    "@prisma/client": "^5.19.0"
+    "@prisma/client": "^7.10.0"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "prisma": "^5.19.0",
+    "@types/node": "^26.6.2",
+    "prisma": "^7.10.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.5.0"
+    "typescript": "^7.0.2"
   }
 }
