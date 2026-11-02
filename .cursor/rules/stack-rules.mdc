@@ -11,9 +11,14 @@ scope: shared
 
 Org rules are stack-agnostic. Every repo also has rules for **its own** technology:
 
-- The repo's `AGENTS.md` carries one `## <Stack> rules` section per framework/language/tool it
-  actually uses (e.g. `Astro rules`, `Java rules`, `Android rules`, `Spring Boot rules`), written
+- The repo's own rules file carries one `## <Stack> rules` section per framework/language/tool
+  it actually uses (e.g. `Astro rules`, `Java rules`, `Android rules`, `Spring Boot rules`), written
   as checkable rules: what to use, what to avoid, which test/lint/hook enforces it.
+- **Which file:** `AGENTS.md` when the repo owns it. When `AGENTS.md` is managed by
+  agent-repo-kit (listed `managed` in `.kit/manifest.txt`, overwritten on every kit sync), put
+  the sections in the project-owned `.claude/rules/local-stack.md` instead, and say so in one
+  line of `.claude/rules/project-context.md`. Never edit a managed `AGENTS.md`: the next sync
+  either erases the sections or reports a CONFLICT that blocks the update.
 - An agent working in a repo follows the org rules **plus that repo's own stack sections** — never
   another stack's rules. Do not copy a stack section into a repo that does not use that stack.
 - Starting work in a repo whose stack has no section yet: add one from that stack's official best
@@ -21,4 +26,6 @@ Org rules are stack-agnostic. Every repo also has rules for **its own** technolo
 - Rules that apply to every repo of a stack and are not project-specific go upstream (kit PR or
   a hub shared rule), the repo keeps only its project specifics.
 
-Reference: `wolverine-solution-landing-page/AGENTS.md` § "Astro rules (static marketing site)".
+References: `wolverine-solution-landing-page/AGENTS.md` § "Astro rules (static marketing site)"
+(repo-owned file); `opencode-24-7-hub/.claude/rules/local-stack.md` § "Bun + TypeScript rules",
+"Shell rules", "systemd rules" (kit-managed `AGENTS.md`, with the rules checked in CI).
