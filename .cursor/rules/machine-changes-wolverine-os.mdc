@@ -1,0 +1,56 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/machine-changes-wolverine-os.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: Any change to a machine outside a git working tree is recorded in wolverine-os in the same session
+alwaysApply: true
+scope: shared
+---
+
+# Local machine changes live in `wolverine-os` (owner 2026-11-02)
+
+`new-project-idea/wolverine-os` is the record of what is installed and configured on the two PCs
+(`wolverine-desktop`, `wolverine-laptop`) and the source the new OS image is built from. A change
+made on a machine and not recorded there is lost at the next reinstall.
+
+## What counts as a machine change
+
+Anything an agent does that lives outside a repo's own git tree:
+
+- apt sources, apt/dpkg/flatpak packages, global `npm` / `pip` / `cargo` / `bun` installs
+- systemd units and timers (system or user), cron, `/etc` files, firewall rules, ports
+- dotfiles and symlinks into `~/.config`, `~/.local`, shell snippets, environment files
+- files or directories created, moved or deleted outside a repo (including a retired clone)
+- secrets files placed on a host (record the path and mode, never the value)
+
+A normal edit inside a repo is a commit, not a machine change.
+
+## Same session, before reporting done
+
+1. **State the change on each host**: update [wolverine-os/docs/LIVE-SETUP.md](../../wolverine-os/docs/LIVE-SETUP.md)
+   (what runs on the desktop, what on the laptop, or why only one) and the session log in
+   `docs/CONTEXT.md`.
+2. **Make it replayable**: an Ansible task or a `scripts/wolvos-*` script in `wolverine-os`, so the
+   image can reproduce it. If it deliberately is not replayed, say so in LIVE-SETUP with the reason.
+3. **If something bit**, add a `tell` / `cause` / `rule` / `guard` entry to `docs/PROJECT-PITFALLS.md`
+   and a guard that fails when it recurs (planted violation proved).
+4. **Prove it on both hosts**, or state which host it was not run on.
+
+Product-level files (a hub's units, its docs) still follow that repo's own rules; this rule adds the
+machine-level record on top. Details and the bite-to-ISO flow:
+[wolverine-os/.cursor/rules/live-setup-sync.mdc](../../wolverine-os/.cursor/rules/live-setup-sync.mdc).
+
+## The agent does the work on both PCs (owner 2026-11-03)
+
+Install, upgrade, check and fix work is done by the agent itself: the local PC directly,
+`wolverine-laptop` over ssh. Never hand the owner a command to run or ask them to install or check
+something on either PC. Do it, prove it on both, report the result. Ask only for a decision with
+cost or data loss, or a credential that does not exist yet. Restarting a service is part of the
+work: check for running sessions first, restart, smoke test, roll back on failure.
+
+## Never
+
+- Write a password, token or key value into `wolverine-os` or any doc. A sudo password given in
+  chat is used once through `WOLVOS_SUDO` and written nowhere.
+- Leave a machine change as tribal knowledge because "it is only live".
+- Treat the record as permission to commit or push: commit and push follow each repo's normal gates.

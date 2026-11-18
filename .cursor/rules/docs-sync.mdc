@@ -1,0 +1,23 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/docs-sync.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: Sync all docs after every task; ClickUp is Softwarelify-only, never used in Wolvrine repos
+alwaysApply: true
+scope: shared
+---
+
+# Docs stay in sync; ClickUp is Softwarelify-only (owner 2026-11-05)
+
+Full rule: `opencode-24-7-hub/config/claude/CLAUDE.md` §§ "Docs stay in sync" and "ClickUp —
+Softwarelify org only". Not an end-of-day chore.
+
+1. Same turn: run the repo's doc-sync so every doc stating what changed moves with it.
+2. End the report with a "Docs" block: which docs moved, one line each.
+3. ClickUp belongs to the Softwarelify org only. Never read, write, compare or report against it in
+   a Wolvrine repo, and never add it (no tasks, sync workflows, MCP entries, sprint skills,
+   template rows or doc mentions). The EOD line `Misc > Meeting, Slack, ClickUp & EOD > 1hr` is
+   Softwarelify's convention and stays in the EOD skill only. A repo file that says to check
+   ClickUp is stale: skip the step and say it needs cleaning.
+4. Tracking is the repo's own docs plus GitHub issues and PRs. Tracker writes still need the exact
+   draft and an explicit yes in that message.

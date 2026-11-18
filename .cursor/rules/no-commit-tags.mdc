@@ -33,13 +33,15 @@ Commit messages across the hub and every submodule must stay **plain**: subject 
    - `Co-authored-by: Copilot <copilot@github.com>`
 3. **Author is the human** — Git `author` / `committer` stay as configured by the user. Do not invent co-authors or rewrite identity via message tags.
 4. **Applies everywhere** — Hub repo and all nested product submodules. Same standard when committing from any workspace that uses these hub rules.
-5. **If a wrapper injects a trailer anyway** — Cursor / Claude Code / Copilot
-   append `Co-authored-by: Cursor <cursoragent@cursor.com>` *after* `git commit`
-   (after commit-msg). `git commit --amend` re-injects it. Do **not** amend to
-   strip. Rewrite HEAD with `commit-tree` (see
-   `.cursor/rules/no-ai-commit-trailers.mdc`; open-claw-setup:
-   `python3 scripts/git-strip-ai-trailers.py --rewrite-head`). Never leave
-   it on `origin`. Never write that line in a HEREDOC.
+5. **Mandatory after every commit** — Cursor / Claude Code / Copilot often
+   append `Co-authored-by: Cursor <cursoragent@cursor.com>` *after*
+   `git commit` (after commit-msg), even when the agent did not write it.
+   `git commit --amend` re-injects it. Do **not** amend to strip.
+   **Every** commit flow: run `git log -1 --format=%B` before push. If any
+   trailer is present, rewrite HEAD with `commit-tree` (open-claw-setup:
+   `python3 scripts/git-strip-ai-trailers.py --rewrite-head`), then push.
+   If it already reached origin, rewrite + `git push --force-with-lease`.
+   Never leave a `Co-authored-by:` / AI trailer on `origin`.
 
 ## Do instead
 

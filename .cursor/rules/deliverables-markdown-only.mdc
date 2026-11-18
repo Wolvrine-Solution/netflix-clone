@@ -23,5 +23,5 @@ relevant repo.
 Why: the HTML twins are unreadable in review, unreadable in a diff, and duplicate
 content that already lives in the `.md`. One file, one source of truth.
 
-Hub push exception still applies: in `new-project-idea` and `opencode-24-7-hub`,
-commit locally only — don't `git push` unless the owner asks in that session.
+Hub repos push like any other repo: after a submodule commit, bump the hub pointer and push
+the hub to `origin` (see `hub-submodule-pins.mdc`).

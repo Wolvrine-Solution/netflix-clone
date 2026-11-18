@@ -1,0 +1,32 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/node-version-per-repo.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: Machine default Node is the latest LTS from wolverine-os; a project that needs another version pins it in its own repo (.nvmrc + engines), never by changing the global default
+alwaysApply: true
+scope: shared
+---
+
+# Node version — one machine default, per-repo pins (owner 2026-11-03)
+
+**Machine default:** the latest Node LTS, set on both PCs by
+`wolverine-os/scripts/wolvos-node.sh` from `wolvos_node_default` in
+`wolverine-os/ansible/group_vars/all.yml`. Upgrading the default = change that one value, run
+`wolvos-node.sh apply` on both PCs, record it in wolverine-os (machine-change rule).
+
+**A project that needs another version pins it in its repo, never globally:**
+
+1. `.nvmrc` at the repo root with the exact version (`22.23.1`), committed.
+2. `"engines": { "node": ">=22.13 <23" }` in `package.json`, and CI uses `.nvmrc`
+   (`actions/setup-node` with `node-version-file: .nvmrc`).
+3. Scripts and systemd units in that repo resolve Node from the repo's `.nvmrc`
+   (`nvm exec`, or `~/.nvm/versions/node/v$(cat .nvmrc)/bin`), not from the default.
+4. The shell switches by itself: `cd` into a repo with `.nvmrc` runs `nvm use`; leaving it goes
+   back to the default (`~/.config/wolvos/node-auto.zsh`).
+
+**Never:** `nvm alias default <x>` for one project, a versioned nvm path
+(`~/.nvm/versions/node/vX/bin`) in a shell file or a machine-wide unit (use
+`~/.local/share/wolvos/node-default/bin`), apt `nodejs` as a runtime, or a second version manager
+for Node.
+
+Package manager is a separate rule: [node-package-manager.mdc](node-package-manager.mdc).

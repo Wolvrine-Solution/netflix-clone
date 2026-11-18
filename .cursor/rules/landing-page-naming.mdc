@@ -1,0 +1,41 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/landing-page-naming.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: A product's public website folder is always named landing-page/ (never site/, web/, website/, www/)
+alwaysApply: true
+scope: shared
+---
+
+# Product website folder is `landing-page/` (hub + all submodules, owner 2026-11-12)
+
+The public website of a product (marketing page, download page, privacy page) lives in a folder
+named `landing-page/` at the repo root, or `apps/landing-page/` in a monorepo.
+
+## Hard rules
+
+1. **One name.** Never `site/`, `web/`, `website/` or `www/` for a product's landing website.
+2. **Everything that names it follows**: package scripts `landing-page:dev|build|test`, the deploy
+   workflow `cd-landing-page.yml`, skills, and paths in docs.
+3. **New repo**: create the folder as `landing-page/`.
+4. **Existing repo**: rename with `git mv` (history is kept) the next time the website is touched,
+   fix every path, and add a grep guard to CI so the old name cannot come back. Prove the guard
+   by planting the old path once.
+5. **Deployment identities do not move with the folder**: a live Worker or project name, a domain
+   or a storage bucket stays as it is unless the owner asks for that rename too.
+
+## Not covered
+
+A web *application* (a dashboard, an admin, the product itself in a browser) keeps its own name.
+Only the product's public landing website takes this one.
+
+## Reference
+
+`google-tv-remote/docs/plans/07-rename-site-to-landing-page.md` — file list, steps and the guard.
+
+## Known candidates (check before renaming, do not rename blind)
+
+| Repo | Folder today | Status |
+|---|---|---|
+| `google-tv-remote` | `site/` | Plan 07 written 2026-11-12 |
+| `ChannelForge` | `web/` | Unchecked: rename only if it is a landing website, not the app |

@@ -1,0 +1,32 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/linux-only.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: The org is Linux only — no Windows scripts, launchers or dual-boot support in any repo
+alwaysApply: true
+scope: shared
+---
+
+# Linux only (hub + all submodules, owner 2026-11-18)
+
+Every machine, server and runner the org uses is Linux (WolvOS on both PCs). Tooling, scripts and
+docs target Linux only.
+
+## Hard rules
+
+1. **No Windows files in git**: `.bat`, `.cmd`, `.ps1`, `.psm1`, `.psd1`, `.vbs`, `.reg`, `.exe`,
+   `.msi`, `.ahk`, `.lnk`. That includes `gradlew.bat` and `mvnw.cmd`: keep `gradlew` / `mvnw`
+   only. `gradle wrapper` and `mvn wrapper` regenerate them, so each repo's `.gitignore` lists
+   `*.bat`, `*.cmd`, `*.ps1`.
+2. **No Windows code paths**: no PowerShell or `cmd` steps, no WSL instructions, no
+   `if windows` branches in scripts, no `windows-latest` CI jobs for our own tooling.
+3. **No Windows dual-boot** in wolverine-os: no Windows partition mounts or `wolvos_windows_*`
+   variables (guard: `wolvos-change-guards.py linux-only`). Existing NTFS **data** disks stay as
+   data, they are not Windows.
+4. A product whose **deliverable** must run on users' Windows machines is a product decision:
+   ask the owner first, never add Windows tooling to the dev workflow for it.
+
+## When found
+
+Remove the file or branch in the same change, add the `.gitignore` lines, and say so in the
+report. Commit and push per that repo's normal rules.
