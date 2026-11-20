@@ -17,7 +17,7 @@
     "record:features:headed": "./record-feature-videos.sh headed"
   },
   "dependencies": {
-    "@auth/prisma-adapter": "^2.7.0",
+    "@auth/drizzle-adapter": "^1.7.0",
     "@netflix/db": "workspace:*",
     "@netflix/types": "workspace:*",
     "@netflix/ui": "workspace:*",
@@ -26,8 +26,10 @@
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
+    "drizzle-orm": "^0.45.2",
     "framer-motion": "^11.9.0",
     "hls.js": "^1.5.15",
+    "jose": "^5.6.3",
     "next": "^14.2.13",
     "next-auth": "^5.0.0-beta.20",
     "react": "^18.3.1",

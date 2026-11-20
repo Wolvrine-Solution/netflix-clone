@@ -1,0 +1,14 @@
+{
+  "$comment": "Only the MCP servers this project uses. Loaded via scripts/claude.sh with --strict-mcp-config. GitHub auth is an env-var token from ~/.config/wolverine/secrets.env, never stored here.",
+  "mcpServers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": { "Authorization": "Bearer ${GITHUB_PERSONAL_ACCESS_TOKEN}" }
+    },
+    "playwright": {
+      "command": "bunx",
+      "args": ["@playwright/mcp@latest"]
+    }
+  }
+}

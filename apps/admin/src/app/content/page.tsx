@@ -1,27 +1,33 @@
-import { prisma } from '@netflix/db'
+import { and, content as contentTable, db, eq, ilike, type SQL } from '@netflix/db'
 import Link from 'next/link'
 import { FiPlus, FiEdit2, FiTrash2, FiStar } from 'react-icons/fi'
 import { ContentActions } from './ContentActions'
 
+export const dynamic = 'force-dynamic'
+
 async function getContent(page: number, q: string, mediaType: string, status: string) {
   const limit = 20
   const skip = (page - 1) * limit
-  const where = {
-    ...(q ? { title: { contains: q, mode: 'insensitive' as const } } : {}),
-    ...(mediaType && ['movie', 'tv'].includes(mediaType)
-      ? { mediaType: mediaType as 'movie' | 'tv' }
-      : {}),
-    ...(status ? { status: status as 'DRAFT' | 'PUBLISHED' | 'ARCHIVED' } : {}),
-  }
+  const conditions = (c: typeof contentTable): SQL | undefined =>
+    and(
+      q ? ilike(c.title, `%${q}%`) : undefined,
+      mediaType && ['movie', 'tv'].includes(mediaType)
+        ? eq(c.mediaType, mediaType as 'movie' | 'tv')
+        : undefined,
+      status ? eq(c.status, status as 'DRAFT' | 'PUBLISHED' | 'ARCHIVED') : undefined
+    )
   const [items, total] = await Promise.all([
-    prisma.content.findMany({
-      skip,
-      take: limit,
-      orderBy: { createdAt: 'desc' },
-      where,
-      include: { genres: { include: { genre: true } }, videoFiles: { select: { quality: true } } },
+    db.query.content.findMany({
+      offset: skip,
+      limit,
+      orderBy: (c, { desc }) => desc(c.createdAt),
+      where: (c) => conditions(c as unknown as typeof contentTable),
+      with: {
+        genres: { with: { genre: true } },
+        videoFiles: { columns: { quality: true } },
+      },
     }),
-    prisma.content.count({ where }),
+    db.$count(contentTable, conditions(contentTable)),
   ])
   return { items, total, pages: Math.ceil(total / limit) }
 }

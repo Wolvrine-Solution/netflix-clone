@@ -5,11 +5,11 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: netflix-clone
-  description: Netflix Clone
-  tags: [pnpm, node]
+  description: White-label multi-tenant streaming SaaS (VOD and live)
+  tags: [bun, node, nextjs, nestjs, expo, postgres]
   annotations:
-    stack: "Prisma"
-    deploy-target: "k8s"
+    stack: "NestJS, Drizzle, Next.js, Expo"
+    deploy-target: "docker-compose"
     status: "active"
     docs: "./docs"
 spec:

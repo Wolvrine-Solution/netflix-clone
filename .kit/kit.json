@@ -1,0 +1,6 @@
+{
+	"$comment": "Selective merge, not a full install: only the common pieces this project needs were taken from agent-repo-kit. Taken: .claude/agents doc-scout, doc-writer, repo-analyst (+ generated .opencode/agents via scripts/sync-opencode-agents.mjs); skills test-driven-development, spec-driven-development, planning-and-task-breakdown, incremental-implementation, documentation-and-adrs, composition-patterns, improve; docs/PITFALLS.md (generic, managed) with scripts/pitfalls-context.sh and the SessionStart hook; scripts/claude.sh; rules session-hygiene, status-reporting, doc-template; seeds docs/PROJECT-PITFALLS.md, docs/CONTEXT.md, docs/README.md; process rules merged by hand into AGENTS.md under 'Org process rules (merged from agent-repo-kit)'. Also copied from bd-pos (not the kit): skills owasp-security, react-best-practices, web-design-guidelines, manual-test-pass, and rule tests-with-logic; logging skill adapted. NOT taken: install.sh, kit-sync.sh, ci.sh, .githooks (deferred to the Biome and ci.sh step), biome.json, competitive-teardown, deep-research. AGENTS.md, CLAUDE.md and .cursor/rules stay project-owned; never run install.sh or kit-sync --apply over them. 'commit' is the kit commit the selection was taken from.",
+	"repo": "https://github.com/sumitbd/agent-repo-kit.git",
+	"ref": "main",
+	"commit": "9188079fa21d0b25563e14e86c10fdb58a1492f1"
+}

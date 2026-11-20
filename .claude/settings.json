@@ -1,0 +1,23 @@
+{
+  "$comment": "Kit seed content, now project-owned. Plugins that inject context into every session are off; SessionStart prints both pitfalls registers. No permission rules are pre-approved here: the owner adds those deliberately.",
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": false,
+    "frontend-design@claude-plugins-official": false,
+    "feature-dev@claude-plugins-official": false,
+    "code-simplifier@claude-plugins-official": false,
+    "slack@claude-plugins-official": false
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/pitfalls-context.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

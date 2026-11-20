@@ -1,36 +1,27 @@
 name: CD
 
+# Deploys are manual only (hub rules: ci-internal-deploys, ci-local-cd-remote).
 on:
-  push:
-    branches: [main]
-  workflow_dispatch: # manual fallback when auto-deploy on push is unavailable
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [staging, production]
+        default: staging
 
 jobs:
-  deploy-staging:
+  deploy:
     runs-on: ubuntu-latest
-    environment: staging
+    environment: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v4
       - name: Build images
         run: docker compose build api web admin
-      - name: Health-gated deploy (staging)
+      - name: Smoke test
         run: |
           docker compose up -d postgres redis
-          sleep 10
-          curl -f http://localhost:4000/health || exit 1
-
-  deploy-production:
-    needs: deploy-staging
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - uses: actions/checkout@v4
-      - name: Promote to production
-        run: echo "Production deploy gated on staging health check"
-
-  rollback:
-    if: failure()
-    needs: deploy-production
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "One-click rollback — redeploy previous image tag from registry"
+          docker compose up -d api
+          for i in $(seq 1 30); do curl -fsS http://localhost:4000/health && exit 0; sleep 2; done
+          docker compose logs api
+          exit 1

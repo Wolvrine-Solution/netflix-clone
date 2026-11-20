@@ -1,6 +1,10 @@
-import { auth } from './lib/auth'
+import NextAuth from 'next-auth'
+import { authConfig } from './lib/auth.config'
 import { NextResponse } from 'next/server'
 import { decideAccess } from './lib/accessGuard'
+
+// Edge runtime: use the DB-free config, never lib/auth.ts.
+const { auth } = NextAuth(authConfig)
 
 export default auth((req) => {
   const action = decideAccess({ isLoggedIn: !!req.auth, pathname: req.nextUrl.pathname })

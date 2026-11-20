@@ -1,35 +1,35 @@
-import { prisma } from '@netflix/db'
+import { db } from '@netflix/db'
 import { MovieRow } from '@/components/home/MovieRow'
 import type { ContentItem } from '@netflix/types'
 
+export const dynamic = 'force-dynamic'
+
 async function getTVShows() {
-  const contents = await prisma.content.findMany({
-    where: { mediaType: 'tv' },
-    include: { genres: { include: { genre: true } } },
-    orderBy: { rating: 'desc' },
+  const contents = await db.query.content.findMany({
+    where: (c, { eq }) => eq(c.mediaType, 'tv'),
+    with: { genres: { with: { genre: true } } },
+    orderBy: (c, { desc }) => desc(c.rating),
   })
-  return contents.map(
-    (c): ContentItem => ({
-      id: c.id,
-      tmdbId: c.tmdbId ?? undefined,
-      title: c.title,
-      description: c.description,
-      posterPath: c.posterPath,
-      backdropPath: c.backdropPath,
-      releaseDate: c.releaseDate,
-      rating: c.rating,
-      mediaType: c.mediaType as 'movie' | 'tv',
-      maturityRating: c.maturityRating,
-      trailerKey: c.trailerKey ?? undefined,
-      isFeatured: c.isFeatured,
-      genres: c.genres.map((cg) => ({ id: cg.genre.id, name: cg.genre.name })),
-      seasons: c.seasons ?? undefined,
-      episodes: c.episodes ?? undefined,
-      status: c.status as import('@netflix/types').ContentStatus,
-      language: c.language,
-      cast: c.cast,
-    })
-  )
+  return contents.map((c): ContentItem => ({
+    id: c.id,
+    tmdbId: c.tmdbId ?? undefined,
+    title: c.title,
+    description: c.description,
+    posterPath: c.posterPath,
+    backdropPath: c.backdropPath,
+    releaseDate: c.releaseDate,
+    rating: c.rating,
+    mediaType: c.mediaType as 'movie' | 'tv',
+    maturityRating: c.maturityRating,
+    trailerKey: c.trailerKey ?? undefined,
+    isFeatured: c.isFeatured,
+    genres: c.genres.map((cg) => ({ id: cg.genre.id, name: cg.genre.name })),
+    seasons: c.seasons ?? undefined,
+    episodes: c.episodes ?? undefined,
+    status: c.status as import('@netflix/types').ContentStatus,
+    language: c.language,
+    cast: c.cast,
+  }))
 }
 
 export default async function TVPage() {

@@ -1,4 +1,17 @@
-import { prisma } from '@netflix/db'
+import {
+  avg,
+  content,
+  count,
+  db,
+  eq,
+  gte,
+  lt,
+  and,
+  myListItem,
+  subscription,
+  user,
+  watchHistory,
+} from '@netflix/db'
 import {
   FiFilm,
   FiUsers,
@@ -12,6 +25,8 @@ import {
 import Link from 'next/link'
 import { RecentActivityTable } from '@/components/RecentActivityTable'
 import { ContentTypeChart } from '@/components/charts/ContentTypeChart'
+
+export const dynamic = 'force-dynamic'
 
 async function getDashboardStats() {
   const now = new Date()
@@ -31,24 +46,27 @@ async function getDashboardStats() {
     recentContent,
     recentLogs,
   ] = await Promise.all([
-    prisma.content.count({ where: { status: 'PUBLISHED' } }),
-    prisma.user.count(),
-    prisma.subscription.count({ where: { status: 'ACTIVE' } }),
-    prisma.watchHistory.count(),
-    prisma.user.count({ where: { createdAt: { gte: monthStart } } }),
-    prisma.user.count({ where: { createdAt: { gte: lastMonthStart, lt: monthStart } } }),
-    prisma.content.aggregate({ _avg: { rating: true } }),
-    prisma.myListItem.count(),
-    prisma.content.groupBy({ by: ['mediaType'], _count: { id: true } }),
-    prisma.content.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 5,
-      include: { genres: { include: { genre: true } } },
+    db.$count(content, eq(content.status, 'PUBLISHED')),
+    db.$count(user),
+    db.$count(subscription, eq(subscription.status, 'ACTIVE')),
+    db.$count(watchHistory),
+    db.$count(user, gte(user.createdAt, monthStart)),
+    db.$count(user, and(gte(user.createdAt, lastMonthStart), lt(user.createdAt, monthStart))),
+    db.select({ avg: avg(content.rating) }).from(content),
+    db.$count(myListItem),
+    db
+      .select({ mediaType: content.mediaType, n: count() })
+      .from(content)
+      .groupBy(content.mediaType),
+    db.query.content.findMany({
+      orderBy: (c, { desc }) => desc(c.createdAt),
+      limit: 5,
+      with: { genres: { with: { genre: true } } },
     }),
-    prisma.adminLog.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 5,
-      include: { admin: { select: { name: true, email: true } } },
+    db.query.adminLog.findMany({
+      orderBy: (l, { desc }) => desc(l.createdAt),
+      limit: 5,
+      with: { admin: { columns: { name: true, email: true } } },
     }),
   ])
 
@@ -63,12 +81,12 @@ async function getDashboardStats() {
     activeSubscriptions,
     totalWatchEvents,
     newUsersThisMonth,
-    avgRating: parseFloat((avgRating._avg.rating ?? 0).toFixed(1)),
+    avgRating: parseFloat(Number(avgRating[0]?.avg ?? 0).toFixed(1)),
     totalMyListAdds,
     estimatedRevenue: activeSubscriptions * 13.99,
     contentByType: {
-      movie: contentByType.find((c) => c.mediaType === 'movie')?._count.id ?? 0,
-      tv: contentByType.find((c) => c.mediaType === 'tv')?._count.id ?? 0,
+      movie: contentByType.find((c) => c.mediaType === 'movie')?.n ?? 0,
+      tv: contentByType.find((c) => c.mediaType === 'tv')?.n ?? 0,
     },
     recentContent,
     recentLogs,

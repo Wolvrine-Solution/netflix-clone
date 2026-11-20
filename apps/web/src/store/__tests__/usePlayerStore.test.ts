@@ -7,7 +7,7 @@ const defaultState = {
   volume: 0.8,
   currentTime: 0,
   duration: 0,
-  quality: 'auto',
+  quality: 'auto' as const,
   isFullscreen: false,
   isLoading: true,
   showControls: true,

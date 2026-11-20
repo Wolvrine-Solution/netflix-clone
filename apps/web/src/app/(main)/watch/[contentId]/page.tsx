@@ -1,7 +1,9 @@
 import { redirect } from 'next/navigation'
-import { prisma } from '@netflix/db'
+import { db, eq, content as contentTable } from '@netflix/db'
 import { WatchClient } from './WatchClient'
 import type { ContentItem } from '@netflix/types'
+
+export const dynamic = 'force-dynamic'
 
 interface WatchPageProps {
   params: { contentId: string }
@@ -13,17 +15,17 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
   const seasonNum = parseInt(searchParams.season ?? '1')
   const episodeNum = parseInt(searchParams.episode ?? '1')
 
-  const content = await prisma.content.findUnique({
-    where: { id: contentId },
-    include: {
-      genres: { include: { genre: true } },
-      videoFiles: { orderBy: { isDefault: 'desc' } },
+  const content = await db.query.content.findFirst({
+    where: eq(contentTable.id, contentId),
+    with: {
+      genres: { with: { genre: true } },
+      videoFiles: { orderBy: (v, { desc }) => desc(v.isDefault) },
       contentSeasons: {
-        orderBy: { seasonNumber: 'asc' },
-        include: {
+        orderBy: (s, { asc }) => asc(s.seasonNumber),
+        with: {
           episodes: {
-            orderBy: { episodeNumber: 'asc' },
-            include: { videoFiles: { orderBy: { isDefault: 'desc' } } },
+            orderBy: (e, { asc }) => asc(e.episodeNumber),
+            with: { videoFiles: { orderBy: (v, { desc }) => desc(v.isDefault) } },
           },
         },
       },

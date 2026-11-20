@@ -1,0 +1,11 @@
+# Generated or vendored (kit-managed files must stay byte-identical to the kit)
+.claude/skills
+.claude/agents
+.opencode
+.kit
+docs/PITFALLS.md
+packages/db/drizzle
+bun.lock
+.next
+dist
+node_modules

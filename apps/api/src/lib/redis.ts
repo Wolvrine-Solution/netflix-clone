@@ -1,4 +1,4 @@
-import { getEnv } from './env'
+import { getEnv } from '../config/env'
 import { logger } from './logger'
 
 type RedisLike = {
@@ -71,7 +71,8 @@ export async function getRedis(): Promise<RedisLike> {
       const redis = new IORedis(url)
       client = {
         get: (k) => redis.get(k),
-        set: (k, v, mode, ttl) => redis.set(k, v, mode as 'EX', ttl),
+        set: (k, v, mode, ttl) =>
+          mode === 'EX' && ttl ? redis.set(k, v, 'EX', ttl) : redis.set(k, v),
         del: (...keys) => redis.del(...keys),
         incr: (k) => redis.incr(k),
         expire: (k, s) => redis.expire(k, s),

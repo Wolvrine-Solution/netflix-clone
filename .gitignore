@@ -12,3 +12,6 @@ videos/
 test-results/
 playwright-report/
 blob-report/
+
+# bun expands the literal "~" from ~/.npmrc cache=~/.cache/npm into a repo-local dir
+/~/

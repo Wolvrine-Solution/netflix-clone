@@ -1,4 +1,4 @@
-import { getEnv } from './env'
+import { getEnv } from '../config/env'
 import { logger } from './logger'
 
 export function initObservability() {

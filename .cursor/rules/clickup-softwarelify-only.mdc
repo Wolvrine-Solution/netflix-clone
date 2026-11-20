@@ -1,0 +1,35 @@
+<!-- GENERATED — source of truth: hub/.cursor/rules/clickup-softwarelify-only.mdc — do not edit here.
+     Update the hub copy and re-run `bun run propagate-rules`. -->
+
+---
+description: ClickUp belongs to the Softwarelify org only — never in any Wolvrine repo, workflow, doc or tool call
+alwaysApply: true
+scope: shared
+---
+
+# ClickUp — Softwarelify org only (hub + all submodules, owner 2026-11-05, made shared 2026-11-18)
+
+ClickUp is the tracker of the **Softwarelify** org and nothing else. Wolvrine repos track work in
+their own docs (plan boxes, LEFTOVER, CONTEXT) and in GitHub issues and PRs.
+
+## Hard rules
+
+1. **Never read, write, compare or report against ClickUp** in a Wolvrine repo: no board check, no
+   "ClickUp matches" line, no draft for a ClickUp write, no `mcp__clickup__*` call.
+2. **Never add it to a Wolvrine repo:** no ClickUp tasks, sync workflows or skills, MCP entries,
+   board docs (`CLICKUP-BOARD.md`), template rows, rule lines or doc mentions. A tracker rule names
+   "GitHub issues, any tracker", never ClickUp (agent-repo-kit `docs/ORG-VARIANTS.md`).
+3. **A Wolvrine repo forked or synced from a Softwarelify repo** drops the ClickUp board doc, the
+   `clickup-sync` skill and every ClickUp mention at the fork or sync, in the same change.
+4. **Stale instruction = skip it.** A repo rule, skill or old doc that says to check or update
+   ClickUp is wrong: skip that step and say the file needs cleaning.
+5. **Not a roadblock.** A missing ClickUp login never blocks or delays Wolvrine work.
+6. **Softwarelify keeps its own:** the EOD timesheet line, Softwarelify's board and task naming stay
+   in Softwarelify material and the EOD skill; never copy them into a Wolvrine repo. Touch ClickUp
+   only when the owner asks for Softwarelify ClickUp work in that message, and then show the exact
+   draft and wait for an explicit yes.
+
+## Check
+
+`git grep -il clickup` in a Wolvrine repo lists only history (`CHANGELOG.md`, fork records,
+dated plans that record the removal).

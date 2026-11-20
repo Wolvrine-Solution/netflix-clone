@@ -1,9 +1,12 @@
 {
   "name": "netflix-clone",
   "private": true,
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "ci": "bun run lint && bun run test && bun run build",
+    "ci": "bun run lint && bun run format:check && bun run typecheck && bun run test && bun run build",
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
@@ -16,7 +19,8 @@
     "test": "turbo run test",
     "mobile": "bun run --filter @netflix/mobile dev",
     "mobile:android": "bun run --filter @netflix/mobile android",
-    "mobile:ios": "bun run --filter @netflix/mobile ios"
+    "mobile:ios": "bun run --filter @netflix/mobile ios",
+    "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\""
   },
   "devDependencies": {
     "turbo": "^2.3.0",
@@ -44,6 +48,7 @@
     "metro-resolver": "0.81.5",
     "metro-runtime": "0.81.5",
     "metro-source-map": "0.81.5",
-    "metro-transform-worker": "0.81.5"
+    "metro-transform-worker": "0.81.5",
+    "fastify": "^5.12.7"
   }
 }

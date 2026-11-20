@@ -1,39 +1,35 @@
-import { prisma } from '@netflix/db'
+import { and, db, eq, ilike, or, user as userTable, type SQL } from '@netflix/db'
 import Link from 'next/link'
 import { FiSearch } from 'react-icons/fi'
 import { UserActions } from './UserActions'
 
+export const dynamic = 'force-dynamic'
+
 async function getUsers(page: number, q: string, role: string, status: string) {
   const limit = 20
   const skip = (page - 1) * limit
-  const where = {
-    ...(q
-      ? {
-          OR: [
-            { name: { contains: q, mode: 'insensitive' as const } },
-            { email: { contains: q, mode: 'insensitive' as const } },
-          ],
-        }
-      : {}),
-    ...(role ? { role: role as 'USER' | 'ADMIN' } : {}),
-    ...(status === 'suspended'
-      ? { isSuspended: true }
-      : status === 'active'
-        ? { isSuspended: false }
-        : {}),
-  }
+  const conditions = (u: typeof userTable): SQL | undefined =>
+    and(
+      q ? or(ilike(u.name, `%${q}%`), ilike(u.email, `%${q}%`)) : undefined,
+      role ? eq(u.role, role as 'USER' | 'ADMIN') : undefined,
+      status === 'suspended'
+        ? eq(u.isSuspended, true)
+        : status === 'active'
+          ? eq(u.isSuspended, false)
+          : undefined
+    )
   const [users, total] = await Promise.all([
-    prisma.user.findMany({
-      skip,
-      take: limit,
-      orderBy: { createdAt: 'desc' },
-      where,
-      include: {
-        profiles: { select: { id: true } },
-        subscription: { select: { plan: true, status: true } },
+    db.query.user.findMany({
+      offset: skip,
+      limit,
+      orderBy: (u, { desc }) => desc(u.createdAt),
+      where: (u) => conditions(u as unknown as typeof userTable),
+      with: {
+        profiles: { columns: { id: true } },
+        subscription: { columns: { plan: true, status: true } },
       },
     }),
-    prisma.user.count({ where }),
+    db.$count(userTable, conditions(userTable)),
   ])
   return { users, total, pages: Math.ceil(total / limit) }
 }

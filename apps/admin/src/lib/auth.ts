@@ -1,20 +1,19 @@
 import NextAuth from 'next-auth'
-import { SignJWT } from 'jose'
-import { PrismaAdapter } from '@auth/prisma-adapter'
 import Credentials from 'next-auth/providers/credentials'
 import { compare } from 'bcryptjs'
-import { prisma } from '@netflix/db'
+import { db, eq, user as userTable } from '@netflix/db'
+import { authAdapter } from './auth-adapter'
+import { authConfig } from './auth.config'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
-  session: { strategy: 'jwt' },
-  pages: { signIn: '/login' },
+  ...authConfig,
+  adapter: authAdapter,
   providers: [
     Credentials({
       credentials: { email: {}, password: {} },
       async authorize(credentials) {
         const { email, password } = credentials as { email: string; password: string }
-        const user = await prisma.user.findUnique({ where: { email } })
+        const [user] = await db.select().from(userTable).where(eq(userTable.email, email)).limit(1)
         if (!user || !user.hashedPassword) return null
         if (user.role !== 'ADMIN') return null
         if (user.isSuspended) return null
@@ -30,31 +29,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  callbacks: {
-    jwt({ token, user }) {
-      if (user) {
-        token['userId'] = user.id
-        token['role'] = (user as { role?: string }).role
-      }
-      return token
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token['userId'] as string
-        ;(session.user as { role?: string }).role = token['role'] as string
-      }
-      const secret = process.env['NEXTAUTH_SECRET']
-      if (secret && secret.length >= 32) {
-        ;(session as { accessToken?: string }).accessToken = await new SignJWT({
-          role: token['role'] as string,
-        })
-          .setProtectedHeader({ alg: 'HS256' })
-          .setSubject(token['userId'] as string)
-          .setIssuedAt()
-          .setExpirationTime('15m')
-          .sign(new TextEncoder().encode(secret))
-      }
-      return session
-    },
-  },
 })

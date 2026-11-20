@@ -1,28 +1,30 @@
-import { prisma } from '@netflix/db'
+import { db } from '@netflix/db'
 import { HeroBanner } from '@/components/home/HeroBanner'
 import { MovieRow } from '@/components/home/MovieRow'
 import { ContinueWatchingRow } from '@/components/home/ContinueWatchingRow'
 import type { ContentItem, BrowseRow } from '@netflix/types'
 
+export const dynamic = 'force-dynamic'
+
 async function getBrowseData(): Promise<{ featured: ContentItem | null; rows: BrowseRow[] }> {
   const [featuredContent, rows] = await Promise.all([
-    prisma.content.findFirst({
-      where: { isFeatured: true },
-      include: { genres: { include: { genre: true } } },
+    db.query.content.findFirst({
+      where: (c, { eq }) => eq(c.isFeatured, true),
+      with: { genres: { with: { genre: true } } },
     }),
-    prisma.row.findMany({
-      orderBy: { order: 'asc' },
-      include: {
+    db.query.row.findMany({
+      orderBy: (r, { asc }) => asc(r.order),
+      with: {
         contents: {
-          orderBy: { order: 'asc' },
-          take: 20,
-          include: { content: { include: { genres: { include: { genre: true } } } } },
+          orderBy: (cr, { asc }) => asc(cr.order),
+          limit: 20,
+          with: { content: { with: { genres: { with: { genre: true } } } } },
         },
       },
     }),
   ])
 
-  const mapContent = (c: typeof featuredContent): ContentItem | null => {
+  const mapContent = (c: typeof featuredContent | undefined | null): ContentItem | null => {
     if (!c) return null
     return {
       id: c.id,

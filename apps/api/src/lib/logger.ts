@@ -1,5 +1,5 @@
 import pino from 'pino'
-import { getEnv } from './env'
+import { getEnv } from '../config/env'
 
 const env = (() => {
   try {

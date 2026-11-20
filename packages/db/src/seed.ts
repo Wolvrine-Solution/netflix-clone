@@ -1,4 +1,13 @@
-import { prisma } from './index'
+import {
+  db,
+  closeDb,
+  genre as genreTable,
+  content as contentTable,
+  contentGenre,
+  row as rowTable,
+  contentRow,
+  eq,
+} from './index'
 
 const TMDB_BASE = 'https://api.themoviedb.org/3'
 const API_KEY = process.env['TMDB_API_KEY'] ?? ''
@@ -26,11 +35,10 @@ async function getTrailerKey(tmdbId: number, mediaType: 'movie' | 'tv'): Promise
 
 async function upsertGenres(genres: Array<{ id: number; name: string }>) {
   for (const genre of genres) {
-    await prisma.genre.upsert({
-      where: { id: genre.id },
-      update: { name: genre.name },
-      create: { id: genre.id, name: genre.name },
-    })
+    await db
+      .insert(genreTable)
+      .values({ id: genre.id, name: genre.name })
+      .onConflictDoUpdate({ target: genreTable.id, set: { name: genre.name } })
   }
 }
 
@@ -57,10 +65,9 @@ async function importContent(item: TMDBItem, mediaType: 'movie' | 'tv') {
   const releaseDate = item.release_date ?? item.first_air_date ?? ''
   const genreIds: number[] = item.genre_ids ?? item.genres?.map((g) => g.id) ?? []
 
-  const content = await prisma.content.upsert({
-    where: { tmdbId: item.id },
-    update: { trailerKey, rating: item.vote_average },
-    create: {
+  const [content] = await db
+    .insert(contentTable)
+    .values({
       tmdbId: item.id,
       mediaType,
       title,
@@ -76,17 +83,18 @@ async function importContent(item: TMDBItem, mediaType: 'movie' | 'tv') {
       seasons: item.number_of_seasons ?? null,
       episodes: item.number_of_episodes ?? null,
       maturityRating: mediaType === 'movie' ? 'R' : 'TV-MA',
-    },
-  })
+    })
+    .onConflictDoUpdate({
+      target: contentTable.tmdbId,
+      set: { trailerKey, rating: item.vote_average },
+    })
+    .returning()
+  if (!content) throw new Error('content upsert returned no row')
 
   for (const genreId of genreIds) {
-    const genreExists = await prisma.genre.findUnique({ where: { id: genreId } })
+    const [genreExists] = await db.select().from(genreTable).where(eq(genreTable.id, genreId))
     if (genreExists) {
-      await prisma.contentGenre.upsert({
-        where: { contentId_genreId: { contentId: content.id, genreId } },
-        update: {},
-        create: { contentId: content.id, genreId },
-      })
+      await db.insert(contentGenre).values({ contentId: content.id, genreId }).onConflictDoNothing()
     }
   }
 
@@ -142,16 +150,20 @@ async function main() {
     const data = await tmdbFetch<PageResult>(rowDef.endpoint)
     const items: TMDBItem[] = data.results?.slice(0, 20) ?? []
 
-    const row = await prisma.row.upsert({
-      where: { id: `row-${rowDef.query}` },
-      update: { title: rowDef.title, order: rowDef.order },
-      create: {
+    const [row] = await db
+      .insert(rowTable)
+      .values({
         id: `row-${rowDef.query}`,
         title: rowDef.title,
         query: rowDef.query,
         order: rowDef.order,
-      },
-    })
+      })
+      .onConflictDoUpdate({
+        target: rowTable.id,
+        set: { title: rowDef.title, order: rowDef.order },
+      })
+      .returning()
+    if (!row) throw new Error('row upsert returned no row')
 
     let order = 0
     for (const item of items) {
@@ -160,11 +172,13 @@ async function main() {
           ? 'tv'
           : 'movie'
       const content = await importContent(item, mediaType)
-      await prisma.contentRow.upsert({
-        where: { contentId_rowId: { contentId: content.id, rowId: row.id } },
-        update: { order },
-        create: { contentId: content.id, rowId: row.id, order },
-      })
+      await db
+        .insert(contentRow)
+        .values({ contentId: content.id, rowId: row.id, order })
+        .onConflictDoUpdate({
+          target: [contentRow.contentId, contentRow.rowId],
+          set: { order },
+        })
       order++
     }
   }
@@ -175,7 +189,7 @@ async function main() {
   if (featured) {
     const details = await tmdbFetch<TMDBItem>(`/movie/${featured.id}`)
     const content = await importContent({ ...featured, ...details }, 'movie')
-    await prisma.content.update({ where: { id: content.id }, data: { isFeatured: true } })
+    await db.update(contentTable).set({ isFeatured: true }).where(eq(contentTable.id, content.id))
   }
 
   console.log('Seed complete!')
@@ -183,4 +197,4 @@ async function main() {
 
 main()
   .catch(console.error)
-  .finally(() => prisma.$disconnect())
+  .finally(() => closeDb())
